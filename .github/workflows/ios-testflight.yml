@@ -1,0 +1,105 @@
+# Builds Factory King for iOS in the cloud and uploads it to TestFlight — no Mac needed.
+# 1) Linux + Unity (GameCI) exports the Xcode project.  2) macOS signs it automatically with an
+# App Store Connect API key and uploads it. Setup steps: Docs/APPSTORE/CloudBuild.md
+name: iOS TestFlight
+
+on:
+  workflow_dispatch:
+    inputs:
+      development:
+        description: "Development build (test store, test ads, developer tools)"
+        type: boolean
+        default: true
+
+jobs:
+  unity:
+    name: Unity → Xcode project
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/cache@v4
+        with:
+          path: FactoryKing/Library
+          key: Library-iOS-${{ hashFiles('FactoryKing/Packages/manifest.json', 'FactoryKing/ProjectSettings/ProjectVersion.txt') }}
+          restore-keys: Library-iOS-
+
+      - name: Free disk space
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+
+      - uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          FK_BUNDLE_ID: ${{ vars.FK_BUNDLE_ID }}
+          FK_APPLE_TEAM_ID: ${{ vars.FK_APPLE_TEAM_ID }}
+          FK_BUILD_NUMBER: ${{ github.run_number }}
+          FK_DEV_BUILD: ${{ inputs.development }}
+        with:
+          projectPath: FactoryKing
+          targetPlatform: iOS
+          buildMethod: FactoryKing.EditorTools.BuildScript.BuildIOS
+          customParameters: -release
+
+      - name: Pack Xcode project
+        run: tar -czf xcode-project.tgz -C FactoryKing/Builds iOS
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: xcode-project
+          path: xcode-project.tgz
+          retention-days: 3
+
+  testflight:
+    name: Sign & upload to TestFlight
+    needs: unity
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: xcode-project
+
+      - name: Unpack
+        run: tar -xzf xcode-project.tgz
+
+      - name: App Store Connect API key
+        env:
+          ASC_KEY: ${{ secrets.ASC_API_KEY_P8 }}
+        run: |
+          mkdir -p ~/private_keys
+          printf '%s' "$ASC_KEY" > ~/private_keys/AuthKey.p8
+
+      - name: Archive
+        run: |
+          xcodebuild -project iOS/Unity-iPhone.xcodeproj -scheme Unity-iPhone -configuration Release \
+            -destination 'generic/platform=iOS' -archivePath $RUNNER_TEMP/FactoryKing.xcarchive \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath ~/private_keys/AuthKey.p8 \
+            -authenticationKeyID "${{ vars.ASC_KEY_ID }}" \
+            -authenticationKeyIssuerID "${{ vars.ASC_ISSUER_ID }}" \
+            DEVELOPMENT_TEAM="${{ vars.FK_APPLE_TEAM_ID }}" CODE_SIGN_STYLE=Automatic \
+            archive | tail -n 60
+
+      - name: Upload to TestFlight
+        run: |
+          cat > ExportOptions.plist <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>upload</string>
+            <key>teamID</key><string>${{ vars.FK_APPLE_TEAM_ID }}</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>uploadSymbols</key><true/>
+          </dict></plist>
+          PLIST
+          xcodebuild -exportArchive -archivePath $RUNNER_TEMP/FactoryKing.xcarchive \
+            -exportOptionsPlist ExportOptions.plist -exportPath $RUNNER_TEMP/export \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath ~/private_keys/AuthKey.p8 \
+            -authenticationKeyID "${{ vars.ASC_KEY_ID }}" \
+            -authenticationKeyIssuerID "${{ vars.ASC_ISSUER_ID }}" | tail -n 40
+          echo "Uploaded. The build appears in App Store Connect → TestFlight after processing (5–30 min)."
