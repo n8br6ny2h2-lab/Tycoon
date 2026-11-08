@@ -118,6 +118,7 @@ button:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
 </div>
 <div id="modal" hidden><div id="modalBox" role="dialog" aria-modal="true"></div></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script id="content" type="application/json">{"factories":[{"id":"steel","order":0,"unlock":0,"raw":1,"elec":0.01,"wage":0.02,"pcap":20,"pcost":150,"pgrow":1.55,"en":"Iron & Steel Works","tr":"Demir Çelik Fabrikası","sup":null,"lines":[0,750,40000],"m":[{"st":0,"in":1,"out":1,"cy":1,"up":8,"g":1.15,"kw":1,"mt":0.005,"v":"Unloader","en":"Ore Unloader","tr":"Cevher Boşaltıcı","col":"#7A5C4E"},{"st":1,"in":2,"out":1,"cy":2,"up":15,"g":1.15,"kw":6,"mt":0.02,"v":"Furnace","en":"Blast Furnace","tr":"Yüksek Fırın","col":"#FF7A2E"},{"st":2,"in":1,"out":1,"cy":2.2,"up":20,"g":1.15,"kw":3,"mt":0.015,"v":"Cutter","en":"Beam Cutter","tr":"Kiriş Kesici","col":"#9AA4AE"},{"st":3,"in":1,"out":1,"cy":1.6,"up":12,"g":1.15,"kw":1.5,"mt":0.01,"v":"Packer","en":"Beam Bundler","tr":"Kiriş Paketleyici","col":"#B9C2CB"},{"st":4,"in":1,"out":1,"cy":0.6,"up":10,"g":1.15,"kw":0.5,"mt":0.005,"v":"Warehouse","en":"Steel Yard","tr":"Çelik Sahası","col":"#B9C2CB"},{"st":5,"in":4,"out":4,"cy":8,"up":25,"g":1.15,"kw":0.5,"mt":0.01,"v":"Dock","en":"Flatbed Dock","tr":"Tır Rampası","col":"#B9C2CB"}],"value":12,"pen":"Steel Bundle","ptr":"Çelik Paket","body":"#E2683C","accent":"#2F4858"},{"id":"food","order":1,"unlock":40000,"raw":15,"elec":0.3,"wage":0.6,"pcap":22.1,"pcost":4500,"pgrow":1.55,"en":"Food Factory","tr":"Gıda Fabrikası","sup":null,"lines":[0,22500,1200000],"m":[{"st":0,"in":1,"out":1,"cy":0.6,"up":240,"g":1.16,"kw":0.8,"mt":0.15,"v":"Silo","en":"Grain Silo","tr":"Tahıl Silosu","col":"#E3C567"},{"st":1,"in":2,"out":1,"cy":1.4,"up":420,"g":1.16,"kw":4,"mt":0.44999999999999996,"v":"Mill","en":"Flour Mill","tr":"Un Değirmeni","col":"#F4EEDC"},{"st":2,"in":1,"out":2,"cy":2.6,"up":660,"g":1.16,"kw":5,"mt":0.6,"v":"Oven","en":"Tunnel Oven","tr":"Tünel Fırın","col":"#C98A3D"},{"st":3,"in":2,"out":1,"cy":1.5,"up":360,"g":1.16,"kw":1.2,"mt":0.3,"v":"Packer","en":"Bread Wrapper","tr":"Ekmek Paketleyici","col":"#D9A35B"},{"st":4,"in":1,"out":1,"cy":0.5,"up":300,"g":1.16,"kw":2,"mt":0.18,"v":"Warehouse","en":"Cold Store","tr":"Soğuk Hava Deposu","col":"#D9A35B"},{"st":5,"in":6,"out":6,"cy":7,"up":720,"g":1.16,"kw":0.8,"mt":0.3,"v":"Dock","en":"Reefer Dock","tr":"Frigorifik Rampa","col":"#D9A35B"}],"value":270,"pen":"Bread Crate","ptr":"Ekmek Kasası","body":"#F2B134","accent":"#E5533D"},{"id":"plastic","order":2,"unlock":6000000,"raw":1080,"elec":9,"wage":18,"pcap":25.4,"pcost":135000,"pgrow":1.55,"en":"Plastics Plant","tr":"Plastik Fabrikası","sup":null,"lines":[0,675000,36000000],"m":[{"st":0,"in":1,"out":1,"cy":0.8,"up":8100,"g":1.17,"kw":2,"mt":5.4,"v":"Pump","en":"Feedstock Pump","tr":"Girdi Pompası","col":"#2B2B33"},{"st":1,"in":1,"out":1,"cy":1.8,"up":14400,"g":1.17,"kw":5.5,"mt":16.2,"v":"Extruder","en":"Pelletizer","tr":"Granül Makinesi","col":"#4FC3F7"},{"st":2,"in":2,"out":1,"cy":2.4,"up":18900,"g":1.17,"kw":6,"mt":18,"v":"Press","en":"Injection Molder","tr":"Enjeksiyon Kalıplama","col":"#29B6F6"},{"st":3,"in":1,"out":1,"cy":1.4,"up":10800,"g":1.17,"kw":1.2,"mt":9,"v":"Packer","en":"Box Packer","tr":"Koli Paketleyici","col":"#81D4FA"},{"st":4,"in":1,"out":1,"cy":0.55,"up":9000,"g":1.17,"kw":0.6,"mt":4.5,"v":"Warehouse","en":"Plastics Warehouse","tr":"Plastik Deposu","col":"#81D4FA"},{"st":5,"in":5,"out":5,"cy":7.5,"up":22500,"g":1.17,"kw":0.6,"mt":9,"v":"Dock","en":"Container Dock","tr":"Konteyner Rampası","col":"#81D4FA"}],"value":13500,"pen":"Plastic Goods Box","ptr":"Plastik Ürün Kolisi","body":"#2EA8E0","accent":"#F25C54"},{"id":"textile","order":3,"unlock":400000000,"raw":21600,"elec":270,"wage":540,"pcap":16,"pcost":4050000,"pgrow":1.55,"en":"Textile Mill","tr":"Tekstil Fabrikası","sup":null,"lines":[0,20250000,1080000000],"m":[{"st":0,"in":1,"out":1,"cy":0.7,"up":243000,"g":1.18,"kw":1.5,"mt":162,"v":"Crusher","en":"Cotton Gin","tr":"Çırçır Makinesi","col":"#F5F5F0"},{"st":1,"in":2,"out":1,"cy":1.6,"up":405000,"g":1.18,"kw":3.5,"mt":432,"v":"Loom","en":"Power Loom","tr":"Dokuma Tezgâhı","col":"#E57373"},{"st":2,"in":1,"out":1,"cy":2.3,"up":567000,"g":1.18,"kw":3,"mt":485.99999999999994,"v":"Cutter","en":"Cut & Sew Line","tr":"Kesim ve Dikim Hattı","col":"#BA68C8"},{"st":3,"in":1,"out":1,"cy":1.5,"up":324000,"g":1.18,"kw":1,"mt":270,"v":"Packer","en":"Garment Folder","tr":"Giysi Katlayıcı","col":"#9575CD"},{"st":4,"in":1,"out":1,"cy":0.55,"up":270000,"g":1.18,"kw":0.5,"mt":135,"v":"Warehouse","en":"Textile Warehouse","tr":"Tekstil Deposu","col":"#9575CD"},{"st":5,"in":5,"out":5,"cy":7.5,"up":675000,"g":1.18,"kw":0.5,"mt":270,"v":"Dock","en":"Box Truck Dock","tr":"Kamyon Rampası","col":"#9575CD"}],"value":378000,"pen":"Garment Pack","ptr":"Giysi Paketi","body":"#9B6BD3","accent":"#F2A541"},{"id":"electronics","order":4,"unlock":30000000000,"raw":1215000,"elec":8100,"wage":16200,"pcap":25.9,"pcost":121500000,"pgrow":1.55,"en":"Electronics Factory","tr":"Elektronik Fabrikası","sup":"plastic","lines":[0,607500000,32400000000],"m":[{"st":0,"in":1,"out":1,"cy":0.9,"up":8100000,"g":1.19,"kw":1.5,"mt":4860,"v":"Unloader","en":"Wafer Loader","tr":"Pul Yükleyici","col":"#90A4AE"},{"st":1,"in":1,"out":1,"cy":2,"up":13770000,"g":1.19,"kw":4.5,"mt":16200,"v":"Press","en":"PCB Etcher","tr":"Devre Aşındırıcı","col":"#43A047"},{"st":2,"in":2,"out":1,"cy":2.5,"up":19440000,"g":1.19,"kw":7,"mt":20250,"v":"RobotArm","en":"Robot Assembly Cell","tr":"Robotik Montaj Hücresi","col":"#37474F"},{"st":3,"in":1,"out":1,"cy":1.5,"up":10530000,"g":1.19,"kw":1.2,"mt":8100,"v":"Packer","en":"Retail Packer","tr":"Perakende Paketleyici","col":"#ECEFF1"},{"st":4,"in":1,"out":1,"cy":0.6,"up":8910000,"g":1.19,"kw":1.5,"mt":4860,"v":"Warehouse","en":"Clean-Room Store","tr":"Temiz Oda Deposu","col":"#ECEFF1"},{"st":5,"in":4,"out":4,"cy":8,"up":21060000,"g":1.19,"kw":0.5,"mt":8100,"v":"Dock","en":"Courier Dock","tr":"Kargo Rampası","col":"#ECEFF1"}],"value":14580000,"pen":"Device Box","ptr":"Cihaz Kutusu","body":"#3DDC97","accent":"#3A86FF"},{"id":"glass","order":5,"unlock":2550000000000,"raw":19440000,"elec":243000,"wage":486000,"pcap":35.3,"pcost":3645000000,"pgrow":1.55,"en":"Glassworks","tr":"Cam Fabrikası","sup":null,"lines":[0,18225000000,972000000000],"m":[{"st":0,"in":1,"out":1,"cy":0.8,"up":218700000,"g":1.2,"kw":2.4000000000000004,"mt":145800,"v":"Silo","en":"Sand Hopper","tr":"Kum Bunkeri","col":"#E8D9A8"},{"st":1,"in":2,"out":1,"cy":1.8,"up":388800000,"g":1.2,"kw":8,"mt":437399.99999999994,"v":"Furnace","en":"Melting Furnace","tr":"Ergitme Fırını","col":"#FF9C4A"},{"st":2,"in":1,"out":2,"cy":2.4,"up":534600000,"g":1.2,"kw":8,"mt":486000,"v":"Cutter","en":"Float Line Cutter","tr":"Float Hattı Kesici","col":"#BFE6F2"},{"st":3,"in":2,"out":1,"cy":1.5,"up":291600000,"g":1.2,"kw":1.92,"mt":243000,"v":"Packer","en":"Crate Packer","tr":"Kasa Paketleyici","col":"#9ED3E6"},{"st":4,"in":1,"out":1,"cy":0.55,"up":243000000,"g":1.2,"kw":0.96,"mt":121500,"v":"Warehouse","en":"Glass Warehouse","tr":"Cam Deposu","col":"#9ED3E6"},{"st":5,"in":5,"out":5,"cy":7.5,"up":607500000,"g":1.2,"kw":0.8,"mt":243000,"v":"Dock","en":"Glass Dock","tr":"Cam Rampası","col":"#9ED3E6"}],"value":218700000,"pen":"Glass Crate","ptr":"Cam Kasası","body":"#5FB3C9","accent":"#F28C38"},{"id":"paper","order":6,"unlock":208080000000000,"raw":656100000,"elec":7290000,"wage":14580000,"pcap":38,"pcost":109350000000,"pgrow":1.55,"en":"Paper Mill","tr":"Kâğıt Fabrikası","sup":null,"lines":[0,546750000000,29160000000000],"m":[{"st":0,"in":1,"out":1,"cy":0.8320000000000001,"up":6561000000,"g":1.2,"kw":2.58,"mt":4374000,"v":"Unloader","en":"Log Crane","tr":"Tomruk Vinci","col":"#8B5A2B"},{"st":1,"in":2,"out":1,"cy":1.872,"up":11664000000,"g":1.2,"kw":8.6,"mt":13121999.999999998,"v":"Mill","en":"Pulper","tr":"Hamurlaştırıcı","col":"#E8E1CF"},{"st":2,"in":1,"out":1,"cy":2.496,"up":16038000000,"g":1.2,"kw":8.6,"mt":14580000,"v":"Loom","en":"Paper Machine","tr":"Kâğıt Makinesi","col":"#F5F2EA"},{"st":3,"in":1,"out":1,"cy":1.56,"up":8748000000,"g":1.2,"kw":2.064,"mt":7290000,"v":"Packer","en":"Ream Wrapper","tr":"Top Sarıcı","col":"#FFFFFF"},{"st":4,"in":1,"out":1,"cy":0.55,"up":7290000000,"g":1.2,"kw":1.032,"mt":3645000,"v":"Warehouse","en":"Paper Warehouse","tr":"Kâğıt Deposu","col":"#FFFFFF"},{"st":5,"in":5,"out":5,"cy":7.800000000000001,"up":18225000000,"g":1.2,"kw":0.86,"mt":7290000,"v":"Dock","en":"Paper Dock","tr":"Kâğıt Rampası","col":"#FFFFFF"}],"value":10935000000,"pen":"Paper Ream","ptr":"Kâğıt Topu","body":"#7A9E5B","accent":"#D9A441"},{"id":"furniture","order":7,"unlock":16300154880000000,"raw":21870000000,"elec":218700000,"wage":437400000,"pcap":40.6,"pcost":3280500000000,"pgrow":1.55,"en":"Furniture Factory","tr":"Mobilya Fabrikası","sup":"textile","lines":[0,16402500000000,874800000000000],"m":[{"st":0,"in":1,"out":1,"cy":0.8640000000000001,"up":196830000000,"g":1.2,"kw":2.76,"mt":131220000,"v":"Unloader","en":"Timber Loader","tr":"Kereste Yükleyici","col":"#A87545"},{"st":1,"in":2,"out":1,"cy":1.9440000000000002,"up":349920000000,"g":1.2,"kw":9.2,"mt":393660000,"v":"Cutter","en":"Sawmill","tr":"Hızar","col":"#C99A6B"},{"st":2,"in":1,"out":2,"cy":2.592,"up":481140000000,"g":1.2,"kw":9.2,"mt":437400000,"v":"Press","en":"CNC Router","tr":"CNC Freze","col":"#B5835A"},{"st":3,"in":2,"out":1,"cy":1.62,"up":262440000000,"g":1.2,"kw":2.2079999999999997,"mt":218700000,"v":"Packer","en":"Flat-pack Packer","tr":"Paketleme Hattı","col":"#D9B48F"},{"st":4,"in":1,"out":1,"cy":0.55,"up":218700000000,"g":1.2,"kw":1.1039999999999999,"mt":109350000,"v":"Warehouse","en":"Furniture Warehouse","tr":"Mobilya Deposu","col":"#D9B48F"},{"st":5,"in":5,"out":5,"cy":8.100000000000001,"up":546750000000,"g":1.2,"kw":0.9199999999999999,"mt":218700000,"v":"Dock","en":"Furniture Dock","tr":"Mobilya Rampası","col":"#D9B48F"}],"value":240570000000,"pen":"Flat-pack Furniture","ptr":"Paketli Mobilya","body":"#A0673A","accent":"#3C6E71"},{"id":"beverage","order":8,"unlock":1.2258133753724925e+18,"raw":721710000000,"elec":6561000000,"wage":13122000000,"pcap":43.3,"pcost":98415000000000,"pgrow":1.55,"en":"Beverage Plant","tr":"İçecek Fabrikası","sup":"glass","lines":[0,492075000000000,26244000000000000],"m":[{"st":0,"in":1,"out":1,"cy":0.8960000000000001,"up":5904900000000,"g":1.2,"kw":2.94,"mt":3936600000,"v":"Silo","en":"Fruit Intake","tr":"Meyve Kabulü","col":"#F25F5C"},{"st":1,"in":2,"out":1,"cy":2.0160000000000005,"up":10497600000000,"g":1.2,"kw":9.8,"mt":11809800000,"v":"Mill","en":"Industrial Juicer","tr":"Endüstriyel Sıkacak","col":"#FFB627"},{"st":2,"in":1,"out":1,"cy":2.688,"up":14434200000000,"g":1.2,"kw":9.8,"mt":13122000000,"v":"RobotArm","en":"Bottling Line","tr":"Dolum Hattı","col":"#FF7F11"},{"st":3,"in":1,"out":1,"cy":1.6800000000000002,"up":7873200000000,"g":1.2,"kw":2.352,"mt":6561000000,"v":"Packer","en":"Case Packer","tr":"Koli Paketleyici","col":"#F9C784"},{"st":4,"in":1,"out":1,"cy":0.55,"up":6561000000000,"g":1.2,"kw":1.176,"mt":3280500000,"v":"Warehouse","en":"Cold Store","tr":"Soğuk Depo","col":"#F9C784"},{"st":5,"in":5,"out":5,"cy":8.4,"up":16402500000000,"g":1.2,"kw":0.98,"mt":6561000000,"v":"Dock","en":"Beverage Dock","tr":"İçecek Rampası","col":"#F9C784"}],"value":11153700000000,"pen":"Juice Case","ptr":"Meyve Suyu Kolisi","body":"#E85D75","accent":"#5BC0EB"},{"id":"cement","order":9,"unlock":8.84969317538423e+19,"raw":23619600000000.004,"elec":196830000000,"wage":393660000000,"pcap":45.9,"pcost":2952450000000000,"pgrow":1.55,"en":"Cement Works","tr":"Çimento Fabrikası","sup":null,"lines":[0,14762250000000000,7.8732e+17],"m":[{"st":0,"in":1,"out":1,"cy":0.8,"up":177147000000000,"g":1.2,"kw":3.12,"mt":118098000000,"v":"Unloader","en":"Quarry Loader","tr":"Ocak Yükleyici","col":"#D9D4C7"},{"st":1,"in":2,"out":1,"cy":1.8,"up":314928000000000,"g":1.2,"kw":10.4,"mt":354294000000,"v":"Extruder","en":"Rotary Kiln","tr":"Döner Fırın","col":"#5C5C5C"},{"st":2,"in":1,"out":2,"cy":2.4,"up":433026000000000,"g":1.2,"kw":10.4,"mt":393660000000,"v":"Mill","en":"Cement Mill","tr":"Çimento Değirmeni","col":"#A9A9A9"},{"st":3,"in":2,"out":1,"cy":1.5,"up":236196000000000,"g":1.2,"kw":2.496,"mt":196830000000,"v":"Packer","en":"Bagging Machine","tr":"Torbalama Makinesi","col":"#C2B280"},{"st":4,"in":1,"out":1,"cy":0.55,"up":196830000000000,"g":1.2,"kw":1.248,"mt":98415000000,"v":"Warehouse","en":"Bulk Silo","tr":"Dökme Silo","col":"#C2B280"},{"st":5,"in":5,"out":5,"cy":7.5,"up":492075000000000,"g":1.2,"kw":1.04,"mt":196830000000,"v":"Dock","en":"Cement Dock","tr":"Çimento Rampası","col":"#C2B280"}],"value":177147000000000,"pen":"Cement Bag","ptr":"Çimento Torbası","body":"#8D99AE","accent":"#EF8354"},{"id":"chemical","order":10,"unlock":6.133428467743545e+21,"raw":472392000000000,"elec":5904900000000,"wage":11809800000000,"pcap":48.6,"pcost":88573500000000000,"pgrow":1.55,"en":"Chemical Plant","tr":"Kimya Fabrikası","sup":null,"lines":[0,4.428675e+17,2.36196e+19],"m":[{"st":0,"in":1,"out":1,"cy":0.8320000000000001,"up":5314410000000000,"g":1.2,"kw":3.3000000000000003,"mt":3542940000000,"v":"Pump","en":"Brine Pump","tr":"Tuzlu Su Pompası","col":"#B8E0F6"},{"st":1,"in":2,"out":1,"cy":1.872,"up":9447840000000000,"g":1.2,"kw":11,"mt":10628820000000,"v":"Oven","en":"Reactor","tr":"Reaktör","col":"#7BD389"},{"st":2,"in":1,"out":1,"cy":2.496,"up":12990780000000000,"g":1.2,"kw":11,"mt":11809800000000,"v":"Press","en":"Formulation Mixer","tr":"Formül Karıştırıcı","col":"#3DCCC7"},{"st":3,"in":1,"out":1,"cy":1.56,"up":7085880000000000,"g":1.2,"kw":2.64,"mt":5904900000000,"v":"Packer","en":"Pack Filler","tr":"Paket Dolum","col":"#68D8D6"},{"st":4,"in":1,"out":1,"cy":0.55,"up":5904900000000000,"g":1.2,"kw":1.32,"mt":2952450000000,"v":"Warehouse","en":"Tank Farm","tr":"Tank Sahası","col":"#68D8D6"},{"st":5,"in":5,"out":5,"cy":7.800000000000001,"up":14762250000000000,"g":1.2,"kw":1.1,"mt":5904900000000,"v":"Dock","en":"Chemical Dock","tr":"Kimya Rampası","col":"#68D8D6"}],"value":8266860000000000,"pen":"Detergent Pack","ptr":"Deterjan Paketi","body":"#4CB944","accent":"#FFD23F"},{"id":"pharma","order":11,"unlock":4.080840574069041e+23,"raw":15943230000000000,"elec":177147000000000,"wage":354294000000000,"pcap":51.2,"pcost":2.657205e+18,"pgrow":1.55,"en":"Pharmaceutical Plant","tr":"İlaç Fabrikası","sup":"chemical","lines":[0,1.3286025e+19,7.08588e+20],"m":[{"st":0,"in":1,"out":1,"cy":0.8640000000000001,"up":1.594323e+17,"g":1.2,"kw":3.4799999999999995,"mt":106288200000000,"v":"Unloader","en":"Compound Loader","tr":"Bileşik Yükleyici","col":"#E0E7FF"},{"st":1,"in":2,"out":1,"cy":1.9440000000000002,"up":2.834352e+17,"g":1.2,"kw":11.6,"mt":318864600000000,"v":"Oven","en":"Synthesis Reactor","tr":"Sentez Reaktörü","col":"#A0C4FF"},{"st":2,"in":1,"out":2,"cy":2.592,"up":3.897234e+17,"g":1.2,"kw":11.6,"mt":354294000000000,"v":"Press","en":"Tablet Press","tr":"Tablet Presi","col":"#FFFFFF"},{"st":3,"in":2,"out":1,"cy":1.62,"up":2.125764e+17,"g":1.2,"kw":2.784,"mt":177147000000000,"v":"Packer","en":"Blister Packer","tr":"Blister Paketleyici","col":"#BDE0FE"},{"st":4,"in":1,"out":1,"cy":0.55,"up":1.77147e+17,"g":1.2,"kw":1.392,"mt":88573500000000,"v":"Warehouse","en":"Clean Store","tr":"Temiz Depo","col":"#BDE0FE"},{"st":5,"in":5,"out":5,"cy":8.100000000000001,"up":4.428675e+17,"g":1.2,"kw":1.16,"mt":177147000000000,"v":"Dock","en":"Pharma Dock","tr":"İlaç Rampası","col":"#BDE0FE"}],"value":1.948617e+17,"pen":"Medicine Box","ptr":"İlaç Kutusu","body":"#FFFFFF","accent":"#3A86FF"},{"id":"rubber","order":12,"unlock":2.606556754253791e+25,"raw":5.31441e+17,"elec":5314410000000000,"wage":10628820000000000,"pcap":53.9,"pcost":7.971615e+19,"pgrow":1.55,"en":"Tyre Factory","tr":"Lastik Fabrikası","sup":"chemical","lines":[0,3.9858075e+20,2.125764e+22],"m":[{"st":0,"in":1,"out":1,"cy":0.8960000000000001,"up":4.782969e+18,"g":1.2,"kw":3.66,"mt":3188646000000000,"v":"Silo","en":"Latex Tank","tr":"Lateks Tankı","col":"#F3EED9"},{"st":1,"in":2,"out":1,"cy":2.0160000000000005,"up":8.503056e+18,"g":1.2,"kw":12.2,"mt":9565938000000000,"v":"Crusher","en":"Banbury Mixer","tr":"Banbury Karıştırıcı","col":"#505050"},{"st":2,"in":1,"out":1,"cy":2.688,"up":1.1691702e+19,"g":1.2,"kw":12.2,"mt":10628820000000000,"v":"Press","en":"Curing Press","tr":"Vulkanizasyon Presi","col":"#222222"},{"st":3,"in":1,"out":1,"cy":1.6800000000000002,"up":6.377292e+18,"g":1.2,"kw":2.928,"mt":5314410000000000,"v":"Packer","en":"Tyre Stacker","tr":"Lastik İstifleyici","col":"#3A3A3A"},{"st":4,"in":1,"out":1,"cy":0.55,"up":5.31441e+18,"g":1.2,"kw":1.464,"mt":2657205000000000,"v":"Warehouse","en":"Tyre Warehouse","tr":"Lastik Deposu","col":"#3A3A3A"},{"st":5,"in":5,"out":5,"cy":8.4,"up":1.3286025e+19,"g":1.2,"kw":1.22,"mt":5314410000000000,"v":"Dock","en":"Tyre Dock","tr":"Lastik Rampası","col":"#3A3A3A"}],"value":8.503056e+18,"pen":"Tyre Stack","ptr":"Lastik Yığını","body":"#3D3D3D","accent":"#F2C14E"},{"id":"appliance","order":13,"unlock":1.598291447616318e+27,"raw":1.7537553000000002e+19,"elec":1.594323e+17,"wage":3.188646e+17,"pcap":56.5,"pcost":2.3914845e+21,"pgrow":1.55,"en":"Appliance Factory","tr":"Beyaz Eşya Fabrikası","sup":"steel","lines":[0,1.19574225e+22,6.377292e+23],"m":[{"st":0,"in":1,"out":1,"cy":0.8,"up":1.4348907e+20,"g":1.2,"kw":3.84,"mt":95659380000000000,"v":"Unloader","en":"Coil Loader","tr":"Rulo Yükleyici","col":"#ADB5BD"},{"st":1,"in":2,"out":1,"cy":1.8,"up":2.5509168e+20,"g":1.2,"kw":12.8,"mt":2.8697813999999997e+17,"v":"Press","en":"Stamping Press","tr":"Pres Hattı","col":"#DEE2E6"},{"st":2,"in":1,"out":2,"cy":2.4,"up":3.5075106e+20,"g":1.2,"kw":12.8,"mt":3.188646e+17,"v":"RobotArm","en":"Assembly Cell","tr":"Montaj Hücresi","col":"#F8F9FA"},{"st":3,"in":2,"out":1,"cy":1.5,"up":1.9131876e+20,"g":1.2,"kw":3.072,"mt":1.594323e+17,"v":"Packer","en":"Boxing Line","tr":"Kutulama Hattı","col":"#D4A373"},{"st":4,"in":1,"out":1,"cy":0.55,"up":1.594323e+20,"g":1.2,"kw":1.536,"mt":79716150000000000,"v":"Warehouse","en":"Appliance Warehouse","tr":"Beyaz Eşya Deposu","col":"#D4A373"},{"st":5,"in":5,"out":5,"cy":7.5,"up":3.9858075e+20,"g":1.2,"kw":1.28,"mt":1.594323e+17,"v":"Dock","en":"Appliance Dock","tr":"Beyaz Eşya Rampası","col":"#D4A373"}],"value":1.4348907e+20,"pen":"Boxed Appliance","ptr":"Kutulu Beyaz Eşya","body":"#E9ECEF","accent":"#E63946"},{"id":"automotive","order":14,"unlock":9.408404883033483e+28,"raw":5.7395628e+20,"elec":4.782969e+18,"wage":9.565938e+18,"pcap":59.2,"pcost":7.1744534999999994e+22,"pgrow":1.55,"en":"Car Factory","tr":"Otomobil Fabrikası","sup":"steel","lines":[0,3.58722675e+23,1.9131876e+25],"m":[{"st":0,"in":1,"out":1,"cy":0.8320000000000001,"up":4.3046721e+21,"g":1.2,"kw":4.02,"mt":2.8697814e+18,"v":"Unloader","en":"Coil Feeder","tr":"Rulo Besleyici","col":"#8D99AE"},{"st":1,"in":2,"out":1,"cy":1.872,"up":7.6527504e+21,"g":1.2,"kw":13.399999999999999,"mt":8.609344199999999e+18,"v":"Press","en":"Body Press","tr":"Kaporta Presi","col":"#457B9D"},{"st":2,"in":1,"out":1,"cy":2.496,"up":1.05225318e+22,"g":1.2,"kw":13.399999999999999,"mt":9.565938e+18,"v":"RobotArm","en":"Assembly Robots","tr":"Montaj Robotları","col":"#E63946"},{"st":3,"in":1,"out":1,"cy":1.56,"up":5.7395628e+21,"g":1.2,"kw":3.2159999999999997,"mt":4.782969e+18,"v":"Packer","en":"Final Inspection","tr":"Son Kontrol","col":"#A8DADC"},{"st":4,"in":1,"out":1,"cy":0.55,"up":4.782969e+21,"g":1.2,"kw":1.6079999999999999,"mt":2.3914845e+18,"v":"Warehouse","en":"Car Park","tr":"Araç Parkı","col":"#A8DADC"},{"st":5,"in":5,"out":5,"cy":7.800000000000001,"up":1.19574225e+22,"g":1.2,"kw":1.3399999999999999,"mt":4.782969e+18,"v":"Dock","en":"Car Carrier Dock","tr":"Oto Taşıyıcı Rampası","col":"#A8DADC"}],"value":8.6093442e+21,"pen":"Car Carrier Load","ptr":"Oto Taşıyıcı Yükü","body":"#1D3557","accent":"#E63946"},{"id":"solar","order":15,"unlock":5.316762426033089e+30,"raw":1.1479125600000002e+22,"elec":1.4348907e+20,"wage":2.8697814e+20,"pcap":61.8,"pcost":2.1523360500000002e+24,"pgrow":1.55,"en":"Solar Panel Factory","tr":"Güneş Paneli Fabrikası","sup":"glass","lines":[0,1.076168025e+25,5.7395628e+26],"m":[{"st":0,"in":1,"out":1,"cy":0.8640000000000001,"up":1.29140163e+23,"g":1.2,"kw":4.199999999999999,"mt":8.609344200000001e+19,"v":"Crusher","en":"Quartz Crusher","tr":"Kuvars Kırıcı","col":"#E5E5E5"},{"st":1,"in":2,"out":1,"cy":1.9440000000000002,"up":2.29582512e+23,"g":1.2,"kw":14,"mt":2.5828032599999998e+20,"v":"Furnace","en":"Ingot Furnace","tr":"Külçe Fırını","col":"#1D3557"},{"st":2,"in":1,"out":2,"cy":2.592,"up":3.15675954e+23,"g":1.2,"kw":14,"mt":2.8697814e+20,"v":"Press","en":"Panel Laminator","tr":"Panel Laminatörü","col":"#264653"},{"st":3,"in":2,"out":1,"cy":1.62,"up":1.72186884e+23,"g":1.2,"kw":3.36,"mt":1.4348907e+20,"v":"Packer","en":"Palletizer","tr":"Paletleyici","col":"#2A9D8F"},{"st":4,"in":1,"out":1,"cy":0.55,"up":1.4348907e+23,"g":1.2,"kw":1.68,"mt":7.1744535e+19,"v":"Warehouse","en":"Panel Warehouse","tr":"Panel Deposu","col":"#2A9D8F"},{"st":5,"in":5,"out":5,"cy":8.100000000000001,"up":3.58722675e+23,"g":1.2,"kw":1.4,"mt":1.4348907e+20,"v":"Dock","en":"Solar Dock","tr":"Güneş Paneli Rampası","col":"#2A9D8F"}],"value":1.57837977e+23,"pen":"Panel Pallet","ptr":"Panel Paleti","body":"#264653","accent":"#E9C46A"},{"id":"battery","order":16,"unlock":2.8843618577703587e+32,"raw":3.87420489e+23,"elec":4.3046721000000004e+21,"wage":8.609344200000001e+21,"pcap":64.5,"pcost":6.45700815e+25,"pgrow":1.55,"en":"Battery Factory","tr":"Batarya Fabrikası","sup":"chemical","lines":[0,3.228504075e+26,1.7218688400000001e+28],"m":[{"st":0,"in":1,"out":1,"cy":0.8960000000000001,"up":3.8742048900000003e+24,"g":1.2,"kw":4.38,"mt":2.58280326e+21,"v":"Unloader","en":"Ore Loader","tr":"Cevher Yükleyici","col":"#CBC0D3"},{"st":1,"in":2,"out":1,"cy":2.0160000000000005,"up":6.88747536e+24,"g":1.2,"kw":14.6,"mt":7.74840978e+21,"v":"Extruder","en":"Calciner","tr":"Kalsinasyon Fırını","col":"#6C757D"},{"st":2,"in":1,"out":1,"cy":2.688,"up":9.47027862e+24,"g":1.2,"kw":14.6,"mt":8.609344200000001e+21,"v":"RobotArm","en":"Cell Line","tr":"Hücre Hattı","col":"#2EC4B6"},{"st":3,"in":1,"out":1,"cy":1.6800000000000002,"up":5.16560652e+24,"g":1.2,"kw":3.504,"mt":4.3046721000000004e+21,"v":"Packer","en":"Pack Assembly","tr":"Paket Montajı","col":"#0B6E4F"},{"st":4,"in":1,"out":1,"cy":0.55,"up":4.3046721000000004e+24,"g":1.2,"kw":1.752,"mt":2.1523360500000002e+21,"v":"Warehouse","en":"Dry Room Store","tr":"Kuru Oda Deposu","col":"#0B6E4F"},{"st":5,"in":5,"out":5,"cy":8.4,"up":1.076168025e+25,"g":1.2,"kw":1.46,"mt":4.3046721000000004e+21,"v":"Dock","en":"Battery Dock","tr":"Batarya Rampası","col":"#0B6E4F"}],"value":6.45700815e+24,"pen":"Battery Pack","ptr":"Batarya Paketi","body":"#2EC4B6","accent":"#FF9F1C"},{"id":"aerospace","order":17,"unlock":1.5021851558368557e+34,"raw":1.29140163e+25,"elec":1.29140163e+23,"wage":2.58280326e+23,"pcap":67.1,"pcost":1.9371024450000001e+27,"pgrow":1.55,"en":"Aerospace Plant","tr":"Havacılık Fabrikası","sup":"battery","lines":[0,9.685512225e+27,5.16560652e+29],"m":[{"st":0,"in":1,"out":1,"cy":0.8,"up":1.162261467e+26,"g":1.2,"kw":4.5600000000000005,"mt":7.74840978e+22,"v":"Unloader","en":"Ingot Loader","tr":"Külçe Yükleyici","col":"#C0C0C0"},{"st":1,"in":2,"out":1,"cy":1.8,"up":2.066242608e+26,"g":1.2,"kw":15.2,"mt":2.324522934e+23,"v":"Furnace","en":"Alloy Furnace","tr":"Alaşım Fırını","col":"#9FA8B3"},{"st":2,"in":1,"out":2,"cy":2.4,"up":2.841083586e+26,"g":1.2,"kw":15.2,"mt":2.58280326e+23,"v":"Cutter","en":"5-Axis Machining","tr":"5 Eksen İşleme","col":"#E0E1DD"},{"st":3,"in":2,"out":1,"cy":1.5,"up":1.549681956e+26,"g":1.2,"kw":3.6479999999999997,"mt":1.29140163e+23,"v":"Packer","en":"Crate Builder","tr":"Sandık Yapıcı","col":"#778DA9"},{"st":4,"in":1,"out":1,"cy":0.55,"up":1.29140163e+26,"g":1.2,"kw":1.8239999999999998,"mt":6.45700815e+22,"v":"Warehouse","en":"Hangar Store","tr":"Hangar Deposu","col":"#778DA9"},{"st":5,"in":5,"out":5,"cy":7.5,"up":3.228504075e+26,"g":1.2,"kw":1.52,"mt":1.29140163e+23,"v":"Dock","en":"Aerospace Dock","tr":"Havacılık Rampası","col":"#778DA9"}],"value":1.162261467e+26,"pen":"Aero Crate","ptr":"Havacılık Sandığı","body":"#ADB5BD","accent":"#0077B6"},{"id":"robotics","order":18,"unlock":7.510492578744975e+35,"raw":4.261625379e+26,"elec":3.87420489e+24,"wage":7.74840978e+24,"pcap":69.8,"pcost":5.811307335e+28,"pgrow":1.55,"en":"Robotics Factory","tr":"Robotik Fabrikası","sup":"electronics","lines":[0,2.9056536674999996e+29,1.549681956e+31],"m":[{"st":0,"in":1,"out":1,"cy":0.8320000000000001,"up":3.486784401e+27,"g":1.2,"kw":4.74,"mt":2.324522934e+24,"v":"Unloader","en":"Chip Loader","tr":"Çip Yükleyici","col":"#3A3A3A"},{"st":1,"in":2,"out":1,"cy":1.872,"up":6.198727824e+27,"g":1.2,"kw":15.8,"mt":6.973568801999999e+24,"v":"Loom","en":"Servo Winder","tr":"Servo Sarıcı","col":"#8AC926"},{"st":2,"in":1,"out":1,"cy":2.496,"up":8.523250757999999e+27,"g":1.2,"kw":15.8,"mt":7.74840978e+24,"v":"RobotArm","en":"Robot Assembly","tr":"Robot Montajı","col":"#6A4C93"},{"st":3,"in":1,"out":1,"cy":1.56,"up":4.6490458679999997e+27,"g":1.2,"kw":3.792,"mt":3.87420489e+24,"v":"Packer","en":"Robot Crater","tr":"Robot Sandıklayıcı","col":"#C3B1E1"},{"st":4,"in":1,"out":1,"cy":0.55,"up":3.87420489e+27,"g":1.2,"kw":1.896,"mt":1.937102445e+24,"v":"Warehouse","en":"Robot Warehouse","tr":"Robot Deposu","col":"#C3B1E1"},{"st":5,"in":5,"out":5,"cy":7.800000000000001,"up":9.685512224999999e+27,"g":1.2,"kw":1.58,"mt":3.87420489e+24,"v":"Dock","en":"Robotics Dock","tr":"Robotik Rampası","col":"#C3B1E1"}],"value":6.586148313e+27,"pen":"Robot Crate","ptr":"Robot Sandığı","body":"#6A4C93","accent":"#8AC926"},{"id":"space","order":19,"unlock":3.604828513579658e+37,"raw":1.3947137604000001e+28,"elec":1.162261467e+26,"wage":2.324522934e+26,"pcap":72.4,"pcost":1.7433922004999999e+30,"pgrow":1.55,"en":"Space Technology","tr":"Uzay Teknolojisi","sup":"robotics","lines":[0,8.7169610025e+30,4.6490458679999994e+32],"m":[{"st":0,"in":1,"out":1,"cy":0.8640000000000001,"up":1.0460353203e+29,"g":1.2,"kw":4.92,"mt":6.9735688019999994e+25,"v":"Unloader","en":"Titanium Loader","tr":"Titanyum Yükleyici","col":"#B0B7C3"},{"st":1,"in":2,"out":1,"cy":1.9440000000000002,"up":1.8596183472e+29,"g":1.2,"kw":16.4,"mt":2.0920706405999997e+26,"v":"Oven","en":"Vacuum Furnace","tr":"Vakum Fırını","col":"#E5E5E5"},{"st":2,"in":1,"out":2,"cy":2.592,"up":2.5569752274e+29,"g":1.2,"kw":16.4,"mt":2.324522934e+26,"v":"RobotArm","en":"Clean-Room Assembly","tr":"Temiz Oda Montajı","col":"#FCA311"},{"st":3,"in":2,"out":1,"cy":1.62,"up":1.3947137603999998e+29,"g":1.2,"kw":3.9359999999999995,"mt":1.162261467e+26,"v":"Packer","en":"Container Packer","tr":"Konteyner Paketleyici","col":"#14213D"},{"st":4,"in":1,"out":1,"cy":0.55,"up":1.162261467e+29,"g":1.2,"kw":1.9679999999999997,"mt":5.811307335e+25,"v":"Warehouse","en":"Integration Hall","tr":"Entegrasyon Salonu","col":"#14213D"},{"st":5,"in":5,"out":5,"cy":8.100000000000001,"up":2.9056536674999996e+29,"g":1.2,"kw":1.64,"mt":1.162261467e+26,"v":"Dock","en":"Launch Dock","tr":"Fırlatma Rampası","col":"#14213D"}],"value":1.2784876137e+29,"pen":"Launch Container","ptr":"Fırlatma Konteyneri","body":"#14213D","accent":"#FCA311"}]}</script>
 <script>
 "use strict";
@@ -396,10 +397,10 @@ function renderSheet() {
 }
 
 // ======================================================================= rendering: canvas factory
-const cv = $("cv"), ctx = cv.getContext("2d");
+const cv = $("cv"); let ctx = null;
 let W = 0, H = 0, DPR = 1, hit = [];
 function resize() { const r = cv.getBoundingClientRect(); DPR = Math.min(2, window.devicePixelRatio || 1); W = r.width; H = r.height; cv.width = W * DPR; cv.height = H * DPR; }
-window.addEventListener("resize", resize);
+window.addEventListener("resize", () => R3 ? fit3d() : resize());
 function shade(hex, k) { const n = parseInt(hex.slice(1), 16); let r = n >> 16, g = (n >> 8) & 255, b = n & 255; const f = c => Math.max(0, Math.min(255, Math.round(k < 0 ? c * (1 + k) : c + (255 - c) * k))); return `rgb(${f(r)},${f(g)},${f(b)})`; }
 function box(x, y, w, h, d, col) { // simple extruded block (front + top + side)
   ctx.fillStyle = shade(col, -0.35); ctx.beginPath(); ctx.moveTo(x + w, y); ctx.lineTo(x + w + d, y - d * 0.6); ctx.lineTo(x + w + d, y + h - d * 0.6); ctx.lineTo(x + w, y + h); ctx.fill();
@@ -430,6 +431,7 @@ function drawMachine(m, x, y, w, h, col, acc, t, active, bott) {
 }
 let truckPhase = {};
 function draw(t) {
+  if (!ctx) ctx = cv.getContext("2d");
   if (!W) resize();
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   const f = byId[S.active], st = S.f[f.id], fc = cache.byF[f.id];
@@ -482,13 +484,246 @@ function draw(t) {
     ctx.globalAlpha = 1;
   }
 }
-cv.addEventListener("click", e => {
-  const r = cv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
-  for (const h of hit) if (x >= h.x && x <= h.x + h.w && y >= h.y && y <= h.y + h.h) {
-    if (h.lockLine !== undefined) { openLine(byId[S.active], h.lockLine); return; }
-    selected = { f: S.active, line: h.line, i: h.i }; beep(440); renderSheet(); return;
+// ======================================================================= 3D factory (three.js); the 2D canvas above is the fallback without WebGL
+let R3 = null;
+const GEO = {}, geo = (k, mk) => GEO[k] || (GEO[k] = mk());
+const MAT = new Map();
+function mat(hex, opt) { const k = hex + (opt ? JSON.stringify(opt) : ""); if (!MAT.has(k)) MAT.set(k, new THREE.MeshStandardMaterial(Object.assign({ color: hex, roughness: 0.6, metalness: 0.1 }, opt || {}))); return MAT.get(k); }
+function own(m) { R3.owned.push(m); return m; } // per-build resources, disposed on rebuild
+function mesh(g, m, x, y, z, parent) { const o = new THREE.Mesh(g, m); o.position.set(x, y, z); o.castShadow = true; o.receiveShadow = true; parent.add(o); return o; }
+const B = (w, h, d) => geo(`b${w},${h},${d}`, () => new THREE.BoxGeometry(w, h, d));
+const Cyl = (r1, r2, h, s = 20) => geo(`c${r1},${r2},${h},${s}`, () => new THREE.CylinderGeometry(r1, r2, h, s));
+
+function init3d() {
+  if (!window.THREE) return null;
+  let renderer;
+  try { renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, powerPreference: "low-power" }); } catch { return null; }
+  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  const scene = new THREE.Scene(); scene.background = new THREE.Color(0x0f1216);
+  const cam = new THREE.OrthographicCamera(-10, 10, 10, -10, 0.1, 200);
+  scene.add(new THREE.HemisphereLight(0xe4ecff, 0x30261c, 0.8));
+  const sun = new THREE.DirectionalLight(0xfff4e6, 0.85); sun.position.set(9, 20, 8); sun.castShadow = true; sun.shadow.mapSize.set(1024, 1024);
+  Object.assign(sun.shadow.camera, { left: -15, right: 15, top: 15, bottom: -15, near: 1, far: 60 }); sun.shadow.bias = -0.0008; scene.add(sun);
+  const world = new THREE.Group(); scene.add(world);
+  // belt surface texture (shared, scrolled every frame)
+  const bc = document.createElement("canvas"); bc.width = 16; bc.height = 32; const bg = bc.getContext("2d");
+  bg.fillStyle = "#2b3038"; bg.fillRect(0, 0, 16, 32); bg.fillStyle = "#4a525e"; bg.fillRect(0, 0, 16, 5);
+  const beltTex = new THREE.CanvasTexture(bc); beltTex.wrapS = beltTex.wrapT = THREE.RepeatWrapping; beltTex.repeat.set(1, 40);
+  const sel = new THREE.Mesh(new THREE.RingGeometry(1.2, 1.36, 40), new THREE.MeshBasicMaterial({ color: 0x7fd8ff, transparent: true, opacity: 0.95 }));
+  sel.rotation.x = -Math.PI / 2; sel.visible = false; scene.add(sel);
+  return { renderer, scene, cam, world, sun, beltTex, sel, az: 0.22, el: 0.98, key: "", owned: [], anim: [], lines: [], hits: [], ray: new THREE.Raycaster() };
+}
+
+function fit3d() {
+  const r = cv.getBoundingClientRect(); if (!r.width) return;
+  W = r.width; H = r.height;
+  R3.renderer.setSize(r.width, r.height, false);
+  const { cam } = R3, d = 50;
+  cam.position.set(Math.sin(R3.az) * Math.cos(R3.el) * d, Math.sin(R3.el) * d, Math.cos(R3.az) * Math.cos(R3.el) * d);
+  cam.lookAt(0, 0, 0); cam.updateMatrixWorld();
+  const inv = cam.matrixWorldInverse, p = new THREE.Vector3();
+  let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+  for (const x of [-6.6, 6.6]) for (const y of [0, 2.4]) for (const z of [-9.6, 10.6]) {
+    p.set(x, y, z).applyMatrix4(inv); x0 = Math.min(x0, p.x); x1 = Math.max(x1, p.x); y0 = Math.min(y0, p.y); y1 = Math.max(y1, p.y);
   }
+  y0 -= (y1 - y0) * 0.11; // room for the power bar overlay
+  const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, asp = r.width / r.height;
+  let hw = (x1 - x0) / 2 * 1.03, hh = (y1 - y0) / 2 * 1.03;
+  if (hw / hh < asp) hw = hh * asp; else hh = hw / asp;
+  Object.assign(cam, { left: cx - hw, right: cx + hw, top: cy + hh, bottom: cy - hh }); cam.updateProjectionMatrix();
+}
+
+function textSprite(text, color, bg, w, h, sx) {
+  const c = document.createElement("canvas"); c.width = w; c.height = h; const g = c.getContext("2d");
+  if (bg) { g.fillStyle = bg; const r = h * 0.3; g.beginPath(); g.moveTo(r, 0); g.arcTo(w, 0, w, h, r); g.arcTo(w, h, 0, h, r); g.arcTo(0, h, 0, 0, r); g.arcTo(0, 0, w, 0, r); g.fill(); }
+  g.fillStyle = color; g.font = `700 ${Math.round(h * 0.55)}px Barlow, system-ui, sans-serif`; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(text, w / 2, h / 2 + 1);
+  const tex = own(new THREE.CanvasTexture(c)), sm = own(new THREE.SpriteMaterial({ map: tex, depthTest: false, transparent: true }));
+  const s = new THREE.Sprite(sm); s.scale.set(sx, sx * h / w, 1); s.renderOrder = 10; return s;
+}
+
+// one machine model per visual kind; returns an animator (t, speed)
+function buildMachine(m, f, g) {
+  const body = mat(f.body), acc = mat(f.accent), metal = mat("#a3acb6", { metalness: 0.65, roughness: 0.35 }), dark = mat("#2a2f37");
+  mesh(B(1.8, 0.2, 1.6), dark, 0, 0.1, 0, g);
+  const lampM = own(new THREE.MeshStandardMaterial({ color: 0x3ddc97, emissive: 0x3ddc97, emissiveIntensity: 0.9 }));
+  const lamp = mesh(geo("lamp", () => new THREE.SphereGeometry(0.09, 10, 8)), lampM, -0.72, 1.45, 0.62, g);
+  const stripe = (y, h = 0.12, w = 1.42) => mesh(B(w, h, 0.04), acc, 0, y, 0.62, g);
+  const sp = (fn) => fn;
+  switch (m.v) {
+    case "Furnace": case "Oven": {
+      mesh(B(1.4, 1.1, 1.2), body, 0, 0.75, 0, g); stripe(1.18);
+      mesh(Cyl(0.17, 0.2, 1.3), metal, 0.42, 1.8, -0.32, g);
+      const glowM = own(new THREE.MeshStandardMaterial({ color: 0xff8a2a, emissive: 0xff6a10, emissiveIntensity: 1 }));
+      mesh(B(0.7, 0.36, 0.05), glowM, 0, 0.62, 0.62, g);
+      return sp((t, s) => { glowM.emissiveIntensity = 0.7 + 0.5 * Math.abs(Math.sin(t * 5 * Math.min(s, 2))); });
+    }
+    case "Mill": case "Crusher": case "Extruder": {
+      mesh(B(1.4, 0.9, 1.2), body, 0, 0.65, 0, g); stripe(1.02);
+      mesh(Cyl(0.35, 0.5, 0.5), metal, 0, 1.35, 0, g);
+      const rotor = new THREE.Group(); rotor.position.set(0, 1.25, 0.66); g.add(rotor);
+      mesh(B(0.95, 0.12, 0.08), acc, 0, 0, 0, rotor); mesh(B(0.12, 0.95, 0.08), acc, 0, 0, 0, rotor);
+      return sp((t, s) => { rotor.rotation.z = -t * 3 * Math.min(s, 3); });
+    }
+    case "Press": case "Cutter": {
+      mesh(B(1.4, 0.45, 1.2), body, 0, 0.42, 0, g);
+      for (const x of [-0.6, 0.6]) mesh(B(0.18, 1.5, 0.18), metal, x, 1.2, 0, g);
+      mesh(B(1.4, 0.25, 0.5), body, 0, 1.95, 0, g);
+      const ram = mesh(B(0.85, 0.22, 0.65), acc, 0, 1.5, 0, g);
+      return sp((t, s) => { ram.position.y = 1.15 + 0.5 * (0.5 + 0.5 * Math.cos(t * 4 * Math.min(s, 2.5))); });
+    }
+    case "RobotArm": {
+      mesh(B(1.3, 0.5, 1.1), body, 0, 0.45, 0, g); stripe(0.6);
+      const turret = new THREE.Group(); turret.position.set(0, 0.7, 0); g.add(turret);
+      mesh(Cyl(0.32, 0.38, 0.3), metal, 0, 0.15, 0, turret);
+      const up = new THREE.Group(); up.position.y = 0.3; turret.add(up);
+      mesh(B(0.18, 0.95, 0.18), acc, 0, 0.47, 0, up);
+      const fore = new THREE.Group(); fore.position.y = 0.95; up.add(fore);
+      mesh(B(0.15, 0.75, 0.15), acc, 0, 0.37, 0, fore); mesh(B(0.32, 0.12, 0.32), metal, 0, 0.75, 0, fore);
+      return sp((t, s) => { const k = t * 1.8 * Math.min(s, 2); turret.rotation.y = Math.sin(k) * 1.1; up.rotation.z = 0.35 + Math.sin(k * 1.3) * 0.25; fore.rotation.z = 0.9 + Math.cos(k * 1.3) * 0.35; });
+    }
+    case "Loom": {
+      mesh(B(1.4, 0.6, 1.2), body, 0, 0.5, 0, g);
+      for (const x of [-0.62, 0.62]) mesh(B(0.12, 1.2, 0.12), metal, x, 1.2, 0, g);
+      mesh(B(1.36, 0.1, 0.1), metal, 0, 1.8, 0, g);
+      for (let k = 0; k < 6; k++) mesh(B(0.02, 1.0, 0.02), mat("#f2efe6"), -0.45 + k * 0.18, 1.3, 0, g);
+      const bar = mesh(B(1.2, 0.1, 0.16), acc, 0, 1.2, 0.08, g);
+      return sp((t, s) => { bar.position.y = 1.05 + 0.3 * (0.5 + 0.5 * Math.sin(t * 6 * Math.min(s, 2))); });
+    }
+    case "Packer": {
+      mesh(B(1.4, 0.8, 1.2), body, 0, 0.6, 0, g); stripe(0.9);
+      mesh(B(1.4, 0.12, 0.12), metal, 0, 1.5, -0.4, g); for (const x of [-0.64, 0.64]) mesh(B(0.12, 0.6, 0.12), metal, x, 1.2, -0.4, g);
+      const boxp = mesh(B(0.5, 0.4, 0.5), mat("#c79a62"), 0, 1.2, 0.1, g);
+      return sp((t, s) => { const k = (t * 0.9 * Math.min(s, 2.5)) % 1; boxp.position.y = 1.2 + Math.sin(k * Math.PI) * 0.18; boxp.rotation.y = k * Math.PI / 2; });
+    }
+    case "Warehouse": {
+      for (const x of [-0.65, 0.65]) for (const z of [-0.5, 0.5]) mesh(B(0.1, 1.8, 0.1), metal, x, 1.0, z, g);
+      for (let r = 0; r < 3; r++) { mesh(B(1.4, 0.06, 1.1), acc, 0, 0.45 + r * 0.6, 0, g); for (let k = 0; k < 3; k++) if ((r + k) % 3 !== 2) mesh(B(0.32, 0.3, 0.4), mat(f.m[4].col || "#c79a62"), -0.42 + k * 0.42, 0.64 + r * 0.6, 0, g); }
+      const fork = mesh(B(0.3, 0.3, 0.3), mat("#ffb02e"), 0.9, 0.35, 0.75, g);
+      return sp((t, s) => { fork.position.x = 0.9 * Math.cos(t * 0.8 * Math.min(s, 2)); });
+    }
+    case "Unloader": {
+      mesh(B(1.4, 0.6, 1.2), body, 0, 0.5, 0, g); stripe(0.7);
+      const hop = mesh(Cyl(0.7, 0.25, 0.8, 4), acc, 0, 1.2, 0, g); hop.rotation.y = Math.PI / 4;
+      const heap = mesh(geo("heap", () => new THREE.ConeGeometry(0.45, 0.3, 10)), mat(m.col), 0, 1.7, 0, g);
+      return sp((t, s) => { heap.scale.y = 0.6 + 0.4 * Math.abs(Math.sin(t * 2 * Math.min(s, 2))); });
+    }
+    case "Pump": {
+      mesh(B(1.3, 0.5, 1.1), body, 0, 0.45, 0, g);
+      mesh(Cyl(0.42, 0.42, 1.0), metal, -0.15, 1.15, -0.1, g);
+      const wheel = new THREE.Group(); wheel.position.set(0.48, 1.0, 0.3); g.add(wheel);
+      mesh(Cyl(0.32, 0.32, 0.08, 16), acc, 0, 0, 0, wheel).rotation.z = Math.PI / 2;
+      mesh(B(0.1, 0.6, 0.1), metal, 0.05, 0, 0, wheel);
+      return sp((t, s) => { wheel.rotation.x = t * 4 * Math.min(s, 3); });
+    }
+    default: { // Silo and anything else
+      mesh(Cyl(0.6, 0.6, 1.4), body, 0, 0.9, 0, g);
+      mesh(geo("siloTop", () => new THREE.ConeGeometry(0.6, 0.45, 20)), acc, 0, 1.82, 0, g);
+      const band = mesh(Cyl(0.62, 0.62, 0.12), acc, 0, 0.9, 0, g);
+      return sp((t, s) => { band.position.y = 0.4 + 1.0 * ((t * 0.5 * Math.min(s, 2)) % 1); });
+    }
+  }
+}
+
+const LINE_X = l => (l - 1) * 4.3, MZ = i => -7.5 + i * 3;
+function build3d(f, st) {
+  const R = R3;
+  R.world.clear(); R.owned.forEach(o => o.dispose()); R.owned = []; R.anim = []; R.lines = []; R.hits = [];
+  const w = R.world;
+  // floor, walls, yard
+  const floor = mesh(B(15, 0.2, 21.5), mat("#1c2129", { roughness: 0.9 }), 0, -0.1, 0.4, w); floor.castShadow = false;
+  const grid = new THREE.GridHelper(21, 21, 0x2b323c, 0x232931); grid.position.set(0, 0.005, 0.4); grid.scale.x = 15 / 21; w.add(grid);
+  mesh(B(15, 2.6, 0.3), mat(f.accent, { roughness: 0.8 }), 0, 1.2, -10.2, w);
+  mesh(B(0.3, 2.6, 21.5), mat(f.accent, { roughness: 0.8 }), -7.6, 1.2, 0.4, w);
+  mesh(B(15, 0.25, 0.3), mat(f.body), 0, 2.55, -10.2, w);
+  for (let k = 0; k < 4; k++) mesh(B(2.2, 1.0, 0.05), mat("#8fc6ff", { emissive: "#2a4a6a", roughness: 0.2 }), -5 + k * 3.4, 1.4, -10.03, w);
+  const yard = mesh(B(15, 0.05, 1.6), mat("#3a3f47"), 0, 0.02, 10.6, w); yard.castShadow = false;
+  const firstLocked = st.lines.indexOf(false);
+  for (let l = 0; l < 3; l++) {
+    const x = LINE_X(l), L3 = { on: st.lines[l], machines: [], crates: [] };
+    R.lines.push(L3);
+    if (!st.lines[l]) {
+      const pad = mesh(B(3.6, 0.06, 19), own(new THREE.MeshStandardMaterial({ color: 0xffb02e, transparent: true, opacity: l === firstLocked ? 0.16 : 0.06 })), x, 0.04, 0, w);
+      pad.castShadow = false;
+      const txt = l === firstLocked ? `${L("unlockLine", l + 1)}\n$ ${fmt(f.lines[l])}` : L("locked");
+      const lines = txt.split("\n");
+      lines.forEach((s, k) => { const sp = textSprite(s, "#ffb02e", "rgba(15,18,22,.85)", 512, 96, 3.6); sp.position.set(x, 1.2 - k * 0.8, 0); w.add(sp); });
+      if (l === firstLocked) { pad.userData = { lockLine: l }; R.hits.push(pad); }
+      continue;
+    }
+    mesh(B(0.9, 0.3, 19.6), mat("#1a1e24"), x, 0.15, 0.6, w);
+    const top = new THREE.Mesh(geo("beltTop", () => new THREE.PlaneGeometry(0.75, 19.6)), own(new THREE.MeshStandardMaterial({ map: R.beltTex, roughness: 0.8 })));
+    top.rotation.x = -Math.PI / 2; top.position.set(x, 0.31, 0.6); top.receiveShadow = true; w.add(top);
+    for (let i = 0; i < 6; i++) {
+      const g = new THREE.Group(); g.position.set(x, 0, MZ(i)); w.add(g);
+      const animate = buildMachine(f.m[i], f, g);
+      const lbl = textSprite(L("level", st.lv[l][i]), "#eef1f5", "rgba(10,12,15,.8)", 192, 96, 1.5); lbl.position.set(0.95, 2.3, 0.4); g.add(lbl);
+      const hitBox = new THREE.Mesh(B(3.0, 3.0, 2.9), new THREE.MeshBasicMaterial({ visible: false })); hitBox.position.y = 1.2; hitBox.userData = { line: l, i }; g.add(hitBox); R.hits.push(hitBox);
+      L3.machines.push({ g, animate });
+    }
+    for (let k = 0; k < 10; k++) { const c = mesh(B(0.34, 0.3, 0.34), mat(f.m[Math.floor(k / 2)].col), x, 0.46, 0, w); c.visible = false; L3.crates.push(c); }
+    const ring = new THREE.Mesh(geo("ring", () => new THREE.RingGeometry(1.15, 1.32, 40)), own(new THREE.MeshBasicMaterial({ color: 0xffb02e, transparent: true })));
+    ring.rotation.x = -Math.PI / 2; ring.position.set(x, 0.03, 0); w.add(ring); L3.ring = ring;
+    const truck = new THREE.Group(); truck.position.set(x, 0, 10.6); w.add(truck);
+    mesh(B(1.0, 0.9, 1.6), mat(f.body), 0, 0.65, 0.2, truck); mesh(B(0.95, 0.7, 0.7), mat(f.accent), 0, 0.55, 1.35, truck);
+    mesh(B(0.8, 0.3, 0.05), mat("#9fd3ff", { roughness: 0.2 }), 0, 0.72, 1.71, truck);
+    for (const zz of [-0.3, 1.3]) for (const xx of [-0.5, 0.5]) mesh(Cyl(0.2, 0.2, 0.15, 12), dark3(), xx, 0.2, zz, truck).rotation.z = Math.PI / 2;
+    L3.truck = truck;
+  }
+}
+const dark3 = () => mat("#14171b");
+
+function draw3d(t) {
+  const R = R3, f = byId[S.active], st = S.f[f.id], fc = cache.byF[f.id];
+  const nl = st.lines.indexOf(false);
+  const key = [f.id, st.lines.join(), st.lv.flat().join(), S.lang, nl >= 0 ? f.lines[nl] : 0].join("|");
+  if (key !== R.key) { R.key = key; build3d(f, st); }
+  R.beltTex.offset.y = -(t * 0.6) % 1;
+  R.sel.visible = false;
+  R.lines.forEach((L3, l) => {
+    if (!L3.on) return;
+    const a = fc.lines[l]; if (!a) return;
+    L3.machines.forEach((mc, i) => mc.animate(t + i * 0.37 + l, Math.max(0.3, 1 / a.cycle[i])));
+    L3.ring.position.z = MZ(a.bi); L3.ring.material.opacity = 0.45 + 0.45 * Math.sin(t * 5);
+    const per = a.rate > 0.8 ? 2 : 1, v = Math.min(1.6, 0.35 + a.rate * 0.4);
+    L3.crates.forEach((c, k) => {
+      const i = k >> 1, j = k & 1; if (j >= per) { c.visible = false; return; }
+      const z0 = MZ(i) + 0.85, z1 = MZ(i + 1) - 0.85, p = (t * v + j / per + i * 0.21) % 1;
+      c.visible = true; c.position.z = z0 + p * (z1 - z0);
+    });
+    const cyc = Math.max(2.5, a.cycle[5] * 3), ph = (t % cyc) / cyc;
+    L3.truck.position.z = 10.6 + (ph > 0.55 ? Math.sin((ph - 0.55) / 0.45 * Math.PI) * 5 : 0);
+    if (selected && selected.f === f.id && selected.line === l) { R.sel.visible = true; R.sel.position.set(LINE_X(l), 0.04, MZ(selected.i)); }
+  });
+  R.renderer.render(R.scene, R.cam);
+}
+
+function tap3d(cx, cy) {
+  const r = cv.getBoundingClientRect(), v = new THREE.Vector2((cx - r.left) / r.width * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
+  R3.ray.setFromCamera(v, R3.cam);
+  const h = R3.ray.intersectObjects(R3.hits, false)[0];
+  return h ? h.object.userData : null;
+}
+
+// pointer: tap selects, horizontal drag orbits the camera
+let drag = null;
+cv.style.touchAction = "none";
+cv.addEventListener("pointerdown", e => { drag = { x: e.clientX, y: e.clientY, az: R3 ? R3.az : 0, moved: false }; });
+window.addEventListener("pointermove", e => {
+  if (!drag) return; const dx = e.clientX - drag.x;
+  if (Math.abs(dx) > 8 || Math.abs(e.clientY - drag.y) > 8) drag.moved = true;
+  if (drag.moved && R3) { R3.az = Math.max(-0.8, Math.min(0.8, drag.az - dx * 0.006)); fit3d(); }
 });
+window.addEventListener("pointerup", e => {
+  if (!drag) return; const d = drag; drag = null; if (d.moved) return;
+  let u = null;
+  if (R3) u = tap3d(e.clientX, e.clientY);
+  else { const r = cv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top; for (const h of hit) if (x >= h.x && x <= h.x + h.w && y >= h.y && y <= h.y + h.h) { u = h.lockLine !== undefined ? { lockLine: h.lockLine } : h; break; } }
+  if (!u) return;
+  if (u.lockLine !== undefined) { openLine(byId[S.active], u.lockLine); return; }
+  selected = { f: S.active, line: u.line, i: u.i }; beep(440); renderSheet();
+});
+
 
 // ======================================================================= sound (starts after the first tap)
 let actx = null;
@@ -545,7 +780,7 @@ function frame(now) {
   const flying = d < S.drone.until;
   droneBtn.hidden = !flying;
   if (flying) { const p = 1 - (S.drone.until - d) / 25000; droneBtn.style.left = (p * ((W || 300) + 100) - 80) + "px"; droneBtn.style.top = (10 + Math.sin(p * 12) * 6) + "px"; }
-  draw(now / 1000);
+  if (R3) draw3d(now / 1000); else draw(now / 1000);
   uiTimer += dt; recTimer += dt;
   if (recTimer > 5) { recTimer = 0; recompute(); }       // market & season drift
   if (uiTimer > 0.25) {
@@ -562,7 +797,7 @@ document.addEventListener("visibilitychange", () => { if (document.hidden) save(
 
 (async function start() {
   await load();
-  recompute(); resize(); render();
+  recompute(); R3 = init3d(); if (R3) fit3d(); else resize(); render();
   offline();
   if (!S.company) onboarding();
   requestAnimationFrame(frame);
