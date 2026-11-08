@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Compile-only check of the Unity runtime scripts against UnityEngine reference assemblies (2021.3 API surface,
+    a subset of Unity 6). It catches syntax/type errors outside the Editor; it does NOT replace compiling in Unity.
+  -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS0649</NoWarn>
+    <AssemblyName>FactoryKing.Runtime</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../../Assets/_Project/Scripts/Runtime/**/*.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="UnityEngine.Modules" Version="2021.3.33" PrivateAssets="all" />
+    <ProjectReference Include="../Core/FactoryKing.Core.csproj" />
+  </ItemGroup>
+</Project>
