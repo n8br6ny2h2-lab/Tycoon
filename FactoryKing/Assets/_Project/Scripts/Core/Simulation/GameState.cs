@@ -113,6 +113,8 @@ namespace FactoryKing.Core.Simulation
         /// <summary>Cosmetic slot name -> equipped cosmetic id.</summary>
         public Dictionary<string, string> EquippedCosmetics = new Dictionary<string, string>(StringComparer.Ordinal);
         public int TutorialStep;
+        /// <summary>Player-chosen company name (local profile; no account needed).</summary>
+        public string CompanyName;
 
         public static GameState CreateNew(GameContent content, EconomyTuning tuning)
         {

@@ -7,6 +7,8 @@ namespace FactoryKing.Runtime.Platform
     /// <summary>
     /// Calls into Assets/Plugins/iOS/FactoryKingNative.mm on device; safe no-ops in the Editor and other platforms.
     /// </summary>
+    public enum HapticStyle { Light = 0, Medium = 1, Heavy = 2, Success = 3, Warning = 4, Error = 5, Selection = 6 }
+
     public static class NativeBridge
     {
 #if UNITY_IOS && !UNITY_EDITOR
@@ -17,6 +19,13 @@ namespace FactoryKing.Runtime.Platform
         [DllImport("__Internal")] private static extern void FK_NotificationSchedule(string id, string title, string body, double seconds);
         [DllImport("__Internal")] private static extern void FK_NotificationsCancelAll();
         [DllImport("__Internal")] private static extern void FK_FreeString(IntPtr p);
+        [DllImport("__Internal")] private static extern void FK_Haptic(int style);
+        [DllImport("__Internal")] private static extern bool FK_LowPowerMode();
+        [DllImport("__Internal")] private static extern void FK_RequestReview();
+
+        public static void Haptic(HapticStyle style) => FK_Haptic((int)style);
+        public static bool LowPowerMode => FK_LowPowerMode();
+        public static void RequestReview() => FK_RequestReview();
 
         public static bool CloudAvailable => FK_CloudAvailable();
         public static void CloudSet(string key, string value) => FK_CloudSet(key, value);
@@ -39,6 +48,9 @@ namespace FactoryKing.Runtime.Platform
         public static void ScheduleNotification(string id, string title, string body, double seconds) =>
             Debug.Log($"[FactoryKing] (editor) notification '{id}' in {seconds:0}s: {title} — {body}");
         public static void CancelAllNotifications() { }
+        public static void Haptic(HapticStyle style) { }
+        public static bool LowPowerMode => false;
+        public static void RequestReview() => Debug.Log("[FactoryKing] (editor) App Store rating prompt requested");
 #endif
     }
 }

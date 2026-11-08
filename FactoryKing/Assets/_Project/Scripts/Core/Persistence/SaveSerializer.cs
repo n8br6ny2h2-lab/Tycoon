@@ -25,6 +25,7 @@ namespace FactoryKing.Core.Persistence
             o.Set("sold", s.TotalUnitsSold);
             o.Set("active", s.ActiveFactoryId);
             o.Set("tutorial", s.TutorialStep);
+            o.Set("company", s.CompanyName);
             o.Set("boostEnd", s.BoostEndUtcTicks.ToString());
 
             var factories = JsonValue.NewArray();
@@ -60,7 +61,8 @@ namespace FactoryKing.Core.Persistence
             var se = s.Settings;
             o.Set("settings", JsonValue.NewObject()
                 .Set("music", se.MusicVolume).Set("sfx", se.SfxVolume).Set("notif", se.Notifications)
-                .Set("analytics", se.AnalyticsConsent).Set("asked", se.ConsentAsked).Set("lang", se.Language).Set("hq", se.HighQuality));
+                .Set("analytics", se.AnalyticsConsent).Set("asked", se.ConsentAsked).Set("lang", se.Language).Set("hq", se.HighQuality)
+                .Set("haptics", se.Haptics).Set("saver", se.BatterySaver).Set("onboard", se.OnboardingDone).Set("review", se.ReviewRequested));
 
             // Ticks exceed double precision: store as strings.
             o.Set("time", JsonValue.NewObject()
@@ -136,6 +138,7 @@ namespace FactoryKing.Core.Persistence
                 TotalUnitsSold = o.Lng("sold"),
                 ActiveFactoryId = o.Str("active"),
                 TutorialStep = o.Int("tutorial"),
+                CompanyName = CompanyNameRules.Sanitize(o.Str("company")),
                 BoostEndUtcTicks = Ticks(o.Str("boostEnd")),
             };
 
@@ -184,6 +187,10 @@ namespace FactoryKing.Core.Persistence
             s.Settings.ConsentAsked = se.Bool("asked");
             s.Settings.Language = se.Int("lang", -1);
             s.Settings.HighQuality = se.Bool("hq", true);
+            s.Settings.Haptics = se.Bool("haptics", true);
+            s.Settings.BatterySaver = se.Bool("saver");
+            s.Settings.OnboardingDone = se.Bool("onboard", o.Has("cash")); // existing saves skip onboarding
+            s.Settings.ReviewRequested = se.Bool("review");
 
             var t = o.Obj("time");
             s.Time.LastSavedUtcTicks = Ticks(t.Str("saved"));

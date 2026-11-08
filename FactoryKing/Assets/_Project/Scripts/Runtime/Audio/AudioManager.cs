@@ -25,6 +25,9 @@ namespace FactoryKing.Runtime.Audio
         private float _musicVolume = 0.6f;
         private float _activity;
 
+        /// <summary>Phone vibration feedback paired with sounds (Settings → Vibration).</summary>
+        public Func<bool> HapticsEnabled;
+
         private void Awake()
         {
             _sfx = new AudioSource[8];
@@ -80,10 +83,21 @@ namespace FactoryKing.Runtime.Audio
 
         public void Play(Sfx sfx, float minInterval = 0.05f, float volume = 1f)
         {
-            if (_sfxVolume <= 0f || !_clips.TryGetValue(sfx, out var clip)) return;
             float now = Time.unscaledTime;
             if (_lastPlayed.TryGetValue(sfx, out float last) && now - last < minInterval) return;
             _lastPlayed[sfx] = now;
+            if (HapticsEnabled != null && HapticsEnabled())
+            {
+                switch (sfx)
+                {
+                    case Sfx.Click: FactoryKing.Runtime.Platform.NativeBridge.Haptic(FactoryKing.Runtime.Platform.HapticStyle.Selection); break;
+                    case Sfx.Upgrade: FactoryKing.Runtime.Platform.NativeBridge.Haptic(FactoryKing.Runtime.Platform.HapticStyle.Medium); break;
+                    case Sfx.Unlock:
+                    case Sfx.Success: FactoryKing.Runtime.Platform.NativeBridge.Haptic(FactoryKing.Runtime.Platform.HapticStyle.Success); break;
+                    case Sfx.Error: FactoryKing.Runtime.Platform.NativeBridge.Haptic(FactoryKing.Runtime.Platform.HapticStyle.Error); break;
+                }
+            }
+            if (_sfxVolume <= 0f || !_clips.TryGetValue(sfx, out var clip)) return;
             var src = _sfx[_next];
             _next = (_next + 1) % _sfx.Length;
             src.pitch = 1f + UnityEngine.Random.Range(-0.04f, 0.04f);

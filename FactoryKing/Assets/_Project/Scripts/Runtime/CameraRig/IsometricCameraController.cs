@@ -46,6 +46,13 @@ namespace FactoryKing.Runtime.CameraRig
 
         public Camera Camera => _camera;
 
+        /// <summary>Title screen: slow cinematic orbit, input ignored.</summary>
+        public bool AttractMode { get; set; }
+        private float _attractYaw;
+
+        /// <summary>Re-frames the whole factory (HUD "home" button).</summary>
+        public void ResetView() => SetBounds(_bounds, true);
+
         private void Awake()
         {
             _camera = GetComponent<Camera>();
@@ -78,6 +85,14 @@ namespace FactoryKing.Runtime.CameraRig
         private void LateUpdate()
         {
             float dt = Time.unscaledDeltaTime;
+            if (AttractMode)
+            {
+                _attractYaw += dt * 6f;
+                Quaternion r = Quaternion.Euler(pitch - 6f, yaw + _attractYaw, 0f);
+                Vector3 c = new Vector3(_bounds.center.x, 0f, _bounds.center.z);
+                transform.SetPositionAndRotation(c - r * Vector3.forward * (_distance * 0.9f), r);
+                return;
+            }
             HandleInput(dt);
 
             if (!_dragging && _velocity.sqrMagnitude > 1e-4f)

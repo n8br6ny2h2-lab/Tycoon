@@ -605,3 +605,35 @@ shop.season_pass	Season Pass	Sezon Bileti
 shop.season_pass.desc	For the current season: 150 diamonds now, double diamonds from season rewards and events, and exclusive premium decorations.	Bu sezon için: hemen 150 elmas, sezon ödülleri ve etkinliklerden çift elmas ve özel dekorasyonlar.
 shop.cosmetic_neon	Neon Look	Neon Görünüm
 shop.cosmetic_neon.desc	Neon floor, walls and sky for your factory. Cosmetic only, kept forever.	Fabrikan için neon zemin, duvar ve gökyüzü. Yalnızca görünüm, kalıcı.
+menu.help	How to play	Nasıl oynanır
+menu.lang_en	English	English
+menu.lang_tr	Türkçe	Türkçe
+menu.cloud_note	No sign-up needed: progress is saved on this phone and synced with iCloud.	Üyelik gerekmez: ilerleme bu telefona kaydedilir ve iCloud ile eşitlenir.
+onboard.welcome	Welcome, boss!	Hoş geldin patron!
+onboard.pitch	Build an iron workshop into a 20-factory empire. Your machines keep working even when you're away.	Bir demir atölyesini 20 fabrikalık bir imparatorluğa dönüştür. Makinelerin sen yokken bile çalışır.
+onboard.name	Name your company	Şirketine bir ad ver
+onboard.default_name	King Industries	Kral Sanayi
+onboard.name_hint	3–20 letters or numbers. You can change it later in Settings.	3–20 harf veya rakam. Daha sonra Ayarlar'dan değiştirebilirsin.
+onboard.name_invalid	Please enter 3–20 letters or numbers.	Lütfen 3–20 harf veya rakam gir.
+onboard.start	Start building	İnşaata başla
+pause.title	Paused	Duraklatıldı
+pause.resume	Resume	Devam et
+pause.home_view	Show whole factory	Tüm fabrikayı göster
+pause.main_menu	Main menu	Ana menü
+settings.haptics	Vibration	Titreşim
+settings.battery	Battery saver (30 FPS)	Pil tasarrufu (30 FPS)
+settings.battery_note	The game also slows to 30 FPS automatically when you are not touching the screen or iOS Low Power Mode is on. Earnings are not affected.	Ekrana dokunmadığında veya iOS Düşük Güç Modu açıkken oyun otomatik olarak 30 FPS'e düşer. Kazançlar etkilenmez.
+settings.company	Company name	Şirket adı
+settings.rename	Rename	Adı değiştir
+help.t1	1 · Production	1 · Üretim
+help.b1	Raw material flows through six machines: input, processing, production, packaging, storage and the truck dock. Money comes when the truck sells.	Hammadde altı makineden geçer: giriş, işleme, üretim, paketleme, depo ve tır rampası. Para, tır sattığında gelir.
+help.t2	2 · Find the bottleneck	2 · Darboğazı bul
+help.b2	A line is only as fast as its slowest machine (marked ⚠). Tap a machine and upgrade it. Full warehouse? Upgrade the dock.	Hat en yavaş makinesi kadar hızlıdır (⚠ ile işaretli). Makineye dokun ve yükselt. Depo dolu mu? Rampayı yükselt.
+help.t3	3 · Power	3 · Elektrik
+help.b3	Bigger machines draw more power. If the plant is overloaded the whole factory slows down — upgrade the power plant.	Büyük makineler daha çok elektrik çeker. Santral yetmezse tüm fabrika yavaşlar; santrali yükselt.
+help.t4	4 · Grow	4 · Büyü
+help.b4	Open new lines, buy the next factory, hire managers (tap their skill!) and research permanent upgrades.	Yeni hat aç, sıradaki fabrikayı al, yönetici işe al (yeteneklerine dokun!) ve kalıcı araştırmalar yap.
+help.t5	5 · While you're away	5 · Sen yokken
+help.b5	Factories keep earning for up to 8 hours. When you come back, collect — or double it with an optional video.	Fabrikalar 8 saate kadar kazanmaya devam eder. Döndüğünde topla ya da isteğe bağlı videoyla ikiye katla.
+help.t6	6 · Seasons	6 · Sezonlar
+help.b6	A season lasts 30 days. Reach factory milestones for permanent rewards. When it ends the run starts over, but diamonds, decorations, managers and legacy stars stay.	Bir sezon 30 gün sürer. Fabrika hedeflerine ulaşıp kalıcı ödüller kazan. Sezon bitince tur yeniden başlar ama elmaslar, dekorasyonlar, yöneticiler ve miras yıldızları kalır.

@@ -24,6 +24,8 @@ namespace FactoryKing.Runtime.UI
         public FactoryView FactoryView;
         public UiManager Ui;
         public Action<MachineView> FocusMachine;
+        public Action ShowPause;
+        public Action ResetView;
         public string PrivacyPolicyUrl = "https://example.com/factoryking/privacy";
         public string SupportUrl = "https://example.com/factoryking/support";
 
@@ -229,6 +231,26 @@ namespace FactoryKing.Runtime.UI
             build(box, CloseModal);
             _modalLayer.Add(overlay);
             return box;
+        }
+
+        /// <summary>
+        /// Full-screen layer that keeps the 3D scene visible (title screen, onboarding). Content is laid out top to
+        /// bottom with a gradient-like dark band behind the controls for readability.
+        /// </summary>
+        public VisualElement ShowFullscreen(Action<VisualElement, Action> build)
+        {
+            var overlay = new VisualElement();
+            overlay.style.position = Position.Absolute;
+            overlay.style.left = 0; overlay.style.right = 0; overlay.style.top = 0; overlay.style.bottom = 0;
+            overlay.style.backgroundColor = new Color(0.03f, 0.05f, 0.08f, 0.35f);
+            var safe = new VisualElement();
+            safe.style.flexGrow = 1;
+            UiKit.Pad(safe, 60, 44);
+            overlay.Add(safe);
+            void Close() { overlay.RemoveFromHierarchy(); }
+            build(safe, Close);
+            _modalLayer.Add(overlay);
+            return safe;
         }
 
         public void Toast(string text, Color? color = null)

@@ -14,7 +14,7 @@ Durum işaretleri:
 - Oyun mantığı Unity'den bağımsız C# çekirdeğinde (netstandard2.1, C# 9). .NET 8 ile derlenip test ediliyor.
 - Unity runtime kodu `UnityEngine.Modules 2021.3.33` referanslarına karşı derleniyor; bu API Unity 6'nın bir alt kümesi.
 - Editor betikleri, IAP adaptörü, iOS native eklentisi ve PlayMode testleri burada derlenemiyor.
-- Kontrol komutu: `FactoryKing/Tools/run-checks.sh`. Son sonuç: **152/152 test geçti, derleme uyarısı yok.**
+- Kontrol komutu: `FactoryKing/Tools/run-checks.sh`. Son sonuç: **161/161 test geçti, derleme uyarısı yok.**
 
 ## Aşama 1 — Proje, sahne, kamera
 | İş | Durum |
@@ -47,6 +47,9 @@ Durum işaretleri:
 | Araştırma ağacı (6 dal, kalıcı) | ✅ |
 | Denge koruması: "ideal oyuncu" botu testi | ✅ |
 | 20 fabrika (120 makine), 30 günlük sezonlar, kalıcı ödüller ve miras yıldızları, Sezon Bileti, 27 dekorasyon (zemin/duvar/dış alan/gökyüzü); sezon temposu testi | ✅ çekirdek / 🟢 UI ve 3D |
+| Telefon odaklı giriş: açılış → ilk kurulum (dil + şirket adı) → canlı 3D arka planlı ana menü; duraklatma menüsü, "Nasıl oynanır", tüm fabrikayı gösterme düğmesi | 🟢 |
+| Telefon özellikleri: titreşim (haptik), pil tasarrufu ve iOS Düşük Güç Modu'nda 30 FPS, dokunulmayınca 30 FPS, uygun anda App Store puanlama isteği, iPad tam ekran, durum çubuğu gizli, alt kenar hareketi koruması | 🟢 / 🟡 native |
+| Hesap sistemi yok (bilinçli karar): ilerleme cihaz + iCloud + Game Center'da. Böylece Apple'ın hesap silme ve "Sign in with Apple" zorunlulukları gerekmiyor | ✅ |
 | Benzer oyunlardan uyarlanan yeni mekanikler: santral/elektrik şebekesi, yaşayan piyasa, yönetici yetenekleri, artırılmış zorluk eğrisi | ✅ çekirdek / 🟢 UI ve 3D santral |
 
 ## Aşama 5 — Arayüz, ses, animasyon

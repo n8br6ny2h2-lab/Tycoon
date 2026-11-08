@@ -33,6 +33,11 @@ namespace FactoryKing.Core.Simulation
         public bool ConsentAsked;
         public int Language = -1;       // -1 = follow device
         public bool HighQuality = true;
+        public bool Haptics = true;
+        /// <summary>Battery saver: 30 FPS and no extra effects.</summary>
+        public bool BatterySaver;
+        public bool OnboardingDone;
+        public bool ReviewRequested;
     }
 
     /// <summary>Wall-clock bookkeeping used by offline earnings and the anti clock-tampering guard.</summary>

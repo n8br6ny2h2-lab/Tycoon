@@ -87,22 +87,6 @@ namespace FactoryKing.Runtime.UI
             }, dismissible: false);
         }
 
-        public static void ShowMainMenu(this UiManager ui, Action play)
-        {
-            var C = ui.Context;
-            ui.ShowModal((box, close) =>
-            {
-                box.style.alignItems = Align.Stretch;
-                box.Add(UiKit.Label("♛ FACTORY KING", 72, true, UiKit.Accent));
-                box.Add(UiKit.Label(C.T("menu.subtitle"), 32, false, UiKit.Muted, true));
-                box.Add(UiKit.Spacer(20));
-                bool fresh = C.Session.State.LifetimeEarnings.IsZero;
-                box.Add(UiKit.Button(fresh ? C.T("menu.play") : C.T("menu.continue"), () => { close(); play?.Invoke(); }, UiKit.Accent, 44, 140));
-                box.Add(UiKit.Button(C.T("screen.settings"), () => { close(); ui.Open("settings"); play?.Invoke(); }, UiKit.CardHi));
-                box.Add(UiKit.Label(C.TF("ui.company_level", C.Session.CompanyLevel), 28, false, UiKit.Muted));
-            }, dismissible: false);
-        }
-
         /// <summary>Asked once, after the tutorial start. Declining changes nothing in gameplay.</summary>
         public static void ShowConsent(this UiManager ui)
         {

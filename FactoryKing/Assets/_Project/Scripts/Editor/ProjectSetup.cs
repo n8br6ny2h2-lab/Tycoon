@@ -129,6 +129,14 @@ namespace FactoryKing.EditorTools
             PlayerSettings.allowedAutorotateToLandscapeLeft = false;
             PlayerSettings.allowedAutorotateToLandscapeRight = false;
             PlayerSettings.runInBackground = false;
+            // Portrait-only universal app: iPad multitasking requires all orientations unless the app declares
+            // full screen (UIRequiresFullScreen), otherwise App Store validation rejects the build.
+            PlayerSettings.iOS.requiresFullScreen = true;
+            PlayerSettings.statusBarHidden = true;
+            // First swipe on the bottom edge goes to the game (camera pan), the second to iOS (home indicator).
+            PlayerSettings.iOS.deferSystemGesturesMode = UnityEngine.iOS.SystemGestureDeferMode.BottomEdge;
+            PlayerSettings.iOS.hideHomeButton = false;
+            PlayerSettings.iOS.appInBackgroundBehavior = iOSAppInBackgroundBehavior.Suspend;
             PlayerSettings.SetManagedStrippingLevel(ios, ManagedStrippingLevel.Low);
         }
 

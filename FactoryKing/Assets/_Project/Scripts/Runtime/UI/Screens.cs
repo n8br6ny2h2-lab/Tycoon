@@ -490,7 +490,7 @@ namespace FactoryKing.Runtime.UI
         {
             (string key, string id)[] items =
             {
-                ("screen.season", "season"), ("screen.cosmetics", "cosmetics"),
+                ("screen.season", "season"), ("screen.cosmetics", "cosmetics"), ("menu.help", "help"),
                 ("screen.orders", "orders"), ("screen.research", "research"), ("screen.warehouse", "warehouse"),
                 ("screen.daily", "daily"), ("screen.achievements", "achievements"), ("screen.events", "events"),
                 ("screen.prestige", "prestige"), ("screen.settings", "settings"),

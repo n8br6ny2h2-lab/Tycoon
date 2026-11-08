@@ -45,6 +45,15 @@ namespace FactoryKing.Runtime.UI
             UiKit.Pad(column, 16, 20);
             _layer.Add(column);
 
+            var tools = UiKit.Row(0, Justify.SpaceBetween);
+            tools.pickingMode = PickingMode.Ignore;
+            var menu = UiKit.Button("☰", () => C.ShowPause?.Invoke(), UiKit.Bg, 40, 96);
+            menu.style.width = 110;
+            tools.Add(menu);
+            var home = UiKit.Button("⌂", () => C.ResetView?.Invoke(), UiKit.Bg, 40, 96);
+            home.style.width = 110;
+            tools.Add(home);
+            column.Add(tools);
             column.Add(TopBar());
             column.Add(Chips());
             column.Add(TutorialBanner());
@@ -71,6 +80,7 @@ namespace FactoryKing.Runtime.UI
             var bar = UiKit.Box(UiKit.Bg, 26, 16, 24);
             var row = UiKit.Row(0, Justify.SpaceBetween);
             var left = new VisualElement();
+            left.Add(B.Text(UiKit.Label("", 26, true, UiKit.Muted), () => S.State.CompanyName ?? ""));
             left.Add(B.Text(UiKit.Label("", 56, true), () => "$ " + C.M(S.Wallet.Cash)));
             left.Add(B.Text(UiKit.Label("", 32, false, UiKit.Good), () =>
                 C.TF("ui.income_per_sec", C.M(S.Ledger.NetPerSecond)) + "   " + C.TF("ui.net_per_hour", C.M(S.Ledger.NetPerHour))));

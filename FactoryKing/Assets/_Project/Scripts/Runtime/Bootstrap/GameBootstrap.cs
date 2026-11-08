@@ -84,6 +84,10 @@ namespace FactoryKing.Runtime.Bootstrap
             QualityProfile.Apply(Session.State.Settings.HighQuality);
 
             Audio = gameObject.AddComponent<AudioManager>();
+            Audio.HapticsEnabled = () => Session.State.Settings.Haptics;
+            var perf = gameObject.AddComponent<PhonePerformance>();
+            perf.Init(Session);
+            if (Save.LastLoadOutcome == Core.Persistence.LoadOutcome.NewGame) Session.State.Settings.HighQuality = QualityProfile.RecommendedHigh;
             Audio.SetVolumes(Session.State.Settings.SfxVolume, Session.State.Settings.MusicVolume);
 
             Session.Ads.Provider = PlatformRegistry.AdsFactory?.Invoke()
@@ -131,7 +135,7 @@ namespace FactoryKing.Runtime.Bootstrap
             {
                 new MapScreen(), new ManagersScreen(), new MissionsScreen(), new ShopScreen(), new MoreScreen(),
                 new OrdersScreen(), new ResearchScreen(), new WarehouseScreen(), new DailyScreen(), new AchievementsScreen(),
-                new EventsScreen(), new PrestigeScreen(), new SettingsScreen(), new SeasonScreen(), new CosmeticsScreen(),
+                new EventsScreen(), new PrestigeScreen(), new SettingsScreen(), new SeasonScreen(), new CosmeticsScreen(), new HelpScreen(),
             });
             CameraController.IsPointerOverUi = Ui.IsPointerOverUi;
             CameraController.Tapped += OnTapped;
@@ -142,7 +146,17 @@ namespace FactoryKing.Runtime.Bootstrap
             FactoryView.SetNightAmount(DayNight.NightAmount);
             Session.Analytics.Track(AnalyticsEvents.AppOpen);
 
-            Ui.ShowSplash(() => Ui.ShowMainMenu(StartPlaying));
+            ctx.ShowPause = () => Ui.ShowPauseMenu(ShowTitle, () => CameraController.ResetView());
+            ctx.ResetView = () => CameraController.ResetView();
+            Ui.ShowSplash(() =>
+            {
+                if (Session.State.Settings.OnboardingDone) ShowTitle();
+                else
+                {
+                    SetAttract(true);
+                    Ui.ShowOnboarding(() => { SetAttract(false); Save.SaveNow(); StartPlaying(); });
+                }
+            });
             if (Save.LastLoadOutcome == Core.Persistence.LoadOutcome.RecoveredFromBackup || Save.LastLoadOutcome == Core.Persistence.LoadOutcome.CorruptReset)
                 Ui.Toast(Localization.Get("save.recovered"), UiKit.Warn);
         }
@@ -153,8 +167,17 @@ namespace FactoryKing.Runtime.Bootstrap
             DayNight.SkyTint = sky != null && !string.IsNullOrEmpty(sky.ColorHex) ? Theme.Hex(sky.ColorHex) : (Color?)null;
         }
 
+        private void ShowTitle() => Ui.ShowTitle(StartPlaying, SetAttract);
+
+        private void SetAttract(bool on)
+        {
+            CameraController.AttractMode = on;
+            Ui.Hud.SetNavVisible(!on);
+        }
+
         private void StartPlaying()
         {
+            if (!Driver.Paused) return; // already playing (returning from the title screen)
             Driver.Paused = false;
             Session.Resume();
             if (Session.Offline.Pending != null) Ui.ShowOfflineSummary();
@@ -173,7 +196,17 @@ namespace FactoryKing.Runtime.Bootstrap
                 Audio.Play(Sfx.Success);
                 Ui.Toast(Localization.Format("achievement.unlocked", Localization.Get(a.NameKey)), UiKit.Good);
             };
-            Session.Factories.FactoryUnlocked += _ => Save.SaveNow();
+            Session.Factories.FactoryUnlocked += _ =>
+            {
+                Save.SaveNow();
+                // Ask for a rating once, at a happy moment (third factory). iOS decides whether to show it.
+                var st = Session.State.Settings;
+                if (!st.ReviewRequested && Session.State.Factories.FindAll(f => f.Unlocked).Count >= 3)
+                {
+                    st.ReviewRequested = true;
+                    NativeBridge.RequestReview();
+                }
+            };
             Session.Prestige.Prestiged += () => GameCenter.ReportScores();
             Session.Purchases.Granted += _ => Audio.Play(Sfx.Success);
             Session.Seasons.SeasonEnded += (season, reached) =>

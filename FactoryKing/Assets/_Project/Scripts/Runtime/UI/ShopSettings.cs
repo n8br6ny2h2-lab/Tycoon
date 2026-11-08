@@ -102,6 +102,26 @@ namespace FactoryKing.Runtime.UI
             root.Add(Toggle(T("settings.analytics"), st.AnalyticsConsent, v => { st.AnalyticsConsent = v; st.ConsentAsked = true; }));
             root.Add(UiKit.Label(T("settings.analytics_note"), 24, false, UiKit.Muted, true));
             root.Add(Toggle(T("settings.quality"), st.HighQuality, v => { st.HighQuality = v; QualityProfile.Apply(v); }));
+            root.Add(Toggle(T("settings.haptics"), st.Haptics, v => st.Haptics = v));
+            root.Add(Toggle(T("settings.battery"), st.BatterySaver, v => st.BatterySaver = v));
+            root.Add(UiKit.Label(T("settings.battery_note"), 24, false, UiKit.Muted, true));
+
+            Section(root, "settings.company");
+            var nameRow = UiKit.Row();
+            var nameField = new TextField { maxLength = CompanyNameRules.MaxLength, value = s.State.CompanyName ?? "" };
+            nameField.style.fontSize = 32;
+            nameField.style.flexGrow = 1;
+            nameField.style.minHeight = 90;
+            nameRow.Add(nameField);
+            nameRow.Add(UiKit.Button(T("settings.rename"), () =>
+            {
+                string n = CompanyNameRules.Sanitize(nameField.value);
+                if (n == null) { C.Ui.Toast(T("onboard.name_invalid"), UiKit.Bad); return; }
+                s.State.CompanyName = n;
+                nameField.value = n;
+                C.Ui.Toast(n, UiKit.Good);
+            }, UiKit.CardHi, 28, 90));
+            root.Add(nameRow);
 
             Section(root, "settings.account");
             root.Add(UiKit.Button(T("shop.restore"), () => C.Store.Restore(), UiKit.CardHi));
