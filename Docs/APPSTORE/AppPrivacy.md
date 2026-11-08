@@ -9,6 +9,12 @@
 
 The privacy manifest `FactoryKing/Assets/Plugins/iOS/PrivacyInfo.xcprivacy` matches this (no collected data types, `NSPrivacyTracking = false`, required-reason APIs: UserDefaults CA92.1, file timestamps C617.1, system boot time 35F9.1).
 
+## When you enable the online features (Server/)
+The optional server stores a random player id, a token hash, the company name chosen in-game, club names and co-op/club scores.
+- App Store Connect: **Identifiers › User ID** (linked, not tracking, purpose App Functionality) and **User Content › Other User Content** (company and club names; linked, not tracking, purpose App Functionality).
+- Privacy policy: add a section on online features (what is stored, retention, deletion through "Settings › Delete my online data").
+- Account deletion: the game has no account sign-up, but the online data can be deleted in the app at any time (`DELETE /v1/player`).
+
 ## When you add an analytics backend
 The opt-in analytics already exists in the game (Settings, plus the first-launch consent dialog). Once events are actually sent to a server:
 - App Store Connect: Data Types › **Usage Data › Product Interaction**, purpose **Analytics**, **Not linked** to the user, **Not used for tracking**.

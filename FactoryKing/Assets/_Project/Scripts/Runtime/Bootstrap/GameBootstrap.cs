@@ -48,6 +48,9 @@ namespace FactoryKing.Runtime.Bootstrap
         public StoreController Store { get; private set; }
         public GameCenterService GameCenter { get; private set; }
         public NotificationService Notifications { get; private set; }
+        public OnlineService Online { get; private set; }
+        private DroneView _drone;
+        private float _gcTimer;
 
         private ModelKit _kit;
         private float _activityTimer;
@@ -96,6 +99,8 @@ namespace FactoryKing.Runtime.Bootstrap
             Store = new StoreController(Session, Save);
             GameCenter = new GameCenterService(Session);
             Notifications = new NotificationService(Session, Localization);
+            Online = gameObject.AddComponent<OnlineService>();
+            Online.Init(Session);
 
             Materials = new MaterialLibrary();
             _kit = new ModelKit(Materials);
@@ -129,13 +134,14 @@ namespace FactoryKing.Runtime.Bootstrap
             var ctx = new UiContext
             {
                 Session = Session, Loc = Localization, Store = Store, Save = Save, GameCenter = GameCenter,
-                Notifications = Notifications, Audio = Audio, FactoryView = FactoryView,
+                Notifications = Notifications, Audio = Audio, FactoryView = FactoryView, Online = Online,
             };
             Ui.Init(ctx, new UiScreen[]
             {
                 new MapScreen(), new ManagersScreen(), new MissionsScreen(), new ShopScreen(), new MoreScreen(),
                 new OrdersScreen(), new ResearchScreen(), new WarehouseScreen(), new DailyScreen(), new AchievementsScreen(),
                 new EventsScreen(), new PrestigeScreen(), new SettingsScreen(), new SeasonScreen(), new CosmeticsScreen(), new HelpScreen(),
+                new ExpeditionsScreen(), new CardsScreen(), new EngineeringScreen(), new StatsScreen(), new CoopScreen(), new ClubScreen(),
             });
             CameraController.IsPointerOverUi = Ui.IsPointerOverUi;
             CameraController.Tapped += OnTapped;
@@ -148,6 +154,11 @@ namespace FactoryKing.Runtime.Bootstrap
 
             ctx.ShowPause = () => Ui.ShowPauseMenu(ShowTitle, () => CameraController.ResetView());
             ctx.ResetView = () => CameraController.ResetView();
+            ctx.CatchDrone = CatchDrone;
+            Ui.ApplyAccessibility();
+            _drone = DroneView.Create(transform, _kit, Session);
+            FactoryView.Rebuilt += _ => _drone.SetArea(FactoryView.WorldBounds);
+            _drone.SetArea(FactoryView.WorldBounds);
             Ui.ShowSplash(() =>
             {
                 if (Session.State.Settings.OnboardingDone) ShowTitle();
@@ -171,7 +182,7 @@ namespace FactoryKing.Runtime.Bootstrap
 
         private void SetAttract(bool on)
         {
-            CameraController.AttractMode = on;
+            CameraController.AttractMode = on && !Session.State.Settings.ReduceMotion;
             Ui.Hud.SetNavVisible(!on);
         }
 
@@ -220,6 +231,8 @@ namespace FactoryKing.Runtime.Bootstrap
         private void Update()
         {
             // Ambience follows how many machines are really working in the visible factory.
+            _gcTimer -= Time.unscaledDeltaTime;
+            if (_gcTimer <= 0f) { _gcTimer = 300f; GameCenter?.ReportScores(); }
             _activityTimer -= Time.unscaledDeltaTime;
             if (_activityTimer > 0 || Session == null) return;
             _activityTimer = 0.5f;
@@ -232,8 +245,37 @@ namespace FactoryKing.Runtime.Bootstrap
             Audio.SetFactoryActivity(total > 0 ? working / (float)total : 0f);
         }
 
+        /// <summary>Tap on the drone (or its HUD chip): show the reward, optionally doubled by a rewarded video.</summary>
+        private void CatchDrone()
+        {
+            if (!Session.Drone.IsVisible) return;
+            var preview = Session.Drone.Peek();
+            Audio.Play(Sfx.Click);
+            Ui.ShowModal((box, close) =>
+            {
+                string text = preview.Kind == DroneRewardKind.Cash ? "$ " + Localization.Money(preview.Cash)
+                    : preview.Kind == DroneRewardKind.Diamonds ? "◆ " + preview.Diamonds
+                    : Localization.Format("daily.boost", preview.BoostMinutes);
+                box.Add(UiKit.Label(Localization.Get("drone.title"), 42, true, UiKit.Accent));
+                box.Add(UiKit.Label(text, 56, true, UiKit.Good));
+                box.Add(UiKit.Button(Localization.Get("ui.claim"), () =>
+                {
+                    close();
+                    if (Session.Drone.TryCatch(out _)) Audio.Play(Sfx.Cash);
+                }, UiKit.Good, 36, 110));
+                var twice = UiKit.Button(Localization.Get("drone.double"), () =>
+                {
+                    Session.Ads.Request(AdPlacements.Drone, () => { close(); if (Session.Drone.TryCatch(out _, 2)) Audio.Play(Sfx.Cash); },
+                        r => { if (r != AdResult.Completed) Ui.Toast(Localization.Get("ads.not_ready")); });
+                }, UiKit.Diamond, 30, 96);
+                UiKit.SetEnabled(twice, Session.Ads.IsAvailable(AdPlacements.Drone));
+                box.Add(twice);
+            });
+        }
+
         private void OnTapped(Collider hit)
         {
+            if (hit != null && hit.GetComponentInParent<DroneView>() != null) { CatchDrone(); return; }
             var view = hit != null ? hit.GetComponentInParent<MachineView>() : null;
             Ui.Hud.Select(view);
             if (view != null)

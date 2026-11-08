@@ -182,8 +182,9 @@ namespace FactoryKing.Core.Meta
         public const string Boost = "boost";
         public const string FreeDiamonds = "free_diamonds";
         public const string FreeCash = "free_cash";
+        public const string Drone = "drone";
 
-        public static int DailyCap(string p) => p == DoubleOffline ? 20 : p == Boost ? 8 : p == FreeDiamonds ? 5 : 10;
+        public static int DailyCap(string p) => p == DoubleOffline ? 20 : p == Boost ? 8 : p == FreeDiamonds ? 5 : p == Drone ? 15 : 10;
         public static TimeSpan Cooldown(string p) =>
             p == FreeDiamonds ? TimeSpan.FromMinutes(10) : p == FreeCash ? TimeSpan.FromMinutes(5) : TimeSpan.Zero;
     }

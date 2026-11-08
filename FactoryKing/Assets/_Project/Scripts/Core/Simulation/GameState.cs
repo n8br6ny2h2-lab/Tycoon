@@ -212,6 +212,7 @@ namespace FactoryKing.Core.Simulation
             Live.RoadClaimedFree ??= new HashSet<int>();
             Live.RoadClaimedPremium ??= new HashSet<int>();
             Live.EventBadges ??= new List<string>();
+            Live.CoopRewardsClaimed ??= new HashSet<string>(StringComparer.Ordinal);
             if (Live.EventFactory != null) Live.EventFactory.ClaimedTiers ??= new HashSet<int>();
             Ads ??= new AdState();
             Ads.ShownToday ??= new Dictionary<string, int>(StringComparer.Ordinal);

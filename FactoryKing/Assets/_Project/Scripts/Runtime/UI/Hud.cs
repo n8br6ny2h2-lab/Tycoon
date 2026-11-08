@@ -125,6 +125,14 @@ namespace FactoryKing.Runtime.UI
                 UiKit.Warn, () => C.Ui.Open("orders"));
             Chip("event", () => T("hud.event_live"), () => S.Events.Active().Count > 0, UiKit.Diamond, () => C.Ui.Open("events"));
             Chip("prestige", () => T("hud.prestige_ready"), () => S.Prestige.Preview().Available, UiKit.Accent, () => C.Ui.Open("prestige"));
+            Chip("claimall", () => T("hud.claim_all"), () => S.Missions.ClaimableCount + S.Seasons.ClaimableCount + S.Road.ClaimableCount > 1,
+                UiKit.Good, () =>
+                {
+                    int n = S.Convenience.ClaimAll();
+                    if (n > 0) { C.Audio?.Play(Sfx.Success); C.Ui.Toast(C.TF("hud.claimed_n", n), UiKit.Good); }
+                });
+            Chip("drone", () => T("hud.drone"), () => S.Drone.IsVisible, UiKit.Warn, () => C.CatchDrone?.Invoke());
+            Chip("expedition", () => T("hud.expedition_back"), () => S.Expeditions.Active.Exists(e => S.Expeditions.Remaining(e) <= 0), UiKit.Diamond, () => C.Ui.Open("expeditions"));
             Chip("season", () => C.TF("hud.season_reward", S.Seasons.ClaimableCount), () => S.Seasons.ClaimableCount > 0,
                 UiKit.Diamond, () => C.Ui.Open("season"));
             Chip("power", () => T("hud.power_low"), () => S.Power.Throttle(S.State.ActiveFactoryId) < 0.999, UiKit.Bad, () => Select(null));
@@ -201,6 +209,21 @@ namespace FactoryKing.Runtime.UI
                 string hot = S.Market.HotFactoryId(S.Time.TrustedNow) == fid ? "  ★ " + T("market.hot") : "";
                 return C.TF("market.price", pct) + hot;
             }));
+
+            // Supply chain and truck fleet.
+            var defF = S.Content.GetFactory(fid);
+            if (defF.SupplierId != null)
+                box.Add(B.Text(UiKit.Label("", 26, false, UiKit.Muted), () =>
+                    C.TF("supply.line", T(S.Content.GetFactory(defF.SupplierId).NameKey)) + (S.Supply.IsSupplied(fid) ? "  ✓ " + T("supply.active") : "")));
+            var fleetRow = UiKit.Row(0, Justify.SpaceBetween);
+            var fleetLabel = UiKit.Label("", 26, false, UiKit.Muted);
+            B.Text(fleetLabel, () => C.TF("fleet.status", T("fleet.tier" + S.Fleet.Level(fid)), Mathf.RoundToInt((float)(FleetService.Capacity(S.Fleet.Level(fid)) * 100))));
+            fleetRow.Add(fleetLabel);
+            var fleetUp = UiKit.Button("", () => { if (S.Fleet.TryUpgrade(fid)) C.Audio?.Play(Sfx.Upgrade); }, UiKit.Warn, 24, 76);
+            B.Button(fleetUp, () => S.Fleet.Level(fid) >= FleetService.MaxLevel ? T("ui.max_level") : C.TF("fleet.upgrade", C.M(S.Fleet.UpgradeCost(fid))),
+                () => S.Fleet.Level(fid) < FleetService.MaxLevel && S.Wallet.CanAfford(S.Fleet.UpgradeCost(fid)));
+            fleetRow.Add(fleetUp);
+            box.Add(fleetRow);
 
             // Power plant: demand vs capacity and its upgrade.
             var powerRow = UiKit.Row(0, Justify.SpaceBetween);

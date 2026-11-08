@@ -13,6 +13,8 @@ namespace FactoryKing.Runtime.Platform
     {
         public const string LeaderboardCompanyLevel = "factoryking.company_level";
         public const string LeaderboardPrestige = "factoryking.prestige_count";
+        /// <summary>Recurring weekly leaderboard (configure as "recurring" in App Store Connect).</summary>
+        public const string LeaderboardEventTokens = "factoryking.event_tokens";
 
         private readonly GameSession _session;
         public bool Authenticated { get; private set; }
@@ -51,6 +53,7 @@ namespace FactoryKing.Runtime.Platform
             if (!Authenticated) return;
             Social.ReportScore(_session.CompanyLevel, LeaderboardCompanyLevel, _ => { });
             Social.ReportScore(_session.State.Prestige.Count, LeaderboardPrestige, _ => { });
+            if (_session.EventFactory.IsActive) Social.ReportScore(_session.EventFactory.Tokens, LeaderboardEventTokens, _ => { });
         }
 
         public void ShowLeaderboards()

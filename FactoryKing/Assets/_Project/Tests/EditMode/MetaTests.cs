@@ -204,7 +204,7 @@ namespace FactoryKing.Tests
             Assert.That(_s.State.Collection, Does.Contain(pv.DecorId));
             Assert.That(_s.State.RunEarnings.IsZero, Is.True);
             Assert.That(_s.AnalyzeLine("steel", 0).RevenuePerSecond, Is.GreaterThan(priceBefore * pv.MultiplierAfter * 0.99 / 1.0 - 1e-9).Or.GreaterThan(0));
-            Assert.That(_s.Modifiers.Get(ModifierStat.SellPrice, "steel") / _s.Market.PriceFactor("steel"), Is.EqualTo(pv.MultiplierAfter).Within(1e-9));
+            Assert.That(_s.Modifiers.Get(ModifierStat.SellPrice, "steel") / _s.Market.PriceFactor("steel") / (1 + _s.Badges.Bonus) / _s.Seasons.Momentum, Is.EqualTo(pv.MultiplierAfter).Within(1e-6));
         }
 
         [Test]

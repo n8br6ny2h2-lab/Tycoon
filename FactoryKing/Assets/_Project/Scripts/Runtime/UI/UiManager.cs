@@ -20,14 +20,18 @@ namespace FactoryKing.Runtime.UI
         public SaveManager Save;
         public GameCenterService GameCenter;
         public NotificationService Notifications;
+        public OnlineService Online;
         public AudioManager Audio;
         public FactoryView FactoryView;
         public UiManager Ui;
         public Action<MachineView> FocusMachine;
         public Action ShowPause;
+        public Action CatchDrone;
         public Action ResetView;
         public string PrivacyPolicyUrl = "https://example.com/factoryking/privacy";
         public string SupportUrl = "https://example.com/factoryking/support";
+        /// <summary>Terms of use (Apple's standard EULA unless you publish your own) — required for subscriptions.</summary>
+        public string TermsUrl = "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/";
 
         public string T(string key) => Loc.Get(key);
         public string TF(string key, params object[] args) => Loc.Format(key, args);
@@ -202,6 +206,16 @@ namespace FactoryKing.Runtime.UI
             page.Add(scroll);
             _pageLayer.Add(page);
             _hud.SetNavVisible(false);
+        }
+
+        /// <summary>Text size and colour-blind palette from Settings.</summary>
+        public void ApplyAccessibility()
+        {
+            var st = _ctx.Session.State.Settings;
+            if (_doc != null && _doc.panelSettings != null)
+                _doc.panelSettings.scale = st.TextScale == 2 ? 1.3f : st.TextScale == 1 ? 1.15f : 1f;
+            UiKit.SetColorblind(st.Colorblind);
+            _hud?.Rebuild();
         }
 
         public void Close()

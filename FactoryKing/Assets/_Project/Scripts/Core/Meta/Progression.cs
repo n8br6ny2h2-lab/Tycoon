@@ -338,6 +338,8 @@ namespace FactoryKing.Core.Meta
     {
         public string Id;
         public string NameKey;
+        /// <summary>Inline names for remotely scheduled events (used when NameKey is null).</summary>
+        public string NameEn, NameTr;
         public DateTime StartUtc;
         public DateTime EndUtc;
         public string GoalType; // a MissionTypes value

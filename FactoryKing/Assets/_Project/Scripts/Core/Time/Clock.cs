@@ -44,16 +44,35 @@ namespace FactoryKing.Core.TimeKeeping
 
         public IClock Clock => _clock;
 
+        private long _serverOffsetTicks;
+
+        /// <summary>True once the clock was checked against the game server (online features enabled).</summary>
+        public bool ServerVerified { get; private set; }
+
+        /// <summary>Device time corrected by the last server time check.</summary>
+        private long Now => _clock.UtcNow.Ticks + _serverOffsetTicks;
+
+        /// <summary>
+        /// Uses the server's clock from now on (removes any manual change of the device clock). Offsets under a
+        /// minute are ignored (network latency).
+        /// </summary>
+        public void ApplyServerTime(DateTime serverUtc)
+        {
+            long offset = serverUtc.Ticks - _clock.UtcNow.Ticks;
+            _serverOffsetTicks = Math.Abs(offset) < TimeSpan.TicksPerMinute ? 0 : offset;
+            ServerVerified = true;
+        }
+
         /// <summary>True when the device clock is earlier than a time the game has already seen.</summary>
         public bool IsRolledBack => _state.MaxSeenUtcTicks > 0 &&
-                                    _clock.UtcNow.Ticks < _state.MaxSeenUtcTicks - RollbackTolerance.Ticks;
+                                    Now < _state.MaxSeenUtcTicks - RollbackTolerance.Ticks;
 
         /// <summary>Monotonic game time: never earlier than anything seen before.</summary>
         public DateTime TrustedNow
         {
             get
             {
-                long now = _clock.UtcNow.Ticks;
+                long now = Now;
                 if (now > _state.MaxSeenUtcTicks) _state.MaxSeenUtcTicks = now;
                 return new DateTime(Math.Max(now, _state.MaxSeenUtcTicks), DateTimeKind.Utc);
             }
@@ -70,7 +89,7 @@ namespace FactoryKing.Core.TimeKeeping
         public double ConsumeElapsedSinceSave()
         {
             if (_state.LastSavedUtcTicks <= 0) return 0;
-            long now = _clock.UtcNow.Ticks;
+            long now = Now;
             if (IsRolledBack)
             {
                 _state.ClockRollbacksDetected++;

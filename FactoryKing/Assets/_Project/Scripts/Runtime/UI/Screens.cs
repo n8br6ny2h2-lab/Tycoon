@@ -20,6 +20,23 @@ namespace FactoryKing.Runtime.UI
         protected override void Build(VisualElement root)
         {
             var s = C.Session;
+            if (s.EventFactory.IsActive)
+            {
+                var ev = s.EventFactory.Current;
+                var evDef = s.Content.GetFactory(ev.FactoryId);
+                var card = Card(root);
+                card.style.borderLeftWidth = 10;
+                card.style.borderLeftColor = UiKit.Diamond;
+                card.Add(UiKit.Label("★ " + T(evDef.NameKey), 40, true, UiKit.Diamond));
+                card.Add(B.Text(UiKit.Label("", 28, false, UiKit.Muted), () =>
+                    TF("event.factory_status", s.EventFactory.Tokens, NumberFormatter.FormatDuration((ev.EndUtcTicks - s.Time.TrustedNow.Ticks) / (double)TimeSpan.TicksPerSecond))));
+                if (s.State.ActiveFactoryId != ev.FactoryId)
+                    card.Add(UiKit.Button(T("map.visit"), () => { s.Factories.SetActiveFactory(ev.FactoryId); C.Ui.Close(); }, UiKit.Diamond));
+            }
+            else if (!s.EventFactory.IsUnlockedForPlayer)
+            {
+                root.Add(UiKit.Label(T("event.factory_locked"), 26, false, UiKit.Muted, true));
+            }
             bool shownNext = false;
             foreach (var f in s.Content.Factories.OrderBy(x => x.Order))
             {
@@ -32,6 +49,9 @@ namespace FactoryKing.Runtime.UI
                 card.Add(head);
                 var final = s.Content.GetProduct(s.Content.GetMachine(def.MachineChain[def.MachineChain.Count - 1]).OutputProductId);
                 card.Add(UiKit.Label(TF("map.product", T(final.NameKey)), 28, false, UiKit.Muted));
+                if (def.SupplierId != null)
+                    card.Add(UiKit.Label(TF("supply.line", T(s.Content.GetFactory(def.SupplierId).NameKey)) + (s.Supply.IsSupplied(def.Id) ? " ✓" : ""), 26, false,
+                        s.Supply.IsSupplied(def.Id) ? UiKit.Good : UiKit.Muted, true));
                 card.Add(B.Text(UiKit.Label("", 28, false, UiKit.Diamond), () =>
                 {
                     double f = s.Market.PriceFactor(def.Id);
@@ -101,6 +121,12 @@ namespace FactoryKing.Runtime.UI
                 card.Add(UiKit.Label(T(d.TitleKey), 30, false, UiKit.Muted));
 
                 var owned = s.Managers.GetOwned(d.Id);
+                if (owned == null && d.HireDiamonds <= 0)
+                {
+                    card.Add(UiKit.Label(TF("managers.bonus", Pct(ManagerService.Bonus(d, 1)), T("stat." + d.Stat)), 30));
+                    card.Add(UiKit.Button(TF("cards.recruit", s.Managers.Cards(d.Id), ManagerService.CardsToUnlock(d.Rarity)), () => C.Ui.Open("cards"), UiKit.CardHi, 26, 84));
+                    continue;
+                }
                 if (owned == null)
                 {
                     card.Add(UiKit.Label(TF("managers.bonus", Pct(ManagerService.Bonus(d, 1)), T("stat." + d.Stat)), 30));
@@ -127,8 +153,9 @@ namespace FactoryKing.Runtime.UI
                 var row = UiKit.Row();
                 var up = UiKit.Button("", () => { if (s.Managers.TryLevelUp(d.Id)) { C.Audio?.Play(Sfx.Upgrade); Rebuild(); } });
                 up.style.flexGrow = 1;
-                B.Button(up, () => owned.Level >= d.MaxLevel ? T("ui.max_level") : TF("managers.levelup", M(s.Managers.LevelUpCost(d, owned.Level))),
-                    () => owned.Level < d.MaxLevel && s.Wallet.CanAfford(s.Managers.LevelUpCost(d, owned.Level)));
+                B.Button(up, () => owned.Level >= d.MaxLevel ? T("ui.max_level")
+                        : TF("managers.levelup", M(s.Managers.LevelUpCost(d, owned.Level))) + $"  ▣ {s.Managers.Cards(d.Id)}/{ManagerService.CardsForLevel(owned.Level)}",
+                    () => owned.Level < d.MaxLevel && s.Wallet.CanAfford(s.Managers.LevelUpCost(d, owned.Level)) && s.Managers.Cards(d.Id) >= ManagerService.CardsForLevel(owned.Level));
                 row.Add(up);
                 bool here = owned.AssignedFactoryId == s.State.ActiveFactoryId;
                 var assign = UiKit.Button(here ? T("managers.unassign") : T("managers.assign_here"), () =>
@@ -373,7 +400,8 @@ namespace FactoryKing.Runtime.UI
             }
 
             Section(root, "collection.title");
-            var badges = s.State.Prestige.Badges.Concat(s.State.Collection).ToList();
+            var badges = s.State.Prestige.Badges.Concat(s.State.Live.EventBadges).Concat(s.State.Collection.Where(c => CosmeticService.Get(c) == null)).ToList();
+            root.Add(UiKit.Label(TF("badges.bonus", s.Badges.Count, Mathf.RoundToInt((float)(s.Badges.Bonus * 100))), 28, true, UiKit.Warn, true));
             if (badges.Count == 0) root.Add(UiKit.Label(T("collection.empty"), 28, false, UiKit.Muted, true));
             foreach (var id in badges)
             {
@@ -399,6 +427,34 @@ namespace FactoryKing.Runtime.UI
         protected override void Build(VisualElement root)
         {
             var s = C.Session;
+            if (s.EventFactory.IsActive)
+            {
+                var ev = s.EventFactory.Current;
+                var evDef = s.Content.GetFactory(ev.FactoryId);
+                var head = Card(root);
+                head.Add(UiKit.Label("★ " + T(evDef.NameKey), 42, true, UiKit.Diamond));
+                head.Add(UiKit.Label(T("event.factory_intro"), 26, false, UiKit.Muted, true));
+                head.Add(B.Text(UiKit.Label("", 30, true), () => TF("event.tokens", s.EventFactory.Tokens)));
+                if (s.State.ActiveFactoryId != ev.FactoryId)
+                    head.Add(UiKit.Button(T("map.visit"), () => { s.Factories.SetActiveFactory(ev.FactoryId); C.Ui.Close(); }, UiKit.Diamond));
+                if (C.GameCenter != null && C.GameCenter.Authenticated)
+                    head.Add(UiKit.Button(T("gc.leaderboards"), C.GameCenter.ShowLeaderboards, UiKit.CardHi, 26, 84));
+                for (int i = 0; i < EventFactoryService.Tiers.Length; i++)
+                {
+                    int tier = i;
+                    var t = EventFactoryService.Tiers[i];
+                    var card = Card(root);
+                    card.Add(UiKit.Label(TF("event.tier", t.tokens) + $"  ◆ {t.diamonds}" + (t.crate != null ? " + " + T("crate." + t.crate.Substring(6)) : "")
+                                         + (tier == EventFactoryService.Tiers.Length - 1 ? " + " + T("event.badge") : ""), 28, true, null, true));
+                    var bar = UiKit.ProgressBar(out var fill, UiKit.Diamond);
+                    B.Progress(fill, () => s.EventFactory.Tokens / (double)t.tokens);
+                    card.Add(bar);
+                    var claim = UiKit.Button("", () => { if (s.EventFactory.TryClaim(tier)) { C.Audio?.Play(Sfx.Success); Rebuild(); } }, UiKit.Good, 28, 84);
+                    B.Button(claim, () => ev.ClaimedTiers.Contains(tier) ? T("ui.claimed") : T("ui.claim"),
+                        () => s.EventFactory.IsTierReached(tier) && !ev.ClaimedTiers.Contains(tier));
+                    card.Add(claim);
+                }
+            }
             var active = s.Events.Active();
             if (active.Count == 0)
             {
@@ -413,8 +469,9 @@ namespace FactoryKing.Runtime.UI
             {
                 var ev = e;
                 var card = Card(root);
-                card.Add(UiKit.Label(T(ev.NameKey), 40, true, UiKit.Diamond));
-                card.Add(UiKit.Label(T(ev.NameKey + ".desc"), 28, false, UiKit.Muted, true));
+                string evName = ev.NameKey != null ? T(ev.NameKey) : (C.Loc.Current == Core.Localization.Language.Turkish ? ev.NameTr : ev.NameEn);
+                card.Add(UiKit.Label(evName, 40, true, UiKit.Diamond));
+                if (ev.NameKey != null) card.Add(UiKit.Label(T(ev.NameKey + ".desc"), 28, false, UiKit.Muted, true));
                 var p = s.Events.Progress(ev);
                 var bar = UiKit.ProgressBar(out var fill, UiKit.Diamond, 24);
                 B.Progress(fill, () => s.Events.Value(ev) / Math.Max(1, p.Target));
@@ -490,7 +547,9 @@ namespace FactoryKing.Runtime.UI
         {
             (string key, string id)[] items =
             {
-                ("screen.season", "season"), ("screen.cosmetics", "cosmetics"), ("menu.help", "help"),
+                ("screen.season", "season"), ("screen.cards", "cards"), ("screen.expeditions", "expeditions"),
+                ("screen.coop", "coop"), ("screen.club", "club"), ("screen.engineering", "engineering"),
+                ("screen.cosmetics", "cosmetics"), ("screen.stats", "stats"), ("menu.help", "help"),
                 ("screen.orders", "orders"), ("screen.research", "research"), ("screen.warehouse", "warehouse"),
                 ("screen.daily", "daily"), ("screen.achievements", "achievements"), ("screen.events", "events"),
                 ("screen.prestige", "prestige"), ("screen.settings", "settings"),

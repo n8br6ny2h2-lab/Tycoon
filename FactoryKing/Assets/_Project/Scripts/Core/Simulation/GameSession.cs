@@ -53,6 +53,7 @@ namespace FactoryKing.Core.Simulation
         public ConvenienceService Convenience { get; }
         public PiggyBankService Piggy { get; }
         public OfferService Offers { get; }
+        public CoopTracker Coop { get; }
         private int _metaCount;
 
         private double _metaTimer;
@@ -102,6 +103,7 @@ namespace FactoryKing.Core.Simulation
             Convenience = new ConvenienceService(this);
             Piggy = new PiggyBankService(this);
             Offers = new OfferService(this);
+            Coop = new CoopTracker(this);
             Seasons.EnsureStarted();
             Offers.EnsureStarted();
 

@@ -23,14 +23,57 @@ namespace FactoryKing.Runtime.UI
             AdOffer(root, AdPlacements.Boost, "shop.ad.boost", () => s.Boosts.Activate(30));
             AdOffer(root, AdPlacements.FreeDiamonds, "shop.ad.diamonds", () => s.Wallet.AddDiamonds(5));
             AdOffer(root, AdPlacements.FreeCash, "shop.ad.cash", () => s.Wallet.Grant(s.IncomeReward(600)));
+            var crates = Card(root);
+            crates.Add(UiKit.Label(T("screen.cards"), 32, true));
+            crates.Add(UiKit.Button(T("cards.go"), () => C.Ui.Open("cards"), UiKit.CardHi, 26, 84));
+
+            if (s.Offers.CanClaimVipDaily)
+                root.Add(UiKit.Button(TF("vip.daily", OfferService.VipDailyDiamonds), () => { if (s.Offers.TryClaimVipDaily()) { C.Audio?.Play(Sfx.Success); Rebuild(); } }, UiKit.Good));
 
             Section(root, "shop.premium");
             foreach (var p in s.Purchases.Catalog.Products)
             {
                 var product = p;
+                if (product.PiggyBank)
+                {
+                    var pc = Card(root);
+                    pc.Add(UiKit.Label(T("shop.piggy_bank"), 36, true));
+                    pc.Add(UiKit.Label(TF("piggy.status", s.Piggy.Diamonds, PiggyBankService.Cap, PiggyBankService.MinToBreak), 26, false, UiKit.Muted, true));
+                    var pbar = UiKit.ProgressBar(out var pfill, UiKit.Diamond);
+                    UiKit.SetProgress(pfill, s.Piggy.Diamonds / (double)PiggyBankService.Cap);
+                    pc.Add(pbar);
+                    var pb = UiKit.Button(C.Store.PriceText(product), () => C.Store.Buy(product), UiKit.Good);
+                    UiKit.SetEnabled(pb, s.Purchases.CanPurchase(product));
+                    pc.Add(pb);
+                    continue;
+                }
+                if (product.SubscriptionDays > 0)
+                {
+                    var vc = Card(root);
+                    vc.Add(UiKit.Label(T("shop.vip_weekly"), 36, true, UiKit.Warn));
+                    vc.Add(UiKit.Label(T("shop.vip_weekly.desc"), 26, false, UiKit.Muted, true));
+                    if (s.Offers.VipActive)
+                        vc.Add(UiKit.Label(TF("vip.active_until", NumberFormatter.FormatDuration((s.State.Live.SubscriptionExpiresUtcTicks - s.Time.TrustedNow.Ticks) / (double)TimeSpan.TicksPerSecond)), 26, true, UiKit.Good));
+                    var vb = UiKit.Button(TF("vip.price", C.Store.PriceText(product)), () => C.Store.Buy(product), UiKit.Good);
+                    UiKit.SetEnabled(vb, s.Purchases.CanPurchase(product));
+                    vc.Add(vb);
+                    // Auto-renewable subscription disclosure required by App Store guideline 3.1.2.
+                    vc.Add(UiKit.Label(T("vip.terms"), 22, false, UiKit.Muted, true));
+                    var subLinks = UiKit.Row();
+                    subLinks.Add(UiKit.Button(T("settings.terms"), () => Application.OpenURL(C.TermsUrl), UiKit.Card, 22, 70));
+                    subLinks.Add(UiKit.Button(T("settings.privacy"), () => Application.OpenURL(C.PrivacyPolicyUrl), UiKit.Card, 22, 70));
+                    vc.Add(subLinks);
+                    continue;
+                }
                 var card = Card(root);
                 var head = UiKit.Row(0, Justify.SpaceBetween);
                 head.Add(UiKit.Label(T(product.NameKey), 36, true));
+                if (product.Id == "starter_pack" && s.Offers.StarterHighlighted)
+                {
+                    card.style.borderLeftWidth = 10;
+                    card.style.borderLeftColor = UiKit.Accent;
+                    card.Add(B.Text(UiKit.Label("", 26, true, UiKit.Accent), () => TF("offer.ends", NumberFormatter.FormatDuration(s.Offers.StarterSecondsLeft))));
+                }
                 if (product.Diamonds > 0) head.Add(UiKit.Label("◆ " + product.Diamonds, 34, true, UiKit.Diamond));
                 card.Add(head);
                 card.Add(UiKit.Label(T(product.DescriptionKey), 28, false, UiKit.Muted, true));
@@ -103,6 +146,21 @@ namespace FactoryKing.Runtime.UI
             root.Add(UiKit.Label(T("settings.analytics_note"), 24, false, UiKit.Muted, true));
             root.Add(Toggle(T("settings.quality"), st.HighQuality, v => { st.HighQuality = v; QualityProfile.Apply(v); }));
             root.Add(Toggle(T("settings.haptics"), st.Haptics, v => st.Haptics = v));
+            root.Add(Toggle(T("settings.auto_upgrade"), st.AutoUpgrade, v => st.AutoUpgrade = v));
+            root.Add(UiKit.Label(T("settings.auto_upgrade_note"), 24, false, UiKit.Muted, true));
+
+            Section(root, "settings.accessibility");
+            var sizes = UiKit.Row();
+            for (int i = 0; i < 3; i++)
+            {
+                int size = i;
+                var b = UiKit.Button(T("settings.text" + i), () => { st.TextScale = size; C.Ui.ApplyAccessibility(); Rebuild(); }, st.TextScale == i ? UiKit.Accent : UiKit.CardHi, 26, 84);
+                b.style.flexGrow = 1;
+                sizes.Add(b);
+            }
+            root.Add(sizes);
+            root.Add(Toggle(T("settings.colorblind"), st.Colorblind, v => { st.Colorblind = v; C.Ui.ApplyAccessibility(); }));
+            root.Add(Toggle(T("settings.reduce_motion"), st.ReduceMotion, v => st.ReduceMotion = v));
             root.Add(Toggle(T("settings.battery"), st.BatterySaver, v => st.BatterySaver = v));
             root.Add(UiKit.Label(T("settings.battery_note"), 24, false, UiKit.Muted, true));
 
@@ -120,6 +178,7 @@ namespace FactoryKing.Runtime.UI
                 s.State.CompanyName = n;
                 nameField.value = n;
                 C.Ui.Toast(n, UiKit.Good);
+                C.Online?.SyncName();
             }, UiKit.CardHi, 28, 90));
             root.Add(nameRow);
 
@@ -130,6 +189,9 @@ namespace FactoryKing.Runtime.UI
                     () => { if (C.GameCenter.Authenticated) C.GameCenter.ShowLeaderboards(); else C.GameCenter.SignIn(); }, UiKit.CardHi));
             root.Add(UiKit.Button(T("settings.privacy"), () => Application.OpenURL(C.PrivacyPolicyUrl), UiKit.CardHi));
             root.Add(UiKit.Button(T("settings.support"), () => Application.OpenURL(C.SupportUrl), UiKit.CardHi));
+            root.Add(UiKit.Button(T("settings.terms"), () => Application.OpenURL(C.TermsUrl), UiKit.CardHi));
+            if (C.Online != null && C.Online.Enabled)
+                root.Add(UiKit.Button(T("settings.delete_online"), () => C.Online.DeleteOnlineData(ok => C.Ui.Toast(T(ok ? "settings.delete_online_done" : "online.error"))), UiKit.Bad));
             root.Add(UiKit.Button(T("settings.reset"), ConfirmReset, UiKit.Bad));
 
             root.Add(UiKit.Label($"Factory King {Application.version} · {C.Store.Backend.Name}", 24, false, UiKit.Muted));

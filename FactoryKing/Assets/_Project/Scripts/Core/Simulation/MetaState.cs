@@ -190,6 +190,13 @@ namespace FactoryKing.Core.Simulation
         public long SubscriptionExpiresUtcTicks;
         public long SubscriptionLastDailyDay = -1;
         public double AutoUpgradeTimer;
+        // Online (optional server)
+        public string CoopCode;
+        public string CoopContractId;
+        public long CoopBaselineSold;
+        public HashSet<string> CoopRewardsClaimed = new HashSet<string>(StringComparer.Ordinal);
+        public long WeekXpWeek = -1;
+        public int WeekXp;
     }
 
     [Serializable]

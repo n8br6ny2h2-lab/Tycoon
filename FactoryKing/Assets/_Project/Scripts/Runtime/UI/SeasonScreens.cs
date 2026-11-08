@@ -13,6 +13,15 @@ namespace FactoryKing.Runtime.UI
         public override string Id => "season";
         public override string TitleKey => "screen.season";
 
+        private string RewardText(RoadReward r)
+        {
+            if (r.Cosmetic != null) return T(CosmeticService.Get(r.Cosmetic).NameKey) + (r.Crate != null ? " + " + T("crate." + r.Crate.Substring(6)) : "");
+            if (r.Crate != null) return T("crate." + r.Crate.Substring(6));
+            if (r.Cards > 0) return TF("road.cards", r.Cards);
+            if (r.BoostMinutes > 0) return TF("daily.boost", r.BoostMinutes);
+            return "◆ " + r.Diamonds;
+        }
+
         protected override void Build(VisualElement root)
         {
             var s = C.Session;
@@ -40,6 +49,37 @@ namespace FactoryKing.Runtime.UI
             else
             {
                 root.Add(UiKit.Label(T("season.premium_active"), 30, true, UiKit.Diamond));
+            }
+
+            Section(root, "road.title");
+            root.Add(B.Text(UiKit.Label("", 30, true), () => TF("road.progress", s.Road.TiersReached, SeasonRoadService.TierCount, s.Road.Xp % SeasonRoadService.XpPerTier, SeasonRoadService.XpPerTier)));
+            var roadBar = UiKit.ProgressBar(out var roadFill, UiKit.Diamond, 22);
+            B.Progress(roadFill, () => s.Road.TiersReached / (double)SeasonRoadService.TierCount);
+            root.Add(roadBar);
+            root.Add(UiKit.Label(T("road.how"), 24, false, UiKit.Muted, true));
+            for (int i = 0; i < SeasonRoadService.TierCount; i++)
+            {
+                int tier = i;
+                var row = UiKit.Box(tier < s.Road.TiersReached ? UiKit.CardHi : UiKit.Card, 16, 8, 14);
+                row.style.flexDirection = FlexDirection.Row;
+                row.style.alignItems = Align.Center;
+                row.style.marginBottom = 6;
+                var num = UiKit.Label((tier + 1).ToString(), 30, true, UiKit.Accent);
+                num.style.width = 70;
+                row.Add(num);
+                Button Reward(RoadReward r, bool premium)
+                {
+                    var b = UiKit.Button(RewardText(r), () => { if (s.Road.TryClaim(tier, premium)) { C.Audio?.Play(Sfx.Success); Rebuild(); } },
+                        premium ? UiKit.Diamond : UiKit.Good, 22, 80);
+                    b.style.flexGrow = 1; b.style.flexBasis = 0;
+                    bool claimed = premium ? s.State.Live.RoadClaimedPremium.Contains(tier) : s.State.Live.RoadClaimedFree.Contains(tier);
+                    if (claimed) b.text = "✓ " + b.text;
+                    UiKit.SetEnabled(b, premium ? s.Road.CanClaimPremium(tier) : s.Road.CanClaimFree(tier));
+                    return b;
+                }
+                row.Add(Reward(SeasonRoadService.Free(tier), false));
+                row.Add(Reward(SeasonRoadService.Premium(tier), true));
+                root.Add(row);
             }
 
             Section(root, "season.rewards");

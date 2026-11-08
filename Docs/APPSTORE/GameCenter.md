@@ -7,6 +7,7 @@ Enable Game Center for the App ID (the Xcode capability is added automatically b
 |---|---|---|
 | factoryking.company_level | Company Level / Şirket Seviyesi | company level |
 | factoryking.prestige_count | Restructures / Yeniden Yapılanmalar | prestige count |
+| factoryking.event_tokens | Event Factory / Etkinlik Fabrikası | tokens in the current weekly event (**recurring leaderboard**, weekly, starting Thursday 00:00 UTC) |
 
 ## Achievements (100 points total suggested; all visible)
 | Id | EN | TR | Points |

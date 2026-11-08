@@ -526,8 +526,15 @@ namespace FactoryKing.Core.Meta
 
         public void AddXp(int xp)
         {
-            if (xp > 0) _s.State.Live.SeasonXp += xp;
+            if (xp <= 0) return;
+            var l = _s.State.Live;
+            l.SeasonXp += xp;
+            long week = _s.Time.TrustedWeekIndex;
+            if (l.WeekXpWeek != week) { l.WeekXpWeek = week; l.WeekXp = 0; }
+            l.WeekXp += xp; // reported to the club (online)
         }
+
+        public int WeekXp => _s.State.Live.WeekXpWeek == _s.Time.TrustedWeekIndex ? _s.State.Live.WeekXp : 0;
 
         public static RoadReward Free(int tier)
         {

@@ -15,9 +15,17 @@ namespace FactoryKing.Runtime.UI
         public static readonly Color Muted = Hex("#9AA6B8");
         public static readonly Color Accent = Hex("#FFA62B");
         public static readonly Color AccentDark = Hex("#C97A10");
-        public static readonly Color Good = Hex("#3DDC97");
-        public static readonly Color Warn = Hex("#FFC531");
-        public static readonly Color Bad = Hex("#FF5A4E");
+        public static Color Good = Hex("#3DDC97");
+        public static Color Warn = Hex("#FFC531");
+        public static Color Bad = Hex("#FF5A4E");
+
+        /// <summary>Colour-blind friendly palette (blue / orange / magenta instead of green / yellow / red).</summary>
+        public static void SetColorblind(bool on)
+        {
+            Good = on ? Hex("#3A86FF") : Hex("#3DDC97");
+            Warn = on ? Hex("#FFBE0B") : Hex("#FFC531");
+            Bad = on ? Hex("#FB5607") : Hex("#FF5A4E");
+        }
         public static readonly Color Diamond = Hex("#7FD8FF");
         public static readonly Color Disabled = Hex("#4A5262");
         public static readonly Color Overlay = Hex("#05080DB0");

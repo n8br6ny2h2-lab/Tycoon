@@ -1,0 +1,16 @@
+{
+  "events": [
+    {
+      "id": "evt_remote_sample",
+      "nameEn": "Spring Production Drive",
+      "nameTr": "Bahar Üretim Kampanyası",
+      "start": "2027-04-01T00:00:00Z",
+      "end": "2027-04-04T00:00:00Z",
+      "goal": "sell",
+      "targetMinutesOfOutput": 240,
+      "rewardDiamonds": 80,
+      "rewardDecorId": "decor_golden_gear"
+    }
+  ],
+  "messageOfTheDay": { "en": "", "tr": "" }
+}

@@ -13,11 +13,17 @@ Example with bundle id `com.yourcompany.factoryking`: `com.yourcompany.factoryki
 | vip | Non-consumable | +10% sale price, +2 h offline cap (permanent) | 7.99 | VIP |
 | cosmetic_gold | Non-consumable | Golden floor, walls, sky and statue (cosmetic only, permanent) | 2.99 | Golden Look |
 | cosmetic_neon | Non-consumable | Neon floor, walls and sky (cosmetic only, permanent) | 2.99 | Neon Look |
+| piggy_bank | **Consumable** | All diamonds saved in the piggy bank (200–1000) | 2.99 | Piggy Bank |
+| vip_weekly | **Auto-renewable subscription** (1 week, own subscription group "VIP") | 30 diamonds per day, video rewards without watching | 2.99 | Weekly VIP |
 | season_pass | **Consumable** (one per season) | Current 30-day season: 150 diamonds, double season and event diamonds, premium decorations | 4.99 | Season Pass |
 
 The Season Pass is consumable because it is bought again each season. The save (and iCloud) remembers that it is active for the current season, and it cannot be bought twice in one season. Decorations it unlocks are permanent.
 
 Localised display names and descriptions for each product are the `shop.<id>` and `shop.<id>.desc` entries in `FactoryKing/Assets/_Project/Resources/Localization/strings.txt` (EN/TR).
+
+**Subscription requirements (guideline 3.1.2):** The Shop shows the title, the period, the price, a renewal and cancellation notice, and links to the Terms of Use (Apple's standard EULA by default) and the Privacy Policy. Add the same links to the App Store description. The subscription expiry comes from the receipt (Unity IAP `SubscriptionManager`); the test store simulates 7 days.
+
+**Crates:** Crates contain random manager cards. They are earned in play or bought with diamonds, and **the odds are always shown before opening or buying** (guideline 3.1.1, "loot boxes").
 
 ## Implementation guarantees (covered by tests)
 - Each transaction id is granted **once**; repeated deliveries return `AlreadyProcessed`.

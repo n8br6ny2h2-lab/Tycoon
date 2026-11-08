@@ -302,7 +302,9 @@ namespace FactoryKing.Core.Persistence
                 .Set("exps", exps).Set("cards", IntMap(l.ManagerCards)).Set("crates", IntMap(l.Crates)).Set("eng", IntMap(l.Engineering))
                 .Set("xp", l.SeasonXp).Set("roadFree", IntSet(l.RoadClaimedFree)).Set("roadPrem", IntSet(l.RoadClaimedPremium))
                 .Set("badges", StrArray(l.EventBadges)).Set("piggy", l.PiggyDiamonds).Set("starter", l.StarterOfferStartUtcTicks.ToString())
-                .Set("subExp", l.SubscriptionExpiresUtcTicks.ToString()).Set("subDay", l.SubscriptionLastDailyDay);
+                .Set("subExp", l.SubscriptionExpiresUtcTicks.ToString()).Set("subDay", l.SubscriptionLastDailyDay)
+                .Set("coop", l.CoopCode).Set("coopC", l.CoopContractId).Set("coopBase", l.CoopBaselineSold)
+                .Set("coopDone", StrArray(l.CoopRewardsClaimed)).Set("wxWeek", l.WeekXpWeek).Set("wx", l.WeekXp);
             if (l.EventFactory != null)
             {
                 var e = l.EventFactory;
@@ -335,6 +337,12 @@ namespace FactoryKing.Core.Persistence
             l.StarterOfferStartUtcTicks = Ticks(o.Str("starter"));
             l.SubscriptionExpiresUtcTicks = Ticks(o.Str("subExp"));
             l.SubscriptionLastDailyDay = o.Lng("subDay", -1);
+            l.CoopCode = o.Str("coop");
+            l.CoopContractId = o.Str("coopC");
+            l.CoopBaselineSold = Math.Max(0, o.Lng("coopBase"));
+            foreach (var v in o.Arr("coopDone").Items) if (v.AsString() != null) l.CoopRewardsClaimed.Add(v.AsString());
+            l.WeekXpWeek = o.Lng("wxWeek", -1);
+            l.WeekXp = Math.Max(0, o.Int("wx"));
             var ev = o.Get("event");
             if (ev != null && ev.Type == JsonType.Object && ev.Str("f") != null)
             {

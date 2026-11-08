@@ -1,0 +1,14 @@
+{
+  "name": "factoryking-server",
+  "version": "1.0.0",
+  "description": "Reference backend for Factory King online features: server time, remote event schedule, co-op contracts, clubs. No dependencies.",
+  "type": "module",
+  "main": "src/server.js",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test test/app.test.js"
+  },
+  "license": "UNLICENSED",
+  "private": true
+}

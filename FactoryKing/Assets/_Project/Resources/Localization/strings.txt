@@ -670,3 +670,149 @@ help.t5	5 · While you're away	5 · Sen yokken
 help.b5	Factories keep earning for up to 8 hours. When you come back, collect — or double it with an optional video.	Fabrikalar 8 saate kadar kazanmaya devam eder. Döndüğünde topla ya da isteğe bağlı videoyla ikiye katla.
 help.t6	6 · Seasons	6 · Sezonlar
 help.b6	A season lasts 30 days. Reach factory milestones for permanent rewards. When it ends the run starts over, but diamonds, decorations, managers and legacy stars stay.	Bir sezon 30 gün sürer. Fabrika hedeflerine ulaşıp kalıcı ödüller kazan. Sezon bitince tur yeniden başlar ama elmaslar, dekorasyonlar, yöneticiler ve miras yıldızları kalır.
+screen.cards	Cards & Crates	Kartlar ve Sandıklar
+screen.club	Club	Kulüp
+screen.coop	Co-op Contract	Ortak Kontrat
+screen.engineering	Engineering	Mühendislik
+screen.expeditions	Expeditions	Seferler
+screen.stats	Statistics	İstatistikler
+hud.claim_all	Collect all	Tümünü topla
+hud.claimed_n	{0} rewards collected	{0} ödül toplandı
+hud.drone	Cargo drone!	Kargo dronu!
+hud.expedition_back	Expedition back	Sefer döndü
+drone.title	Cargo drone	Kargo dronu
+drone.double	Double it (video)	İkiye katla (video)
+badges.bonus	{0} badges: +{1}% sale price forever	{0} rozet: kalıcı +%{1} satış fiyatı
+cards.crates	Crates	Sandıklar
+cards.collection	Manager cards	Yönetici kartları
+cards.go	Open crates	Sandıkları aç
+cards.recruit	Recruit ▣ {0}/{1}	İşe al ▣ {0}/{1}
+cards.level_need	Level {0} · next level needs ▣ {1}	Seviye {0} · sonraki seviye için ▣ {1}
+crate.small	Small crate	Küçük sandık
+crate.big	Big crate	Büyük sandık
+crate.epic	Epic crate	Destansı sandık
+crate.contents	{0} manager cards	{0} yönetici kartı
+crate.odds	Odds: Common {0} · Rare {1} · Epic {2} · Legendary {3}	Olasılık: Sıradan {0} · Nadir {1} · Destansı {2} · Efsanevi {3}
+crate.open	Open	Aç
+crate.buy	Buy ◆ {0}	Satın al ◆ {0}
+crate.opened	You got:	Kazandıkların:
+exp.intro	Send trucks on trips. They come back with cash, manager cards and diamonds.	Kamyonları sefere gönder. Para, yönetici kartı ve elmasla dönerler.
+exp.slot	Truck {0}	Kamyon {0}
+exp.kind0	Short trip	Kısa sefer
+exp.kind1	Long haul	Uzun yol
+exp.kind2	Export voyage	İhracat seferi
+exp.rewards_hint	Longer trips bring more cards and diamonds; export voyages may find a crate.	Uzun seferler daha çok kart ve elmas getirir; ihracat seferinde sandık çıkabilir.
+exp.reward	{0} + ▣ {1} + ◆ {2}	{0} + ▣ {1} + ◆ {2}
+exp.back_in	Back in {0}	{0} sonra döner
+eng.intro	Engineering upgrades are permanent: they stay through every season.	Mühendislik yükseltmeleri kalıcıdır: her sezonda seninle kalır.
+eng.eng_offline	Night Shift Automation	Gece Vardiyası Otomasyonu
+eng.eng_offline.desc	+1 hour of offline earnings per level.	Seviye başına +1 saat çevrimdışı kazanç.
+eng.eng_startcash	Investor Network	Yatırımcı Ağı
+eng.eng_startcash.desc	Each season starts with more cash.	Her sezon daha fazla parayla başlar.
+eng.eng_cooldown	Leadership Training	Liderlik Eğitimi
+eng.eng_cooldown.desc	Manager skills recharge 8% faster per level.	Yönetici yetenekleri seviye başına %8 daha hızlı dolar.
+eng.eng_expedition	Route Planning	Rota Planlama
+eng.eng_expedition.desc	Expeditions take 10% less time per level.	Seferler seviye başına %10 daha kısa sürer.
+eng.eng_drone	Drone Hangar	Dron Hangarı
+eng.eng_drone.desc	Cargo drones come 10% more often per level.	Kargo dronları seviye başına %10 daha sık gelir.
+eng.eng_cards	Talent Scouts	Yetenek Avcıları
+eng.eng_cards.desc	+1 card in every crate per level.	Seviye başına her sandıkta +1 kart.
+stats.lifetime	Lifetime earnings	Toplam kazanç
+stats.income	Income	Gelir
+stats.value	Company value	Şirket değeri
+stats.factories	Factories	Fabrikalar
+stats.machines	Machines	Makineler
+stats.highest	Highest machine level	En yüksek makine seviyesi
+stats.produced	Items produced	Üretilen ürün
+stats.sold	Goods sold	Satılan mamul
+stats.upgrades	Upgrades	Yükseltmeler
+stats.orders	Orders delivered	Teslim edilen sipariş
+stats.drones	Drones caught	Yakalanan dron
+stats.expeditions	Expeditions	Seferler
+stats.crates	Crates opened	Açılan sandık
+stats.seasons	Seasons completed	Tamamlanan sezon
+stats.badges	Badges	Rozetler
+stats.playtime	Time played	Oynama süresi
+online.disabled	Online features are not set up for this version. Everything else works offline.	Bu sürümde çevrimiçi özellikler ayarlanmamış. Diğer her şey çevrimdışı çalışır.
+online.connecting	Connecting…	Bağlanıyor…
+online.ok	Done!	Tamam!
+online.error	Could not connect. Please try again.	Bağlanılamadı. Lütfen tekrar dene.
+coop.intro	Team up with up to 8 players. Everyone's sales this week count towards one big goal.	En fazla 8 oyuncuyla takım kur. Bu hafta herkesin satışı tek bir büyük hedefe sayılır.
+coop.create	Create a team	Takım kur
+coop.join	Join with code	Kodla katıl
+coop.code	Code: {0}	Kod: {0}
+coop.progress	{0} / {1} goods	{0} / {1} mamul
+coop.ends	Ends in {0}	Bitişe: {0}
+coop.reward	Team reward: ◆ {0} + Big crate	Takım ödülü: ◆ {0} + Büyük sandık
+coop.members	Team	Takım
+coop.done	Goal reached! Reward added.	Hedefe ulaşıldı! Ödül eklendi.
+club.intro	Join a club. Members' weekly season XP adds up to the club score.	Bir kulübe katıl. Üyelerin haftalık sezon XP'si kulüp puanına eklenir.
+club.create	Create	Kur
+club.join	Join with code	Kodla katıl
+club.leave	Leave	Ayrıl
+club.members	Members	Üyeler
+club.name_taken	Name not available.	Bu ad kullanılamıyor.
+club.report	Report name	Adı bildir
+club.reported	Thanks, we'll review it.	Teşekkürler, inceleyeceğiz.
+club.score	Club score this week: {0}	Bu haftaki kulüp puanı: {0}
+club.top	Top clubs this week	Haftanın en iyi kulüpleri
+road.title	Season road	Sezon yolu
+road.progress	Tier {0}/{1} · {2}/{3} XP	Kademe {0}/{1} · {2}/{3} XP
+road.how	Earn XP from missions, orders, events, expeditions, drones and new factories. Left: free rewards · right: Season Pass rewards.	XP'yi görevler, siparişler, etkinlikler, seferler, dronlar ve yeni fabrikalardan kazan. Sol: ücretsiz ödüller · sağ: Sezon Bileti ödülleri.
+road.cards	▣ {0} cards	▣ {0} kart
+event.factory_intro	A limited-time factory, open Thursday to Monday. Sold goods are tokens; reach the tiers for rewards and a permanent badge.	Perşembeden pazartesiye açık, süreli bir fabrika. Satılan her ürün bir jetondur; kademelere ulaşıp ödül ve kalıcı rozet kazan.
+event.factory_status	Event · {0} tokens · ends in {1}	Etkinlik · {0} jeton · bitişe {1}
+event.factory_locked	Event factories open every Thursday once you own two factories.	İki fabrikan olduğunda her perşembe etkinlik fabrikası açılır.
+event.tier	{0} tokens	{0} jeton
+event.tokens	Tokens: {0}	Jeton: {0}
+event.badge	event badge (+1% forever)	etkinlik rozeti (kalıcı +%1)
+supply.line	Supplied by: {0}	Tedarikçi: {0}
+supply.active	−20% costs, +10% price	−%20 gider, +%10 fiyat
+fleet.status	Fleet: {0} ({1}% load)	Filo: {0} (%{1} yük)
+fleet.upgrade	Upgrade fleet: {0}	Filoyu yükselt: {0}
+fleet.tier1	Vans	Kamyonetler
+fleet.tier2	Trucks	Kamyonlar
+fleet.tier3	Semi-trailers	Tırlar
+fleet.tier4	Road trains	Uzun tırlar
+fleet.tier5	Freight train	Yük treni
+offer.ends	Starter offer ends in {0}	Başlangıç teklifi {0} sonra bitiyor
+piggy.status	{0}/{1} diamonds saved · opens from {2}	{0}/{1} elmas birikti · {2} elmastan itibaren açılır
+shop.piggy_bank	Piggy Bank	Kumbara
+shop.piggy_bank.desc	A share of diamonds you earn is saved here. Break it to get them all.	Kazandığın elmasların bir kısmı burada birikir. Kır ve hepsini al.
+shop.vip_weekly	Weekly VIP	Haftalık VIP
+shop.vip_weekly.desc	30 diamonds every day and all video rewards without watching, while subscribed.	Abonelik süresince her gün 30 elmas ve tüm video ödülleri izlemeden.
+vip.price	Subscribe: {0} / week	Abone ol: {0} / hafta
+vip.active_until	Active · renews in {0}	Aktif · {0} sonra yenilenir
+vip.daily	Collect VIP diamonds (◆ {0})	VIP elmaslarını al (◆ {0})
+vip.terms	Auto-renewing weekly subscription. Payment is charged to your Apple ID at confirmation and renews automatically unless cancelled at least 24 hours before the end of the period. Manage or cancel in your App Store account settings.	Haftalık otomatik yenilenen abonelik. Ödeme onayda Apple Kimliğinden alınır ve dönem bitiminden en az 24 saat önce iptal edilmezse otomatik yenilenir. App Store hesap ayarlarından yönetebilir veya iptal edebilirsin.
+settings.accessibility	Accessibility	Erişilebilirlik
+settings.text0	Text: normal	Yazı: normal
+settings.text1	Text: large	Yazı: büyük
+settings.text2	Text: extra large	Yazı: çok büyük
+settings.colorblind	Colour-blind friendly colours	Renk körlüğüne uygun renkler
+settings.reduce_motion	Reduce motion	Hareketi azalt
+settings.auto_upgrade	Auto-upgrade bottlenecks	Darboğazları otomatik yükselt
+settings.auto_upgrade_note	Spends at most a quarter of your cash at a time on the slowest machines and the power plant.	Bir seferde en fazla paranın dörtte birini en yavaş makinelere ve santrale harcar.
+settings.terms	Terms of use	Kullanım koşulları
+settings.delete_online	Delete my online data	Çevrimiçi verilerimi sil
+settings.delete_online_done	Your online data was deleted.	Çevrimiçi verilerin silindi.
+decor.badge_event_chocolate	Chocolate Champion	Çikolata Şampiyonu
+decor.badge_event_toys	Toy Tycoon	Oyuncak Kralı
+decor.badge_event_fireworks	Fireworks Master	Havai Fişek Ustası
+cosmetic.floor_carbon	Carbon fibre	Karbon fiber
+cosmetic.wall_aurora	Aurora walls	Kutup ışığı duvar
+manager.mgr_mert	Mert	Mert
+manager.mgr_elif	Elif	Elif
+manager.mgr_can	Can	Can
+manager.mgr_zeynep	Zeynep	Zeynep
+manager.mgr_emre	Emre	Emre
+manager.mgr_derya	Derya	Derya
+manager.mgr_burak	Burak	Burak
+manager.mgr_ece	Ece	Ece
+manager.mgr_oguz	Oğuz	Oğuz
+manager.mgr_seda	Seda	Seda
+manager.mgr_tolga	Tolga	Tolga
+manager.mgr_nil	Nil	Nil
+manager.mgr_kaan	Kaan	Kaan
+manager.mgr_ipek	İpek	İpek
+manager.mgr_arda	Arda	Arda
