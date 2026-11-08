@@ -30,8 +30,8 @@ FactoryKing/                         Unity projesi (Unity Hub ile bu klasörü a
     Tests/EditMode/                  NUnit testleri (Unity Test Runner ve dotnet test ortak kullanır)
     Tests/PlayMode/                  Unity içinde oyun açılış testleri
     Art/AppIcon.png                  1024x1024 uygulama ikonu
-  Assets/Plugins/iOS/                iCloud ve bildirim native eklentisi, gizlilik manifesti
     Resources/Localization/strings.txt   Türkçe/İngilizce metinler
+  Assets/Plugins/iOS/                iCloud ve bildirim native eklentisi, gizlilik manifesti
   Packages/manifest.json
   ProjectSettings/ProjectVersion.txt
   Tools/run-checks.sh                Unity olmadan derleme ve test
@@ -52,7 +52,7 @@ Docs/web/                            Gizlilik politikası ve destek sayfası (TR
 5. Testleri **Window → General → Test Runner → EditMode → Run All** ile çalıştırın.
 6. iOS Xcode projesini **Factory King → Build iOS (Xcode project)** ile üretin. Çıktı `FactoryKing/Builds/iOS` klasörüne yazılır.
 
-> URP kurulumu sorun çıkarırsa: Unity Hub'da **Universal 3D** şablonuyla yeni bir proje oluşturup `FactoryKing/Assets/_Project` klasörünü içine kopyalayın.
+> URP kurulumu sorun çıkarırsa: Unity Hub'da **Universal 3D** şablonuyla yeni bir proje oluşturup `FactoryKing/Assets/_Project` ve `FactoryKing/Assets/Plugins` klasörlerini içine kopyalayın.
 
 ## Unity olmadan kontroller
 
