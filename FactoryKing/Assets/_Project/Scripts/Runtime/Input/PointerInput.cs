@@ -12,12 +12,13 @@ namespace FactoryKing.Runtime.InputHandling
         {
             get
             {
-                if (Input.touchSupported && Input.touchCount > 0) return Input.touchCount;
+                if (Input.touchCount > 0) return Input.touchCount;
                 return Input.GetMouseButton(0) || Input.GetMouseButton(1) || Input.GetMouseButton(2) ? 1 : 0;
             }
         }
 
-        public static bool IsTouch => Input.touchSupported && Input.touchCount > 0;
+        // touchCount (not touchSupported) so Unity Remote touches from a phone also work inside the Editor.
+        public static bool IsTouch => Input.touchCount > 0;
 
         public static Vector2 Position(int index)
         {
