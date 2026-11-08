@@ -91,6 +91,7 @@ namespace FactoryKing.Runtime.Visuals
             var hallMin = new Vector2(-2.8f, -(lineCount - 1) * LineSpacing - 3.1f);
             var hallMax = new Vector2((machineCount - 1) * MachineSpacing - 1.6f, 3.0f);
             _environment.Build(_root, hallMin, hallMax);
+            _environment.BuildDecorations(_root, _session.State.Collection, hallMin, hallMax);
 
             var fs = _session.State.GetFactory(factoryId);
             for (int l = 0; l < lineCount; l++)

@@ -142,6 +142,53 @@ namespace FactoryKing.Runtime.Visuals
             return root;
         }
 
+        /// <summary>
+        /// Collection items earned from prestige, events, the login calendar and cosmetic packs appear as props in
+        /// front of the hall, so progress is visible in the world.
+        /// </summary>
+        public void BuildDecorations(Transform parent, IEnumerable<string> collection, Vector2 hallMin, Vector2 hallMax)
+        {
+            var gold = _kit.Materials.Tier(3);
+            int slot = 0;
+            foreach (var id in collection)
+            {
+                var pos = new Vector3(hallMin.x + 2f + slot * 3.2f, 0, hallMin.y - 4.5f);
+                slot++;
+                if (id.StartsWith("decor_monument"))
+                {
+                    _kit.Part(parent, "Decor.Plinth", pos, b => { b.Slot = (int)Mat.Concrete; b.Box(new Vector3(0, 0.3f, 0), new Vector3(1.4f, 0.6f, 1.4f), 0.06f); });
+                    _kit.Solid(parent, "Decor.Crown", pos + Vector3.up * 0.6f, gold, b =>
+                    {
+                        b.Cylinder(Vector3.zero, 0.5f, 0.35f, 10);
+                        for (int i = 0; i < 5; i++)
+                        {
+                            float a = i * Mathf.PI * 2f / 5f;
+                            b.Frustum(new Vector3(Mathf.Cos(a) * 0.42f, 0.35f, Mathf.Sin(a) * 0.42f), 0.12f, 0f, 0.45f, 4, false, true, false);
+                        }
+                    }, true);
+                }
+                else if (id.Contains("flag"))
+                {
+                    _kit.Part(parent, "Decor.FlagPole", pos, b => { b.Slot = (int)Mat.Chrome; b.Cylinder(Vector3.zero, 0.05f, 4f, 8); });
+                    _kit.Part(parent, "Decor.Flag", pos + new Vector3(0.6f, 3.4f, 0), b => { b.Slot = (int)Mat.Accent; b.Box(Vector3.zero, new Vector3(1.1f, 0.7f, 0.04f), 0f); });
+                }
+                else
+                {
+                    _kit.Part(parent, "Decor.Pedestal", pos, b => { b.Slot = (int)Mat.Metal; b.Cylinder(Vector3.zero, 0.6f, 0.4f, 12); });
+                    _kit.Solid(parent, "Decor.Gear", pos + Vector3.up * 0.4f, gold, b =>
+                    {
+                        b.CylinderAlong(new Vector3(0, 0.8f, -0.1f), new Vector3(0, 0.8f, 0.1f), 0.6f, 12);
+                        for (int i = 0; i < 8; i++)
+                        {
+                            b.PushTRS(new Vector3(0, 0.8f, 0), Quaternion.Euler(0, 0, i * 45f), Vector3.one);
+                            b.Box(new Vector3(0, 0.68f, 0), new Vector3(0.22f, 0.22f, 0.2f), 0.02f);
+                            b.PopMatrix();
+                        }
+                    }, true);
+                }
+            }
+        }
+
         private static void Tree(MeshBuilder b, int variant)
         {
             b.Slot = (int)Mat.Trunk;

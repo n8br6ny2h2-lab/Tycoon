@@ -88,3 +88,258 @@ ui.debt	Unpaid costs: {0}	Ödenmemiş gider: {0}
 ui.language	Language: English	Dil: Türkçe
 ui.sold_per_min	Sold/min: {0}	Satış/dk: {0}
 ui.close	Close	Kapat
+ui.claim	Claim	Al
+ui.claimed	Claimed	Alındı
+ui.cancel	Cancel	Vazgeç
+ui.ok	OK	Tamam
+save.recovered	Your save was damaged and has been restored from the backup.	Kayıt dosyası hasar görmüştü; yedekten geri yüklendi.
+achievement.unlocked	Achievement unlocked: {0}	Başarım kazanıldı: {0}
+nav.map	Map	Harita
+nav.managers	Managers	Yöneticiler
+nav.missions	Missions	Görevler
+nav.shop	Shop	Mağaza
+nav.more	More	Diğer
+screen.map	Factory Map	Fabrika Haritası
+screen.managers	Managers	Yöneticiler
+screen.missions	Missions	Görevler
+screen.shop	Shop	Mağaza
+screen.more	More	Diğer
+screen.orders	Orders	Siparişler
+screen.research	Research	Araştırma
+screen.warehouse	Warehouse	Depo
+screen.daily	Daily Rewards	Günlük Ödüller
+screen.achievements	Achievements	Başarımlar
+screen.events	Events	Etkinlikler
+screen.prestige	Restructure (Prestige)	Yeniden Yapılanma (Prestij)
+screen.settings	Settings	Ayarlar
+hud.boost	x2 speed {0}	x2 hız {0}
+hud.daily_ready	Daily reward!	Günlük ödül!
+hud.missions_ready	{0} mission(s) done	{0} görev tamam
+hud.order_ready	Order ready	Sipariş hazır
+hud.event_live	Event live	Etkinlik sürüyor
+hud.prestige_ready	Prestige available	Prestij hazır
+tutorial.step0	Tap a machine to see what it does.	Bir makineye dokunarak ne yaptığını gör.
+tutorial.step1	Upgrade the bottleneck machine to earn more per second.	Darboğaz makineyi yükselterek saniyelik gelirini artır.
+tutorial.step2	Save up and open a second production line.	Para biriktir ve ikinci üretim hattını aç.
+tutorial.done	Well done! Your factory runs on its own now.	Harika! Fabrikan artık kendi kendine çalışıyor.
+map.here	You are here	Buradasın
+map.product	Produces: {0}	Üretir: {0}
+map.lines	Lines {0}/{1}	Hat {0}/{1}
+map.manager	Manager: {0}	Yönetici: {0}
+map.visit	Visit	Git
+managers.intro	Managers boost the factory they are assigned to. One manager per factory.	Yöneticiler atandıkları fabrikayı güçlendirir. Her fabrikaya bir yönetici.
+managers.bonus	{0} {1}	{0} {1}
+managers.hire	Hire ◆ {0}	İşe al ◆ {0}
+managers.level	Level {0}/{1}	Seviye {0}/{1}
+managers.levelup	Train: {0}	Eğit: {0}
+managers.assigned	Working at {0}	{0} fabrikasında çalışıyor
+managers.unassigned	Not assigned	Atanmadı
+managers.assign_here	Assign here	Buraya ata
+managers.unassign	Unassign	Görevden al
+manager.mgr_kemal	Kemal	Kemal
+manager.mgr_baris	Barış	Barış
+manager.mgr_ayla	Ayla	Ayla
+manager.mgr_selin	Selin	Selin
+manager.mgr_deniz	Deniz	Deniz
+manager.title.cost	Cost Controller	Maliyet Uzmanı
+manager.title.storage	Logistics Chief	Lojistik Şefi
+manager.title.speed	Production Lead	Üretim Şefi
+manager.title.offline	Night Shift Supervisor	Gece Vardiyası Amiri
+manager.title.price	Sales Director	Satış Direktörü
+rarity.Common	Common	Sıradan
+rarity.Rare	Rare	Nadir
+rarity.Epic	Epic	Destansı
+rarity.Legendary	Legendary	Efsanevi
+stat.ProductionSpeed	production speed	üretim hızı
+stat.SellPrice	sale price	satış fiyatı
+stat.OperatingCost	lower operating costs	daha düşük işletme gideri
+stat.StorageCapacity	storage capacity	depo kapasitesi
+stat.OfflineEarnings	offline earnings	çevrimdışı kazanç
+stat.UpgradeCost	cheaper upgrades	daha ucuz yükseltme
+missions.daily	Daily missions	Günlük görevler
+missions.weekly	Weekly missions	Haftalık görevler
+missions.resets_in	New missions in {0}	Yeni görevler: {0}
+missions.reward	Reward: ◆ {0} + {1} of income	Ödül: ◆ {0} + {1} gelir
+mission.produce	Produce {0} items	{0} ürün üret
+mission.sell	Sell {0} finished goods	{0} mamul sat
+mission.upgrade	Upgrade machines {0} times	Makineleri {0} kez yükselt
+mission.earn	Earn {0}	{0} kazan
+mission.orders	Complete {0} orders	{0} sipariş tamamla
+mission.manager_levels	Train managers {0} times	Yöneticileri {0} kez eğit
+mission.reach_level	Get a machine to level {0}	Bir makineyi {0}. seviyeye çıkar
+orders.intro	Customers pay extra for timely deliveries. Orders fill from your normal sales.	Müşteriler zamanında teslimata ekstra öder. Siparişler normal satışlarınla dolar.
+orders.line	{0} × {1}	{0} × {1}
+orders.status	{0}/{1} · {2} left	{0}/{1} · kalan {2}
+orders.claim	Deliver: {0} + ◆2	Teslim et: {0} + ◆2
+warehouse.full	Full — upgrade shipping	Dolu — sevkiyatı yükselt
+warehouse.sold_total	{0} sold in total: {1}	Toplam satılan {0}: {1}
+warehouse.tip_title	Tip	İpucu
+warehouse.tip	A full warehouse means the dock is the bottleneck. An empty one means production is.	Depo doluysa darboğaz rampadadır; boşsa üretimdedir.
+research.intro	Research is permanent and is kept when you restructure.	Araştırmalar kalıcıdır; yeniden yapılanmada korunur.
+research.level	Level {0}/{1}	Seviye {0}/{1}
+research.buy	Research: {0}	Araştır: {0}
+research.requires	Requires company level {0}	Şirket seviyesi {0} gerekir
+research.res_speed	Lean Production	Yalın Üretim
+research.res_speed.desc	+5% production speed in all factories per level.	Seviye başına tüm fabrikalarda +%5 üretim hızı.
+research.res_price	Brand Value	Marka Değeri
+research.res_price.desc	+5% sale price per level.	Seviye başına +%5 satış fiyatı.
+research.res_cost	Energy Efficiency	Enerji Verimliliği
+research.res_cost.desc	About 4% lower operating costs per level.	Seviye başına yaklaşık %4 daha düşük işletme gideri.
+research.res_storage	Smart Shelving	Akıllı Raflar
+research.res_storage.desc	+10% buffer and warehouse capacity per level.	Seviye başına +%10 tampon ve depo kapasitesi.
+research.res_upgrade	Modular Machines	Modüler Makineler
+research.res_upgrade.desc	About 3% cheaper machine upgrades per level.	Seviye başına yaklaşık %3 daha ucuz makine yükseltmesi.
+research.res_offline_cap	Night Automation	Gece Otomasyonu
+research.res_offline_cap.desc	+1 hour of offline earnings per level.	Seviye başına +1 saat çevrimdışı kazanç.
+daily.intro	Log in every day for rewards. Missing a day never resets your progress.	Her gün giriş yap, ödül al. Bir gün kaçırmak ilerlemeni sıfırlamaz.
+daily.day	Day {0}	{0}. gün
+daily.cash	{0} of income	{0} gelir
+daily.boost	{0} min x2 speed	{0} dk x2 hız
+daily.decor	Decoration	Dekorasyon
+daily.come_back	Come back tomorrow	Yarın tekrar gel
+achievements.claim	Claim ◆ {0}	Al ◆ {0}
+gc.achievements	Game Center achievements	Game Center başarımları
+gc.leaderboards	Leaderboards	Liderlik tabloları
+gc.sign_in	Sign in to Game Center	Game Center'a giriş yap
+achievement.ach_first_upgrade	First Upgrade	İlk Yükseltme
+achievement.ach_first_upgrade.desc	Upgrade any machine.	Herhangi bir makineyi yükselt.
+achievement.ach_first_factory	First Factory	İlk Fabrika
+achievement.ach_first_factory.desc	Buy your first new factory.	İlk yeni fabrikanı satın al.
+achievement.ach_ten_machines	First 10 Machines	İlk 10 Makine
+achievement.ach_ten_machines.desc	Own 10 working machines.	Çalışan 10 makineye sahip ol.
+achievement.ach_first_million	First Million	İlk Milyon
+achievement.ach_first_million.desc	Earn 1 million in total.	Toplam 1 milyon kazan.
+achievement.ach_first_prestige	Fresh Start	Taze Başlangıç
+achievement.ach_first_prestige.desc	Restructure your company once.	Şirketini bir kez yeniden yapılandır.
+achievement.ach_five_factories	Industrial Empire	Sanayi İmparatorluğu
+achievement.ach_five_factories.desc	Own all five factories.	Beş fabrikanın hepsine sahip ol.
+achievement.ach_first_billion	Billionaire	Milyarder
+achievement.ach_first_billion.desc	Earn 1 billion in total.	Toplam 1 milyar kazan.
+achievement.ach_level_100	Perfection	Kusursuzluk
+achievement.ach_level_100.desc	Get a machine to level 100.	Bir makineyi 100. seviyeye çıkar.
+achievement.ach_orders_10	Reliable Supplier	Güvenilir Tedarikçi
+achievement.ach_orders_10.desc	Complete 10 orders.	10 sipariş tamamla.
+achievement.ach_first_manager	Team Builder	Ekip Kurucusu
+achievement.ach_first_manager.desc	Hire a manager.	Bir yönetici işe al.
+achievement.ach_research_10	Innovator	Yenilikçi
+achievement.ach_research_10.desc	Complete 10 research levels.	10 araştırma seviyesi tamamla.
+achievement.ach_streak_7	Loyal Boss	Sadık Patron
+achievement.ach_streak_7.desc	Claim 7 daily rewards.	7 günlük ödül al.
+collection.title	Collection	Koleksiyon
+collection.empty	Earn decorations from prestige, events and the daily calendar.	Dekorasyonları prestij, etkinlikler ve günlük takvimden kazan.
+decor.decor_monument	Crown Monument	Taç Anıtı
+decor.badge_prestige	Restructuring Badge	Yeniden Yapılanma Rozeti
+decor.decor_weekly_flag	Loyalty Flag	Sadakat Bayrağı
+decor.decor_golden_gear	Golden Gear	Altın Dişli
+decor.decor_gold_trucks	Golden Truck Fleet	Altın Kamyon Filosu
+decor.decor_gold_trim	Golden Machine Trim	Altın Makine Süsü
+decor.decor_gold_statue	Golden Statue	Altın Heykel
+events.none	No event is running right now.	Şu anda etkinlik yok.
+events.next_in	Weekend Rush starts in {0}	Hafta Sonu Telaşı {0} sonra başlıyor
+events.progress	{0}/{1} · ends in {2}	{0}/{1} · bitişe {2}
+events.reward	Reward: ◆ {0} + {1}	Ödül: ◆ {0} + {1}
+event.weekend_rush	Weekend Rush	Hafta Sonu Telaşı
+event.weekend_rush.desc	Sell as many finished goods as you can before Monday.	Pazartesiye kadar olabildiğince çok mamul sat.
+prestige.intro	Restructure to turn this run's earnings into Crowns. Each Crown permanently raises all sale prices by 10%.	Bu turdaki kazancını Taç'a çevirmek için yeniden yapılan. Her Taç tüm satış fiyatlarını kalıcı olarak %10 artırır.
+prestige.crowns_now	Crowns: {0} (+{1}% prices)	Taç: {0} (fiyatlar +%{1})
+prestige.run	This run: {0} (needs {1})	Bu tur: {0} (gereken {1})
+prestige.gain	You will gain {0} Crowns → +{1}% prices	{0} Taç kazanacaksın → fiyatlar +%{1}
+prestige.you_get	You get	Kazanacakların
+prestige.you_keep	You keep	Korunanlar
+prestige.you_reset	Starts over	Sıfırlananlar
+prestige.bonus.multiplier	Permanent sale price bonus	Kalıcı satış fiyatı bonusu
+prestige.bonus.cash	Starting cash: {0}	Başlangıç parası: {0}
+prestige.bonus.line2	Second steel line already open	İkinci çelik hattı açık başlar
+prestige.bonus.food	Food factory already owned (from 3rd prestige)	Gıda fabrikası hazır (3. prestijden itibaren)
+prestige.keep.diamonds	Diamonds	Elmaslar
+prestige.keep.managers	Managers and their levels	Yöneticiler ve seviyeleri
+prestige.keep.research	All research	Tüm araştırmalar
+prestige.keep.achievements	Achievements and missions	Başarımlar ve görevler
+prestige.keep.collection	Badges and decorations	Rozetler ve dekorasyonlar
+prestige.keep.purchases	Everything you bought	Satın aldığın her şey
+prestige.reset.cash	Cash	Nakit para
+prestige.reset.factories	Factories and lines (except the bonuses)	Fabrikalar ve hatlar (bonuslar hariç)
+prestige.reset.levels	Machine levels	Makine seviyeleri
+prestige.reset.orders	Open orders	Açık siparişler
+prestige.confirm	Restructure now	Şimdi yeniden yapılan
+prestige.are_you_sure	Start a new run with your Crowns? This cannot be undone.	Taçlarınla yeni bir tura başlansın mı? Bu işlem geri alınamaz.
+prestige.do_it	Yes, restructure	Evet, yeniden yapılan
+prestige.done	New run started. Your Crowns make everything sell for more!	Yeni tur başladı. Taçların sayesinde her şey daha pahalıya satılıyor!
+shop.free	Free rewards	Ücretsiz ödüller
+shop.premium	Packs	Paketler
+shop.ad.boost	30 minutes of x2 production speed	30 dakika x2 üretim hızı
+shop.ad.diamonds	5 diamonds	5 elmas
+shop.ad.cash	10 minutes of income	10 dakikalık gelir
+shop.ad.remaining	{0} left today	Bugün kalan: {0}
+shop.ad.watch	Watch video	Video izle
+shop.ad.claim_free	Claim (ad-free)	Al (reklamsız)
+shop.ad.cooldown	Ready in {0}	{0} sonra hazır
+shop.owned	Owned	Sahipsin
+shop.restore	Restore purchases	Satın alımları geri yükle
+shop.legal	Payment is charged to your Apple ID. Prices include tax. Purchased diamonds and items cannot be refunded in-game; see Apple's refund policy.	Ödeme Apple Kimliğinizden alınır. Fiyatlara vergi dahildir. Satın alınan elmas ve ürünler oyun içinde iade edilemez; Apple iade politikasına bakın.
+shop.diamonds_small	Handful of Diamonds	Bir Avuç Elmas
+shop.diamonds_small.desc	80 diamonds.	80 elmas.
+shop.diamonds_medium	Bag of Diamonds	Bir Kese Elmas
+shop.diamonds_medium.desc	500 diamonds.	500 elmas.
+shop.diamonds_large	Chest of Diamonds	Bir Sandık Elmas
+shop.diamonds_large.desc	1,200 diamonds.	1.200 elmas.
+shop.no_ads	Ad-free Rewards	Reklamsız Ödüller
+shop.no_ads.desc	Get every video reward instantly without watching. There are no forced ads anyway.	Tüm video ödüllerini izlemeden anında al. Oyunda zaten zorunlu reklam yok.
+shop.starter_pack	Starter Pack	Başlangıç Paketi
+shop.starter_pack.desc	300 diamonds, 2 hours of income and Ayla (Rare manager). One time only.	300 elmas, 2 saatlik gelir ve Ayla (Nadir yönetici). Tek seferlik.
+shop.vip	VIP Membership	VIP Üyelik
+shop.vip.desc	Permanent +10% sale price and +2 hours offline earnings.	Kalıcı +%10 satış fiyatı ve +2 saat çevrimdışı kazanç.
+shop.cosmetic_gold	Golden Look	Altın Görünüm
+shop.cosmetic_gold.desc	Cosmetic golden statue, trim and trucks for your collection. No gameplay effect.	Koleksiyonun için kozmetik altın heykel, süs ve kamyonlar. Oynanışa etkisi yok.
+shop.season_pass_s1	Season Pass — Season 1	Sezon Bileti — 1. Sezon
+shop.season_pass_s1.desc	150 diamonds now and double diamond rewards from events this season.	Hemen 150 elmas ve bu sezon etkinliklerden çift elmas ödülü.
+shop.msg.thanks	Thank you! Your purchase has been added.	Teşekkürler! Satın alımın eklendi.
+shop.msg.owned	You already own this.	Buna zaten sahipsin.
+shop.msg.unavailable	The store is not available right now. Please try again later.	Mağaza şu anda kullanılamıyor. Lütfen daha sonra tekrar dene.
+shop.msg.cancelled	Purchase cancelled. You were not charged.	Satın alma iptal edildi. Ücret alınmadı.
+shop.msg.declined	Payment declined. You were not charged.	Ödeme reddedildi. Ücret alınmadı.
+shop.msg.pending	Your purchase is pending approval.	Satın alman onay bekliyor.
+shop.msg.failed	Purchase failed. You were not charged.	Satın alma başarısız. Ücret alınmadı.
+shop.msg.invalid	The purchase could not be verified. Contact support if you were charged.	Satın alma doğrulanamadı. Ücret alındıysa destekle iletişime geç.
+shop.msg.restored	Purchases restored.	Satın alımlar geri yüklendi.
+shop.msg.restore_failed	Could not restore purchases.	Satın alımlar geri yüklenemedi.
+ads.not_ready	No video is available right now. Try again later.	Şu anda video yok. Daha sonra tekrar dene.
+ads.skipped	The video was not finished, so no reward was given.	Video bitmediği için ödül verilmedi.
+ads.failed	The video could not be played.	Video oynatılamadı.
+ads.thanks	Reward received!	Ödül alındı!
+settings.sound	Sound	Ses
+settings.music	Music	Müzik
+settings.sfx	Sound effects	Ses efektleri
+settings.language	Language	Dil
+settings.privacy_title	Notifications & privacy	Bildirimler ve gizlilik
+settings.notifications	Reminders (optional)	Hatırlatmalar (isteğe bağlı)
+settings.analytics	Share anonymous gameplay statistics	Anonim oyun istatistiklerini paylaş
+settings.analytics_note	No personal data, no tracking, no advertising ID. You can change this at any time.	Kişisel veri yok, takip yok, reklam kimliği yok. İstediğin zaman değiştirebilirsin.
+settings.quality	High graphics quality	Yüksek grafik kalitesi
+settings.account	Account	Hesap
+settings.privacy	Privacy policy	Gizlilik politikası
+settings.support	Support	Destek
+settings.reset	Reset progress	İlerlemeyi sıfırla
+settings.reset_confirm	Delete all progress on this device and in iCloud? Purchases can be restored afterwards.	Bu cihazdaki ve iCloud'daki tüm ilerleme silinsin mi? Satın alımlar sonradan geri yüklenebilir.
+settings.reset_yes	Delete everything	Her şeyi sil
+settings.reset_done	Progress deleted.	İlerleme silindi.
+debug.title	Developer tools (debug builds only)	Geliştirici araçları (yalnızca test sürümü)
+menu.subtitle	Build an industrial empire from a small workshop.	Küçük bir atölyeden sanayi imparatorluğu kur.
+menu.play	Play	Oyna
+menu.continue	Continue	Devam et
+consent.title	Help us improve	Gelişmemize yardım et
+consent.body	May we collect anonymous gameplay statistics (e.g. which screens are used)? No personal data, no tracking across apps. The game works exactly the same if you say no.	Anonim oyun istatistikleri (ör. hangi ekranların kullanıldığı) toplayabilir miyiz? Kişisel veri yok, uygulamalar arası takip yok. Hayır dersen oyun aynen çalışır.
+consent.yes	Allow	İzin ver
+consent.no	No thanks	Hayır, teşekkürler
+offline.title	Welcome back, boss!	Tekrar hoş geldin patron!
+offline.away	You were away for {0}.	{0} boyunca uzaktaydın.
+offline.capped	Your factories store at most {0} of production while you are away.	Fabrikaların sen yokken en fazla {0} üretim biriktirir.
+offline.sold	Goods sold meanwhile: {0}	Bu sürede satılan ürün: {0}
+offline.collect	Collect	Topla
+offline.double_ad	Collect x2 (video)	x2 topla (video)
+offline.double_free	Collect x2	x2 topla
+offline.rollback	Your device clock moved backwards, so no offline earnings could be calculated this time.	Cihaz saatin geri alındığı için bu sefer çevrimdışı kazanç hesaplanamadı.
+notif.offline.title	Your warehouses are full	Depoların doldu
+notif.offline.body	Collect your factory earnings!	Fabrika kazançlarını topla!
+notif.daily.title	Daily reward ready	Günlük ödül hazır
+notif.daily.body	Your next login reward is waiting.	Sıradaki giriş ödülün seni bekliyor.

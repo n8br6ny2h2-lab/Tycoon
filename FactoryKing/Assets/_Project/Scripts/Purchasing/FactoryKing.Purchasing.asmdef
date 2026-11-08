@@ -1,0 +1,27 @@
+{
+    "name": "FactoryKing.Purchasing",
+    "rootNamespace": "FactoryKing.Purchasing",
+    "references": [
+        "FactoryKing.Core",
+        "FactoryKing.Runtime",
+        "UnityEngine.Purchasing",
+        "UnityEngine.Purchasing.Stores"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "FK_UNITY_IAP"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.purchasing",
+            "expression": "[4.9.0,5.0.0)",
+            "define": "FK_UNITY_IAP"
+        }
+    ],
+    "noEngineReferences": false
+}

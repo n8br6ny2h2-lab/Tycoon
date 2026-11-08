@@ -168,3 +168,38 @@ namespace FactoryKing.Tests
         }
     }
 }
+
+namespace FactoryKing.Tests
+{
+    public class CloudConflictTests
+    {
+        [Test]
+        public void More_Progress_Wins_And_Purchases_Merge()
+        {
+            var content = DefaultContent.Create();
+            var local = GameState.CreateNew(content, EconomyTuning.CreateDefault());
+            var cloud = GameState.CreateNew(content, EconomyTuning.CreateDefault());
+            local.LifetimeEarnings = 1e6;
+            local.Time.LastSavedUtcTicks = 200;
+            local.Entitlements.Add("no_ads");
+            cloud.LifetimeEarnings = 5e6;
+            cloud.Time.LastSavedUtcTicks = 100; // older but further ahead
+            Assert.That(SaveConflictResolver.Choose(local, cloud), Is.EqualTo(CloudChoice.UseCloud));
+            var merged = SaveConflictResolver.Resolve(local, cloud, content);
+            Assert.That(merged.LifetimeEarnings.ToDouble(), Is.EqualTo(5e6));
+            Assert.That(merged.Entitlements, Does.Contain("no_ads"));
+        }
+
+        [Test]
+        public void Prestige_Count_Beats_Earnings_And_Missing_Cloud_Keeps_Local()
+        {
+            var content = DefaultContent.Create();
+            var local = GameState.CreateNew(content, EconomyTuning.CreateDefault());
+            var cloud = GameState.CreateNew(content, EconomyTuning.CreateDefault());
+            local.Prestige.Count = 2;
+            cloud.LifetimeEarnings = 1e12;
+            Assert.That(SaveConflictResolver.Choose(local, cloud), Is.EqualTo(CloudChoice.KeepLocal));
+            Assert.That(SaveConflictResolver.Choose(local, null), Is.EqualTo(CloudChoice.KeepLocal));
+        }
+    }
+}
