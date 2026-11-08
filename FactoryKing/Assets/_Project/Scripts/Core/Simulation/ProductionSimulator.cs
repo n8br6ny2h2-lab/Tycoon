@@ -208,6 +208,9 @@ namespace FactoryKing.Core.Simulation
                 _ledger.Record(LedgerCategory.Revenue, revenue.ToDouble());
                 _ledger.RecordUnitsSold(units);
                 _state.TotalUnitsSold += units;
+                _state.Stats.UnitsSold += units;
+                _state.Stats.SoldByProduct.TryGetValue(product.Id, out long soldBefore);
+                _state.Stats.SoldByProduct[product.Id] = soldBefore + units;
                 FinishCycle(ms);
                 GoodsSold?.Invoke(factory.Id, product.Id, units, revenue);
                 return true;
@@ -224,6 +227,7 @@ namespace FactoryKing.Core.Simulation
             {
                 _state.UnitsProduced.TryGetValue(def.OutputProductId, out long produced);
                 _state.UnitsProduced[def.OutputProductId] = produced + def.OutputPerCycle;
+                _state.Stats.UnitsProduced += def.OutputPerCycle;
             }
             FinishCycle(ms);
             return true;

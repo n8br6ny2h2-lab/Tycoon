@@ -29,6 +29,7 @@ namespace FactoryKing.Core.Economy
         {
             if (!amount.IsPositive) return;
             _state.LifetimeEarnings += amount;
+            _state.RunEarnings += amount;
             if (_state.Debt.IsPositive)
             {
                 if (amount >= _state.Debt)
@@ -78,6 +79,9 @@ namespace FactoryKing.Core.Economy
             _state.Diamonds = checked(_state.Diamonds + amount);
             DiamondsChanged?.Invoke();
         }
+
+        /// <summary>Cash reward (missions, orders, ads...). Counts as earnings.</summary>
+        public void Grant(BigDouble amount) => Earn(amount);
 
         public bool TrySpendDiamonds(long amount)
         {

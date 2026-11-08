@@ -73,7 +73,7 @@ namespace FactoryKing.Core.Simulation
     [Serializable]
     public sealed class GameState
     {
-        public const int CurrentVersion = 1;
+        public const int CurrentVersion = 2;
 
         public int Version = CurrentVersion;
         public BigDouble Cash;
@@ -87,6 +87,27 @@ namespace FactoryKing.Core.Simulation
         public string ActiveFactoryId;
         public List<FactoryState> Factories = new List<FactoryState>();
         public Dictionary<string, long> UnitsProduced = new Dictionary<string, long>(StringComparer.Ordinal);
+
+        /// <summary>Earnings since the last prestige (drives prestige crowns).</summary>
+        public BigDouble RunEarnings;
+        public GameStats Stats = new GameStats();
+        public SettingsState Settings = new SettingsState();
+        public TimeState Time = new TimeState();
+        public List<ManagerState> Managers = new List<ManagerState>();
+        public PrestigeState Prestige = new PrestigeState();
+        public Dictionary<string, int> Research = new Dictionary<string, int>(StringComparer.Ordinal);
+        public MissionBoard Missions = new MissionBoard();
+        public List<OrderState> Orders = new List<OrderState>();
+        public HashSet<string> AchievementsUnlocked = new HashSet<string>(StringComparer.Ordinal);
+        public HashSet<string> AchievementsClaimed = new HashSet<string>(StringComparer.Ordinal);
+        public DailyRewardState Daily = new DailyRewardState();
+        public HashSet<string> Entitlements = new HashSet<string>(StringComparer.Ordinal);
+        public HashSet<string> ProcessedTransactions = new HashSet<string>(StringComparer.Ordinal);
+        public HashSet<string> Collection = new HashSet<string>(StringComparer.Ordinal);
+        public Dictionary<string, EventProgress> Events = new Dictionary<string, EventProgress>(StringComparer.Ordinal);
+        public AdState Ads = new AdState();
+        public long BoostEndUtcTicks;
+        public int TutorialStep;
 
         public static GameState CreateNew(GameContent content, EconomyTuning tuning)
         {
@@ -141,6 +162,41 @@ namespace FactoryKing.Core.Simulation
             }
             Factories = rebuilt;
             UnitsProduced ??= new Dictionary<string, long>(StringComparer.Ordinal);
+            Stats ??= new GameStats();
+            Stats.SoldByProduct ??= new Dictionary<string, long>(StringComparer.Ordinal);
+            Settings ??= new SettingsState();
+            Time ??= new TimeState();
+            Managers ??= new List<ManagerState>();
+            Managers.RemoveAll(m => m == null || m.Id == null);
+            foreach (var m in Managers) if (m.Level < 1) m.Level = 1;
+            Prestige ??= new PrestigeState();
+            Prestige.Badges ??= new List<string>();
+            if (double.IsNaN(Prestige.Crowns) || Prestige.Crowns < 0) Prestige.Crowns = 0;
+            Research ??= new Dictionary<string, int>(StringComparer.Ordinal);
+            Missions ??= new MissionBoard();
+            Missions.Daily ??= new List<MissionState>();
+            Missions.Weekly ??= new List<MissionState>();
+            Orders ??= new List<OrderState>();
+            Orders.RemoveAll(o => o == null || o.FactoryId == null || content.Factories.TrueForAll(f => f.Id != o.FactoryId));
+            AchievementsUnlocked ??= new HashSet<string>(StringComparer.Ordinal);
+            AchievementsClaimed ??= new HashSet<string>(StringComparer.Ordinal);
+            Daily ??= new DailyRewardState();
+            Entitlements ??= new HashSet<string>(StringComparer.Ordinal);
+            ProcessedTransactions ??= new HashSet<string>(StringComparer.Ordinal);
+            Collection ??= new HashSet<string>(StringComparer.Ordinal);
+            Events ??= new Dictionary<string, EventProgress>(StringComparer.Ordinal);
+            Ads ??= new AdState();
+            Ads.ShownToday ??= new Dictionary<string, int>(StringComparer.Ordinal);
+            Ads.LastShownUtcTicks ??= new Dictionary<string, long>(StringComparer.Ordinal);
+            if (Cash.IsNegative) Cash = BigDouble.Zero;
+            if (Debt.IsNegative) Debt = BigDouble.Zero;
+            if (Diamonds < 0) Diamonds = 0;
+            if (Factories.Count > 0 && !Factories[0].Unlocked)
+            {
+                Factories[0].Unlocked = true;
+                Factories[0].Lines[0].Unlocked = true;
+            }
+            foreach (var f in Factories) if (f.Unlocked && !f.Lines[0].Unlocked) f.Lines[0].Unlocked = true;
             if (ActiveFactoryId == null || !rebuilt.Exists(f => f.FactoryId == ActiveFactoryId))
                 ActiveFactoryId = rebuilt.Count > 0 ? rebuilt[0].FactoryId : null;
         }

@@ -84,6 +84,8 @@ namespace FactoryKing.Core.Simulation
             int old = ms.Level;
             ms.Level = quote.TargetLevel;
             _state.TotalInvested += quote.Cost;
+            _state.Stats.Upgrades += quote.Levels;
+            if (ms.Level > _state.Stats.HighestMachineLevel) _state.Stats.HighestMachineLevel = ms.Level;
             MachineUpgraded?.Invoke(r, old, ms.Level);
             return true;
         }
@@ -129,6 +131,7 @@ namespace FactoryKing.Core.Simulation
             fs.Unlocked = true;
             fs.Lines[0].Unlocked = true;
             _state.TotalInvested += cost;
+            _state.Stats.FactoriesBought++;
             FactoryUnlocked?.Invoke(factoryId);
             return true;
         }
@@ -151,6 +154,7 @@ namespace FactoryKing.Core.Simulation
             if (!CanUnlockLine(factoryId, line, out var cost) || !_wallet.TrySpend(cost)) return false;
             _state.GetFactory(factoryId).Lines[line].Unlocked = true;
             _state.TotalInvested += cost;
+            _state.Stats.LinesBought++;
             LineUnlocked?.Invoke(factoryId, line);
             return true;
         }

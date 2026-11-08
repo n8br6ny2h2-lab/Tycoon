@@ -32,6 +32,20 @@ namespace FactoryKing.Core.Economy
         /// <summary>Rolling window for income statistics, seconds.</summary>
         public int StatsWindowSeconds = 60;
 
+        /// <summary>Base offline earnings window (hours).</summary>
+        public double OfflineCapHours = 8;
+        /// <summary>Share of steady-state profit credited while away (the rewarded ad doubles it).</summary>
+        public double OfflineEfficiency = 0.6;
+        /// <summary>Away time below this is not reported as offline earnings (seconds).</summary>
+        public double OfflineMinimumSeconds = 60;
+
+        /// <summary>Run earnings needed before prestige is offered.</summary>
+        public double PrestigeMinRunEarnings = 1e7;
+        /// <summary>Crowns = floor(sqrt(runEarnings / PrestigeCrownDivisor)).</summary>
+        public double PrestigeCrownDivisor = 1e6;
+        /// <summary>Permanent sell-price bonus per crown (0.1 = +10%).</summary>
+        public double PrestigeBonusPerCrown = 0.10;
+
         public static EconomyTuning CreateDefault() => new EconomyTuning();
     }
 }
