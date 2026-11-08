@@ -1,0 +1,570 @@
+<title>Factory King</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#14171c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Russo+One&family=Barlow:wght@400;600;700&family=Barlow+Condensed:wght@500;700&display=swap">
+<style>
+/* Layout: one-screen phone game — HUD on top, live factory canvas, action sheet, bottom bar. Single dark industrial look. */
+:root {
+  color-scheme: dark;
+  --bg: #14171c; --panel: #1d222a; --panel2: #262c36; --line: #333b47;
+  --fg: #eef1f5; --muted: #98a2b3; --amber: #ffb02e; --amber-ink: #241500;
+  --good: #3ddc97; --bad: #ff5a4e; --diamond: #7fd8ff;
+  --display: "Russo One", "Arial Black", system-ui, sans-serif;
+  --body: "Barlow", system-ui, -apple-system, sans-serif;
+  --num: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
+}
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; overflow: hidden;
+  -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+#app { height: 100%; display: flex; flex-direction: column; max-width: 560px; margin: 0 auto;
+  padding-left: max(10px, env(safe-area-inset-left, 0px)); padding-right: max(10px, env(safe-area-inset-right, 0px)); }
+button { font: inherit; color: inherit; border: 0; cursor: pointer; }
+button:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+.num { font-family: var(--num); font-variant-numeric: tabular-nums; }
+
+/* HUD */
+#hud { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; align-items: end; padding-block: 8px 6px; }
+#company { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; font-size: 12px;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+#company b { font-family: var(--display); font-weight: 400; color: var(--amber); letter-spacing: .04em; }
+#cash { font-family: var(--num); font-weight: 700; font-size: 38px; line-height: 1; }
+#cash::before { content: "$"; color: var(--amber); margin-right: 3px; font-size: 26px; vertical-align: 5px; }
+#income { font-family: var(--num); font-size: 17px; color: var(--good); }
+#hudRight { text-align: right; display: grid; gap: 2px; }
+#crowns { font-family: var(--num); font-size: 17px; color: var(--amber); }
+.iconbtn { background: var(--panel2); border-radius: 10px; padding: 6px 10px; font-size: 13px; font-weight: 700; min-height: 34px; }
+
+/* Factory tabs */
+#tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; }
+#tabs::-webkit-scrollbar { display: none; }
+.tab { flex: none; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 7px 11px;
+  font-size: 13px; font-weight: 600; white-space: nowrap; min-height: 40px; }
+.tab.on { background: var(--amber); color: var(--amber-ink); border-color: var(--amber); }
+.tab.buy { border-style: dashed; color: var(--amber); }
+.tab.buy small { display: block; font-family: var(--num); font-size: 13px; color: var(--fg); }
+.tab.locked { opacity: .45; }
+
+/* Factory canvas */
+#stage { position: relative; flex: 1 1 auto; min-height: 220px; border-radius: 16px; overflow: hidden; background: #0f1216; }
+#cv { width: 100%; height: 100%; display: block; }
+#drone { position: absolute; top: 8px; left: -80px; width: 64px; height: 50px; background: none; padding: 0; }
+#drone svg { width: 100%; height: 100%; }
+#power { position: absolute; left: 8px; bottom: 8px; right: 8px; display: flex; justify-content: space-between; align-items: center;
+  gap: 8px; background: rgba(15,18,22,.85); border-radius: 12px; padding: 6px 6px 6px 10px; font-size: 13px; }
+#power.low { box-shadow: inset 0 0 0 2px var(--bad); }
+#power .warn { color: var(--bad); font-weight: 700; }
+
+/* Sheet */
+#sheet { background: var(--panel); border-radius: 16px; padding: 12px; margin-top: 8px; display: grid; gap: 8px; }
+#sheetHead { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+#sheetTitle { font-family: var(--display); font-size: 18px; text-wrap: balance; }
+#sheetMeta { color: var(--muted); font-size: 13px; }
+.bar { height: 8px; background: #0e1116; border-radius: 4px; overflow: hidden; }
+.bar > i { display: block; height: 100%; width: 0; background: var(--amber); border-radius: 4px; }
+.row3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.act { background: var(--amber); color: var(--amber-ink); border-radius: 12px; padding: 8px 4px; font-weight: 700; min-height: 58px; line-height: 1.15; }
+.act small { display: block; font-family: var(--num); font-size: 15px; font-weight: 700; }
+.act:disabled { background: var(--panel2); color: var(--muted); cursor: default; }
+.ghost { background: var(--panel2); border-radius: 12px; padding: 10px; font-weight: 700; min-height: 44px; }
+.chip { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; background: var(--panel2); }
+.chip.bn { background: var(--amber); color: var(--amber-ink); }
+.lines { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+.lines b { color: var(--fg); font-weight: 600; }
+
+/* Bottom bar */
+#bottom { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding-block: 8px; }
+#bottom button { background: var(--panel); border-radius: 12px; min-height: 48px; font-weight: 700; font-size: 13px; }
+#bottom button.alert { box-shadow: inset 0 0 0 2px var(--amber); color: var(--amber); }
+
+/* Modal */
+[hidden] { display: none !important; }
+#modal { position: fixed; inset: 0; background: rgba(5,7,10,.72); display: flex; align-items: flex-end; justify-content: center; z-index: 20;
+  padding: 12px max(12px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px)); }
+#modalBox { background: var(--panel); border-radius: 20px; width: 100%; max-width: 520px; max-height: 82%; overflow-y: auto; padding: 18px; display: grid; gap: 10px; }
+#modalBox h2 { font-family: var(--display); font-weight: 400; font-size: 22px; margin: 0; text-wrap: balance; }
+#modalBox p { margin: 0; color: var(--muted); line-height: 1.45; }
+.big { font-family: var(--num); font-weight: 700; font-size: 42px; color: var(--good); }
+.flist { display: grid; gap: 6px; }
+.fitem { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; background: var(--panel2); border-radius: 12px; padding: 10px; align-items: center; }
+.fitem .n { font-weight: 700; }
+.fitem .s { grid-column: 1; color: var(--muted); font-size: 12px; }
+.fitem button { grid-row: 1 / span 2; grid-column: 2; }
+.toast { position: fixed; left: 50%; top: calc(14px + env(safe-area-inset-top, 0px)); transform: translateX(-50%); background: var(--panel2);
+  border: 1px solid var(--line); padding: 8px 14px; border-radius: 12px; font-weight: 700; z-index: 30; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { #drone { transition: none; } }
+</style>
+<div id="app">
+  <header id="hud">
+    <div id="company"><b id="coName">Factory King</b><span><button class="iconbtn" id="langBtn">TR</button></span></div>
+    <div><div id="cash" class="num">0</div><div id="income">+0/s</div></div>
+    <div id="hudRight"><div id="crowns"></div><div id="season" style="font-size:12px;color:var(--muted)"></div></div>
+  </header>
+  <nav id="tabs" aria-label="Factories"></nav>
+  <section id="stage">
+    <canvas id="cv"></canvas>
+    <button id="drone" aria-label="Cargo drone" hidden>
+      <svg viewBox="0 0 64 50"><rect x="6" y="6" width="22" height="3" rx="1.5" fill="#c7ced6"/><rect x="36" y="6" width="22" height="3" rx="1.5" fill="#c7ced6"/>
+      <rect x="18" y="10" width="28" height="12" rx="4" fill="#ffb02e"/><rect x="24" y="24" width="16" height="14" rx="2" fill="#b98552"/>
+      <path d="M24 31h16" stroke="#7a5536" stroke-width="2"/></svg>
+    </button>
+    <div id="power"><span id="powerTxt"></span><button class="iconbtn" id="powerBtn"></button></div>
+  </section>
+  <section id="sheet" aria-live="polite"></section>
+  <nav id="bottom">
+    <button id="bMap"></button><button id="bDaily"></button><button id="bPrestige"></button><button id="bMore"></button>
+  </nav>
+</div>
+<div id="modal" hidden><div id="modalBox" role="dialog" aria-modal="true"></div></div>
+
+<script id="content" type="application/json">{"factories":[{"id":"steel","order":0,"unlock":0,"raw":1,"elec":0.01,"wage":0.02,"pcap":20,"pcost":150,"pgrow":1.55,"en":"Iron & Steel Works","tr":"Demir Çelik Fabrikası","sup":null,"lines":[0,750,40000],"m":[{"st":0,"in":1,"out":1,"cy":1,"up":8,"g":1.15,"kw":1,"mt":0.005,"v":"Unloader","en":"Ore Unloader","tr":"Cevher Boşaltıcı","col":"#7A5C4E"},{"st":1,"in":2,"out":1,"cy":2,"up":15,"g":1.15,"kw":6,"mt":0.02,"v":"Furnace","en":"Blast Furnace","tr":"Yüksek Fırın","col":"#FF7A2E"},{"st":2,"in":1,"out":1,"cy":2.2,"up":20,"g":1.15,"kw":3,"mt":0.015,"v":"Cutter","en":"Beam Cutter","tr":"Kiriş Kesici","col":"#9AA4AE"},{"st":3,"in":1,"out":1,"cy":1.6,"up":12,"g":1.15,"kw":1.5,"mt":0.01,"v":"Packer","en":"Beam Bundler","tr":"Kiriş Paketleyici","col":"#B9C2CB"},{"st":4,"in":1,"out":1,"cy":0.6,"up":10,"g":1.15,"kw":0.5,"mt":0.005,"v":"Warehouse","en":"Steel Yard","tr":"Çelik Sahası","col":"#B9C2CB"},{"st":5,"in":4,"out":4,"cy":8,"up":25,"g":1.15,"kw":0.5,"mt":0.01,"v":"Dock","en":"Flatbed Dock","tr":"Tır Rampası","col":"#B9C2CB"}],"value":12,"pen":"Steel Bundle","ptr":"Çelik Paket","body":"#E2683C","accent":"#2F4858"},{"id":"food","order":1,"unlock":40000,"raw":15,"elec":0.3,"wage":0.6,"pcap":22.1,"pcost":4500,"pgrow":1.55,"en":"Food Factory","tr":"Gıda Fabrikası","sup":null,"lines":[0,22500,1200000],"m":[{"st":0,"in":1,"out":1,"cy":0.6,"up":240,"g":1.16,"kw":0.8,"mt":0.15,"v":"Silo","en":"Grain Silo","tr":"Tahıl Silosu","col":"#E3C567"},{"st":1,"in":2,"out":1,"cy":1.4,"up":420,"g":1.16,"kw":4,"mt":0.44999999999999996,"v":"Mill","en":"Flour Mill","tr":"Un Değirmeni","col":"#F4EEDC"},{"st":2,"in":1,"out":2,"cy":2.6,"up":660,"g":1.16,"kw":5,"mt":0.6,"v":"Oven","en":"Tunnel Oven","tr":"Tünel Fırın","col":"#C98A3D"},{"st":3,"in":2,"out":1,"cy":1.5,"up":360,"g":1.16,"kw":1.2,"mt":0.3,"v":"Packer","en":"Bread Wrapper","tr":"Ekmek Paketleyici","col":"#D9A35B"},{"st":4,"in":1,"out":1,"cy":0.5,"up":300,"g":1.16,"kw":2,"mt":0.18,"v":"Warehouse","en":"Cold Store","tr":"Soğuk Hava Deposu","col":"#D9A35B"},{"st":5,"in":6,"out":6,"cy":7,"up":720,"g":1.16,"kw":0.8,"mt":0.3,"v":"Dock","en":"Reefer Dock","tr":"Frigorifik Rampa","col":"#D9A35B"}],"value":270,"pen":"Bread Crate","ptr":"Ekmek Kasası","body":"#F2B134","accent":"#E5533D"},{"id":"plastic","order":2,"unlock":6000000,"raw":1080,"elec":9,"wage":18,"pcap":25.4,"pcost":135000,"pgrow":1.55,"en":"Plastics Plant","tr":"Plastik Fabrikası","sup":null,"lines":[0,675000,36000000],"m":[{"st":0,"in":1,"out":1,"cy":0.8,"up":8100,"g":1.17,"kw":2,"mt":5.4,"v":"Pump","en":"Feedstock Pump","tr":"Girdi Pompası","col":"#2B2B33"},{"st":1,"in":1,"out":1,"cy":1.8,"up":14400,"g":1.17,"kw":5.5,"mt":16.2,"v":"Extruder","en":"Pelletizer","tr":"Granül Makinesi","col":"#4FC3F7"},{"st":2,"in":2,"out":1,"cy":2.4,"up":18900,"g":1.17,"kw":6,"mt":18,"v":"Press","en":"Injection Molder","tr":"Enjeksiyon Kalıplama","col":"#29B6F6"},{"st":3,"in":1,"out":1,"cy":1.4,"up":10800,"g":1.17,"kw":1.2,"mt":9,"v":"Packer","en":"Box Packer","tr":"Koli Paketleyici","col":"#81D4FA"},{"st":4,"in":1,"out":1,"cy":0.55,"up":9000,"g":1.17,"kw":0.6,"mt":4.5,"v":"Warehouse","en":"Plastics Warehouse","tr":"Plastik Deposu","col":"#81D4FA"},{"st":5,"in":5,"out":5,"cy":7.5,"up":22500,"g":1.17,"kw":0.6,"mt":9,"v":"Dock","en":"Container Dock","tr":"Konteyner Rampası","col":"#81D4FA"}],"value":13500,"pen":"Plastic Goods Box","ptr":"Plastik Ürün Kolisi","body":"#2EA8E0","accent":"#F25C54"},{"id":"textile","order":3,"unlock":400000000,"raw":21600,"elec":270,"wage":540,"pcap":16,"pcost":4050000,"pgrow":1.55,"en":"Textile Mill","tr":"Tekstil Fabrikası","sup":null,"lines":[0,20250000,1080000000],"m":[{"st":0,"in":1,"out":1,"cy":0.7,"up":243000,"g":1.18,"kw":1.5,"mt":162,"v":"Crusher","en":"Cotton Gin","tr":"Çırçır Makinesi","col":"#F5F5F0"},{"st":1,"in":2,"out":1,"cy":1.6,"up":405000,"g":1.18,"kw":3.5,"mt":432,"v":"Loom","en":"Power Loom","tr":"Dokuma Tezgâhı","col":"#E57373"},{"st":2,"in":1,"out":1,"cy":2.3,"up":567000,"g":1.18,"kw":3,"mt":485.99999999999994,"v":"Cutter","en":"Cut & Sew Line","tr":"Kesim ve Dikim Hattı","col":"#BA68C8"},{"st":3,"in":1,"out":1,"cy":1.5,"up":324000,"g":1.18,"kw":1,"mt":270,"v":"Packer","en":"Garment Folder","tr":"Giysi Katlayıcı","col":"#9575CD"},{"st":4,"in":1,"out":1,"cy":0.55,"up":270000,"g":1.18,"kw":0.5,"mt":135,"v":"Warehouse","en":"Textile Warehouse","tr":"Tekstil Deposu","col":"#9575CD"},{"st":5,"in":5,"out":5,"cy":7.5,"up":675000,"g":1.18,"kw":0.5,"mt":270,"v":"Dock","en":"Box Truck Dock","tr":"Kamyon Rampası","col":"#9575CD"}],"value":378000,"pen":"Garment Pack","ptr":"Giysi Paketi","body":"#9B6BD3","accent":"#F2A541"},{"id":"electronics","order":4,"unlock":30000000000,"raw":1215000,"elec":8100,"wage":16200,"pcap":25.9,"pcost":121500000,"pgrow":1.55,"en":"Electronics Factory","tr":"Elektronik Fabrikası","sup":"plastic","lines":[0,607500000,32400000000],"m":[{"st":0,"in":1,"out":1,"cy":0.9,"up":8100000,"g":1.19,"kw":1.5,"mt":4860,"v":"Unloader","en":"Wafer Loader","tr":"Pul Yükleyici","col":"#90A4AE"},{"st":1,"in":1,"out":1,"cy":2,"up":13770000,"g":1.19,"kw":4.5,"mt":16200,"v":"Press","en":"PCB Etcher","tr":"Devre Aşındırıcı","col":"#43A047"},{"st":2,"in":2,"out":1,"cy":2.5,"up":19440000,"g":1.19,"kw":7,"mt":20250,"v":"RobotArm","en":"Robot Assembly Cell","tr":"Robotik Montaj Hücresi","col":"#37474F"},{"st":3,"in":1,"out":1,"cy":1.5,"up":10530000,"g":1.19,"kw":1.2,"mt":8100,"v":"Packer","en":"Retail Packer","tr":"Perakende Paketleyici","col":"#ECEFF1"},{"st":4,"in":1,"out":1,"cy":0.6,"up":8910000,"g":1.19,"kw":1.5,"mt":4860,"v":"Warehouse","en":"Clean-Room Store","tr":"Temiz Oda Deposu","col":"#ECEFF1"},{"st":5,"in":4,"out":4,"cy":8,"up":21060000,"g":1.19,"kw":0.5,"mt":8100,"v":"Dock","en":"Courier Dock","tr":"Kargo Rampası","col":"#ECEFF1"}],"value":14580000,"pen":"Device Box","ptr":"Cihaz Kutusu","body":"#3DDC97","accent":"#3A86FF"},{"id":"glass","order":5,"unlock":2550000000000,"raw":19440000,"elec":243000,"wage":486000,"pcap":35.3,"pcost":3645000000,"pgrow":1.55,"en":"Glassworks","tr":"Cam Fabrikası","sup":null,"lines":[0,18225000000,972000000000],"m":[{"st":0,"in":1,"out":1,"cy":0.8,"up":218700000,"g":1.2,"kw":2.4000000000000004,"mt":145800,"v":"Silo","en":"Sand Hopper","tr":"Kum Bunkeri","col":"#E8D9A8"},{"st":1,"in":2,"out":1,"cy":1.8,"up":388800000,"g":1.2,"kw":8,"mt":437399.99999999994,"v":"Furnace","en":"Melting Furnace","tr":"Ergitme Fırını","col":"#FF9C4A"},{"st":2,"in":1,"out":2,"cy":2.4,"up":534600000,"g":1.2,"kw":8,"mt":486000,"v":"Cutter","en":"Float Line Cutter","tr":"Float Hattı Kesici","col":"#BFE6F2"},{"st":3,"in":2,"out":1,"cy":1.5,"up":291600000,"g":1.2,"kw":1.92,"mt":243000,"v":"Packer","en":"Crate Packer","tr":"Kasa Paketleyici","col":"#9ED3E6"},{"st":4,"in":1,"out":1,"cy":0.55,"up":243000000,"g":1.2,"kw":0.96,"mt":121500,"v":"Warehouse","en":"Glass Warehouse","tr":"Cam Deposu","col":"#9ED3E6"},{"st":5,"in":5,"out":5,"cy":7.5,"up":607500000,"g":1.2,"kw":0.8,"mt":243000,"v":"Dock","en":"Glass Dock","tr":"Cam Rampası","col":"#9ED3E6"}],"value":218700000,"pen":"Glass Crate","ptr":"Cam Kasası","body":"#5FB3C9","accent":"#F28C38"},{"id":"paper","order":6,"unlock":208080000000000,"raw":656100000,"elec":7290000,"wage":14580000,"pcap":38,"pcost":109350000000,"pgrow":1.55,"en":"Paper Mill","tr":"Kâğıt Fabrikası","sup":null,"lines":[0,546750000000,29160000000000],"m":[{"st":0,"in":1,"out":1,"cy":0.8320000000000001,"up":6561000000,"g":1.2,"kw":2.58,"mt":4374000,"v":"Unloader","en":"Log Crane","tr":"Tomruk Vinci","col":"#8B5A2B"},{"st":1,"in":2,"out":1,"cy":1.872,"up":11664000000,"g":1.2,"kw":8.6,"mt":13121999.999999998,"v":"Mill","en":"Pulper","tr":"Hamurlaştırıcı","col":"#E8E1CF"},{"st":2,"in":1,"out":1,"cy":2.496,"up":16038000000,"g":1.2,"kw":8.6,"mt":14580000,"v":"Loom","en":"Paper Machine","tr":"Kâğıt Makinesi","col":"#F5F2EA"},{"st":3,"in":1,"out":1,"cy":1.56,"up":8748000000,"g":1.2,"kw":2.064,"mt":7290000,"v":"Packer","en":"Ream Wrapper","tr":"Top Sarıcı","col":"#FFFFFF"},{"st":4,"in":1,"out":1,"cy":0.55,"up":7290000000,"g":1.2,"kw":1.032,"mt":3645000,"v":"Warehouse","en":"Paper Warehouse","tr":"Kâğıt Deposu","col":"#FFFFFF"},{"st":5,"in":5,"out":5,"cy":7.800000000000001,"up":18225000000,"g":1.2,"kw":0.86,"mt":7290000,"v":"Dock","en":"Paper Dock","tr":"Kâğıt Rampası","col":"#FFFFFF"}],"value":10935000000,"pen":"Paper Ream","ptr":"Kâğıt Topu","body":"#7A9E5B","accent":"#D9A441"},{"id":"furniture","order":7,"unlock":16300154880000000,"raw":21870000000,"elec":218700000,"wage":437400000,"pcap":40.6,"pcost":3280500000000,"pgrow":1.55,"en":"Furniture Factory","tr":"Mobilya Fabrikası","sup":"textile","lines":[0,16402500000000,874800000000000],"m":[{"st":0,"in":1,"out":1,"cy":0.8640000000000001,"up":196830000000,"g":1.2,"kw":2.76,"mt":131220000,"v":"Unloader","en":"Timber Loader","tr":"Kereste Yükleyici","col":"#A87545"},{"st":1,"in":2,"out":1,"cy":1.9440000000000002,"up":349920000000,"g":1.2,"kw":9.2,"mt":393660000,"v":"Cutter","en":"Sawmill","tr":"Hızar","col":"#C99A6B"},{"st":2,"in":1,"out":2,"cy":2.592,"up":481140000000,"g":1.2,"kw":9.2,"mt":437400000,"v":"Press","en":"CNC Router","tr":"CNC Freze","col":"#B5835A"},{"st":3,"in":2,"out":1,"cy":1.62,"up":262440000000,"g":1.2,"kw":2.2079999999999997,"mt":218700000,"v":"Packer","en":"Flat-pack Packer","tr":"Paketleme Hattı","col":"#D9B48F"},{"st":4,"in":1,"out":1,"cy":0.55,"up":218700000000,"g":1.2,"kw":1.1039999999999999,"mt":109350000,"v":"Warehouse","en":"Furniture Warehouse","tr":"Mobilya Deposu","col":"#D9B48F"},{"st":5,"in":5,"out":5,"cy":8.100000000000001,"up":546750000000,"g":1.2,"kw":0.9199999999999999,"mt":218700000,"v":"Dock","en":"Furniture Dock","tr":"Mobilya Rampası","col":"#D9B48F"}],"value":240570000000,"pen":"Flat-pack Furniture","ptr":"Paketli Mobilya","body":"#A0673A","accent":"#3C6E71"},{"id":"beverage","order":8,"unlock":1.2258133753724925e+18,"raw":721710000000,"elec":6561000000,"wage":13122000000,"pcap":43.3,"pcost":98415000000000,"pgrow":1.55,"en":"Beverage Plant","tr":"İçecek Fabrikası","sup":"glass","lines":[0,492075000000000,26244000000000000],"m":[{"st":0,"in":1,"out":1,"cy":0.8960000000000001,"up":5904900000000,"g":1.2,"kw":2.94,"mt":3936600000,"v":"Silo","en":"Fruit Intake","tr":"Meyve Kabulü","col":"#F25F5C"},{"st":1,"in":2,"out":1,"cy":2.0160000000000005,"up":10497600000000,"g":1.2,"kw":9.8,"mt":11809800000,"v":"Mill","en":"Industrial Juicer","tr":"Endüstriyel Sıkacak","col":"#FFB627"},{"st":2,"in":1,"out":1,"cy":2.688,"up":14434200000000,"g":1.2,"kw":9.8,"mt":13122000000,"v":"RobotArm","en":"Bottling Line","tr":"Dolum Hattı","col":"#FF7F11"},{"st":3,"in":1,"out":1,"cy":1.6800000000000002,"up":7873200000000,"g":1.2,"kw":2.352,"mt":6561000000,"v":"Packer","en":"Case Packer","tr":"Koli Paketleyici","col":"#F9C784"},{"st":4,"in":1,"out":1,"cy":0.55,"up":6561000000000,"g":1.2,"kw":1.176,"mt":3280500000,"v":"Warehouse","en":"Cold Store","tr":"Soğuk Depo","col":"#F9C784"},{"st":5,"in":5,"out":5,"cy":8.4,"up":16402500000000,"g":1.2,"kw":0.98,"mt":6561000000,"v":"Dock","en":"Beverage Dock","tr":"İçecek Rampası","col":"#F9C784"}],"value":11153700000000,"pen":"Juice Case","ptr":"Meyve Suyu Kolisi","body":"#E85D75","accent":"#5BC0EB"},{"id":"cement","order":9,"unlock":8.84969317538423e+19,"raw":23619600000000.004,"elec":196830000000,"wage":393660000000,"pcap":45.9,"pcost":2952450000000000,"pgrow":1.55,"en":"Cement Works","tr":"Çimento Fabrikası","sup":null,"lines":[0,14762250000000000,7.8732e+17],"m":[{"st":0,"in":1,"out":1,"cy":0.8,"up":177147000000000,"g":1.2,"kw":3.12,"mt":118098000000,"v":"Unloader","en":"Quarry Loader","tr":"Ocak Yükleyici","col":"#D9D4C7"},{"st":1,"in":2,"out":1,"cy":1.8,"up":314928000000000,"g":1.2,"kw":10.4,"mt":354294000000,"v":"Extruder","en":"Rotary Kiln","tr":"Döner Fırın","col":"#5C5C5C"},{"st":2,"in":1,"out":2,"cy":2.4,"up":433026000000000,"g":1.2,"kw":10.4,"mt":393660000000,"v":"Mill","en":"Cement Mill","tr":"Çimento Değirmeni","col":"#A9A9A9"},{"st":3,"in":2,"out":1,"cy":1.5,"up":236196000000000,"g":1.2,"kw":2.496,"mt":196830000000,"v":"Packer","en":"Bagging Machine","tr":"Torbalama Makinesi","col":"#C2B280"},{"st":4,"in":1,"out":1,"cy":0.55,"up":196830000000000,"g":1.2,"kw":1.248,"mt":98415000000,"v":"Warehouse","en":"Bulk Silo","tr":"Dökme Silo","col":"#C2B280"},{"st":5,"in":5,"out":5,"cy":7.5,"up":492075000000000,"g":1.2,"kw":1.04,"mt":196830000000,"v":"Dock","en":"Cement Dock","tr":"Çimento Rampası","col":"#C2B280"}],"value":177147000000000,"pen":"Cement Bag","ptr":"Çimento Torbası","body":"#8D99AE","accent":"#EF8354"},{"id":"chemical","order":10,"unlock":6.133428467743545e+21,"raw":472392000000000,"elec":5904900000000,"wage":11809800000000,"pcap":48.6,"pcost":88573500000000000,"pgrow":1.55,"en":"Chemical Plant","tr":"Kimya Fabrikası","sup":null,"lines":[0,4.428675e+17,2.36196e+19],"m":[{"st":0,"in":1,"out":1,"cy":0.8320000000000001,"up":5314410000000000,"g":1.2,"kw":3.3000000000000003,"mt":3542940000000,"v":"Pump","en":"Brine Pump","tr":"Tuzlu Su Pompası","col":"#B8E0F6"},{"st":1,"in":2,"out":1,"cy":1.872,"up":9447840000000000,"g":1.2,"kw":11,"mt":10628820000000,"v":"Oven","en":"Reactor","tr":"Reaktör","col":"#7BD389"},{"st":2,"in":1,"out":1,"cy":2.496,"up":12990780000000000,"g":1.2,"kw":11,"mt":11809800000000,"v":"Press","en":"Formulation Mixer","tr":"Formül Karıştırıcı","col":"#3DCCC7"},{"st":3,"in":1,"out":1,"cy":1.56,"up":7085880000000000,"g":1.2,"kw":2.64,"mt":5904900000000,"v":"Packer","en":"Pack Filler","tr":"Paket Dolum","col":"#68D8D6"},{"st":4,"in":1,"out":1,"cy":0.55,"up":5904900000000000,"g":1.2,"kw":1.32,"mt":2952450000000,"v":"Warehouse","en":"Tank Farm","tr":"Tank Sahası","col":"#68D8D6"},{"st":5,"in":5,"out":5,"cy":7.800000000000001,"up":14762250000000000,"g":1.2,"kw":1.1,"mt":5904900000000,"v":"Dock","en":"Chemical Dock","tr":"Kimya Rampası","col":"#68D8D6"}],"value":8266860000000000,"pen":"Detergent Pack","ptr":"Deterjan Paketi","body":"#4CB944","accent":"#FFD23F"},{"id":"pharma","order":11,"unlock":4.080840574069041e+23,"raw":15943230000000000,"elec":177147000000000,"wage":354294000000000,"pcap":51.2,"pcost":2.657205e+18,"pgrow":1.55,"en":"Pharmaceutical Plant","tr":"İlaç Fabrikası","sup":"chemical","lines":[0,1.3286025e+19,7.08588e+20],"m":[{"st":0,"in":1,"out":1,"cy":0.8640000000000001,"up":1.594323e+17,"g":1.2,"kw":3.4799999999999995,"mt":106288200000000,"v":"Unloader","en":"Compound Loader","tr":"Bileşik Yükleyici","col":"#E0E7FF"},{"st":1,"in":2,"out":1,"cy":1.9440000000000002,"up":2.834352e+17,"g":1.2,"kw":11.6,"mt":318864600000000,"v":"Oven","en":"Synthesis Reactor","tr":"Sentez Reaktörü","col":"#A0C4FF"},{"st":2,"in":1,"out":2,"cy":2.592,"up":3.897234e+17,"g":1.2,"kw":11.6,"mt":354294000000000,"v":"Press","en":"Tablet Press","tr":"Tablet Presi","col":"#FFFFFF"},{"st":3,"in":2,"out":1,"cy":1.62,"up":2.125764e+17,"g":1.2,"kw":2.784,"mt":177147000000000,"v":"Packer","en":"Blister Packer","tr":"Blister Paketleyici","col":"#BDE0FE"},{"st":4,"in":1,"out":1,"cy":0.55,"up":1.77147e+17,"g":1.2,"kw":1.392,"mt":88573500000000,"v":"Warehouse","en":"Clean Store","tr":"Temiz Depo","col":"#BDE0FE"},{"st":5,"in":5,"out":5,"cy":8.100000000000001,"up":4.428675e+17,"g":1.2,"kw":1.16,"mt":177147000000000,"v":"Dock","en":"Pharma Dock","tr":"İlaç Rampası","col":"#BDE0FE"}],"value":1.948617e+17,"pen":"Medicine Box","ptr":"İlaç Kutusu","body":"#FFFFFF","accent":"#3A86FF"},{"id":"rubber","order":12,"unlock":2.606556754253791e+25,"raw":5.31441e+17,"elec":5314410000000000,"wage":10628820000000000,"pcap":53.9,"pcost":7.971615e+19,"pgrow":1.55,"en":"Tyre Factory","tr":"Lastik Fabrikası","sup":"chemical","lines":[0,3.9858075e+20,2.125764e+22],"m":[{"st":0,"in":1,"out":1,"cy":0.8960000000000001,"up":4.782969e+18,"g":1.2,"kw":3.66,"mt":3188646000000000,"v":"Silo","en":"Latex Tank","tr":"Lateks Tankı","col":"#F3EED9"},{"st":1,"in":2,"out":1,"cy":2.0160000000000005,"up":8.503056e+18,"g":1.2,"kw":12.2,"mt":9565938000000000,"v":"Crusher","en":"Banbury Mixer","tr":"Banbury Karıştırıcı","col":"#505050"},{"st":2,"in":1,"out":1,"cy":2.688,"up":1.1691702e+19,"g":1.2,"kw":12.2,"mt":10628820000000000,"v":"Press","en":"Curing Press","tr":"Vulkanizasyon Presi","col":"#222222"},{"st":3,"in":1,"out":1,"cy":1.6800000000000002,"up":6.377292e+18,"g":1.2,"kw":2.928,"mt":5314410000000000,"v":"Packer","en":"Tyre Stacker","tr":"Lastik İstifleyici","col":"#3A3A3A"},{"st":4,"in":1,"out":1,"cy":0.55,"up":5.31441e+18,"g":1.2,"kw":1.464,"mt":2657205000000000,"v":"Warehouse","en":"Tyre Warehouse","tr":"Lastik Deposu","col":"#3A3A3A"},{"st":5,"in":5,"out":5,"cy":8.4,"up":1.3286025e+19,"g":1.2,"kw":1.22,"mt":5314410000000000,"v":"Dock","en":"Tyre Dock","tr":"Lastik Rampası","col":"#3A3A3A"}],"value":8.503056e+18,"pen":"Tyre Stack","ptr":"Lastik Yığını","body":"#3D3D3D","accent":"#F2C14E"},{"id":"appliance","order":13,"unlock":1.598291447616318e+27,"raw":1.7537553000000002e+19,"elec":1.594323e+17,"wage":3.188646e+17,"pcap":56.5,"pcost":2.3914845e+21,"pgrow":1.55,"en":"Appliance Factory","tr":"Beyaz Eşya Fabrikası","sup":"steel","lines":[0,1.19574225e+22,6.377292e+23],"m":[{"st":0,"in":1,"out":1,"cy":0.8,"up":1.4348907e+20,"g":1.2,"kw":3.84,"mt":95659380000000000,"v":"Unloader","en":"Coil Loader","tr":"Rulo Yükleyici","col":"#ADB5BD"},{"st":1,"in":2,"out":1,"cy":1.8,"up":2.5509168e+20,"g":1.2,"kw":12.8,"mt":2.8697813999999997e+17,"v":"Press","en":"Stamping Press","tr":"Pres Hattı","col":"#DEE2E6"},{"st":2,"in":1,"out":2,"cy":2.4,"up":3.5075106e+20,"g":1.2,"kw":12.8,"mt":3.188646e+17,"v":"RobotArm","en":"Assembly Cell","tr":"Montaj Hücresi","col":"#F8F9FA"},{"st":3,"in":2,"out":1,"cy":1.5,"up":1.9131876e+20,"g":1.2,"kw":3.072,"mt":1.594323e+17,"v":"Packer","en":"Boxing Line","tr":"Kutulama Hattı","col":"#D4A373"},{"st":4,"in":1,"out":1,"cy":0.55,"up":1.594323e+20,"g":1.2,"kw":1.536,"mt":79716150000000000,"v":"Warehouse","en":"Appliance Warehouse","tr":"Beyaz Eşya Deposu","col":"#D4A373"},{"st":5,"in":5,"out":5,"cy":7.5,"up":3.9858075e+20,"g":1.2,"kw":1.28,"mt":1.594323e+17,"v":"Dock","en":"Appliance Dock","tr":"Beyaz Eşya Rampası","col":"#D4A373"}],"value":1.4348907e+20,"pen":"Boxed Appliance","ptr":"Kutulu Beyaz Eşya","body":"#E9ECEF","accent":"#E63946"},{"id":"automotive","order":14,"unlock":9.408404883033483e+28,"raw":5.7395628e+20,"elec":4.782969e+18,"wage":9.565938e+18,"pcap":59.2,"pcost":7.1744534999999994e+22,"pgrow":1.55,"en":"Car Factory","tr":"Otomobil Fabrikası","sup":"steel","lines":[0,3.58722675e+23,1.9131876e+25],"m":[{"st":0,"in":1,"out":1,"cy":0.8320000000000001,"up":4.3046721e+21,"g":1.2,"kw":4.02,"mt":2.8697814e+18,"v":"Unloader","en":"Coil Feeder","tr":"Rulo Besleyici","col":"#8D99AE"},{"st":1,"in":2,"out":1,"cy":1.872,"up":7.6527504e+21,"g":1.2,"kw":13.399999999999999,"mt":8.609344199999999e+18,"v":"Press","en":"Body Press","tr":"Kaporta Presi","col":"#457B9D"},{"st":2,"in":1,"out":1,"cy":2.496,"up":1.05225318e+22,"g":1.2,"kw":13.399999999999999,"mt":9.565938e+18,"v":"RobotArm","en":"Assembly Robots","tr":"Montaj Robotları","col":"#E63946"},{"st":3,"in":1,"out":1,"cy":1.56,"up":5.7395628e+21,"g":1.2,"kw":3.2159999999999997,"mt":4.782969e+18,"v":"Packer","en":"Final Inspection","tr":"Son Kontrol","col":"#A8DADC"},{"st":4,"in":1,"out":1,"cy":0.55,"up":4.782969e+21,"g":1.2,"kw":1.6079999999999999,"mt":2.3914845e+18,"v":"Warehouse","en":"Car Park","tr":"Araç Parkı","col":"#A8DADC"},{"st":5,"in":5,"out":5,"cy":7.800000000000001,"up":1.19574225e+22,"g":1.2,"kw":1.3399999999999999,"mt":4.782969e+18,"v":"Dock","en":"Car Carrier Dock","tr":"Oto Taşıyıcı Rampası","col":"#A8DADC"}],"value":8.6093442e+21,"pen":"Car Carrier Load","ptr":"Oto Taşıyıcı Yükü","body":"#1D3557","accent":"#E63946"},{"id":"solar","order":15,"unlock":5.316762426033089e+30,"raw":1.1479125600000002e+22,"elec":1.4348907e+20,"wage":2.8697814e+20,"pcap":61.8,"pcost":2.1523360500000002e+24,"pgrow":1.55,"en":"Solar Panel Factory","tr":"Güneş Paneli Fabrikası","sup":"glass","lines":[0,1.076168025e+25,5.7395628e+26],"m":[{"st":0,"in":1,"out":1,"cy":0.8640000000000001,"up":1.29140163e+23,"g":1.2,"kw":4.199999999999999,"mt":8.609344200000001e+19,"v":"Crusher","en":"Quartz Crusher","tr":"Kuvars Kırıcı","col":"#E5E5E5"},{"st":1,"in":2,"out":1,"cy":1.9440000000000002,"up":2.29582512e+23,"g":1.2,"kw":14,"mt":2.5828032599999998e+20,"v":"Furnace","en":"Ingot Furnace","tr":"Külçe Fırını","col":"#1D3557"},{"st":2,"in":1,"out":2,"cy":2.592,"up":3.15675954e+23,"g":1.2,"kw":14,"mt":2.8697814e+20,"v":"Press","en":"Panel Laminator","tr":"Panel Laminatörü","col":"#264653"},{"st":3,"in":2,"out":1,"cy":1.62,"up":1.72186884e+23,"g":1.2,"kw":3.36,"mt":1.4348907e+20,"v":"Packer","en":"Palletizer","tr":"Paletleyici","col":"#2A9D8F"},{"st":4,"in":1,"out":1,"cy":0.55,"up":1.4348907e+23,"g":1.2,"kw":1.68,"mt":7.1744535e+19,"v":"Warehouse","en":"Panel Warehouse","tr":"Panel Deposu","col":"#2A9D8F"},{"st":5,"in":5,"out":5,"cy":8.100000000000001,"up":3.58722675e+23,"g":1.2,"kw":1.4,"mt":1.4348907e+20,"v":"Dock","en":"Solar Dock","tr":"Güneş Paneli Rampası","col":"#2A9D8F"}],"value":1.57837977e+23,"pen":"Panel Pallet","ptr":"Panel Paleti","body":"#264653","accent":"#E9C46A"},{"id":"battery","order":16,"unlock":2.8843618577703587e+32,"raw":3.87420489e+23,"elec":4.3046721000000004e+21,"wage":8.609344200000001e+21,"pcap":64.5,"pcost":6.45700815e+25,"pgrow":1.55,"en":"Battery Factory","tr":"Batarya Fabrikası","sup":"chemical","lines":[0,3.228504075e+26,1.7218688400000001e+28],"m":[{"st":0,"in":1,"out":1,"cy":0.8960000000000001,"up":3.8742048900000003e+24,"g":1.2,"kw":4.38,"mt":2.58280326e+21,"v":"Unloader","en":"Ore Loader","tr":"Cevher Yükleyici","col":"#CBC0D3"},{"st":1,"in":2,"out":1,"cy":2.0160000000000005,"up":6.88747536e+24,"g":1.2,"kw":14.6,"mt":7.74840978e+21,"v":"Extruder","en":"Calciner","tr":"Kalsinasyon Fırını","col":"#6C757D"},{"st":2,"in":1,"out":1,"cy":2.688,"up":9.47027862e+24,"g":1.2,"kw":14.6,"mt":8.609344200000001e+21,"v":"RobotArm","en":"Cell Line","tr":"Hücre Hattı","col":"#2EC4B6"},{"st":3,"in":1,"out":1,"cy":1.6800000000000002,"up":5.16560652e+24,"g":1.2,"kw":3.504,"mt":4.3046721000000004e+21,"v":"Packer","en":"Pack Assembly","tr":"Paket Montajı","col":"#0B6E4F"},{"st":4,"in":1,"out":1,"cy":0.55,"up":4.3046721000000004e+24,"g":1.2,"kw":1.752,"mt":2.1523360500000002e+21,"v":"Warehouse","en":"Dry Room Store","tr":"Kuru Oda Deposu","col":"#0B6E4F"},{"st":5,"in":5,"out":5,"cy":8.4,"up":1.076168025e+25,"g":1.2,"kw":1.46,"mt":4.3046721000000004e+21,"v":"Dock","en":"Battery Dock","tr":"Batarya Rampası","col":"#0B6E4F"}],"value":6.45700815e+24,"pen":"Battery Pack","ptr":"Batarya Paketi","body":"#2EC4B6","accent":"#FF9F1C"},{"id":"aerospace","order":17,"unlock":1.5021851558368557e+34,"raw":1.29140163e+25,"elec":1.29140163e+23,"wage":2.58280326e+23,"pcap":67.1,"pcost":1.9371024450000001e+27,"pgrow":1.55,"en":"Aerospace Plant","tr":"Havacılık Fabrikası","sup":"battery","lines":[0,9.685512225e+27,5.16560652e+29],"m":[{"st":0,"in":1,"out":1,"cy":0.8,"up":1.162261467e+26,"g":1.2,"kw":4.5600000000000005,"mt":7.74840978e+22,"v":"Unloader","en":"Ingot Loader","tr":"Külçe Yükleyici","col":"#C0C0C0"},{"st":1,"in":2,"out":1,"cy":1.8,"up":2.066242608e+26,"g":1.2,"kw":15.2,"mt":2.324522934e+23,"v":"Furnace","en":"Alloy Furnace","tr":"Alaşım Fırını","col":"#9FA8B3"},{"st":2,"in":1,"out":2,"cy":2.4,"up":2.841083586e+26,"g":1.2,"kw":15.2,"mt":2.58280326e+23,"v":"Cutter","en":"5-Axis Machining","tr":"5 Eksen İşleme","col":"#E0E1DD"},{"st":3,"in":2,"out":1,"cy":1.5,"up":1.549681956e+26,"g":1.2,"kw":3.6479999999999997,"mt":1.29140163e+23,"v":"Packer","en":"Crate Builder","tr":"Sandık Yapıcı","col":"#778DA9"},{"st":4,"in":1,"out":1,"cy":0.55,"up":1.29140163e+26,"g":1.2,"kw":1.8239999999999998,"mt":6.45700815e+22,"v":"Warehouse","en":"Hangar Store","tr":"Hangar Deposu","col":"#778DA9"},{"st":5,"in":5,"out":5,"cy":7.5,"up":3.228504075e+26,"g":1.2,"kw":1.52,"mt":1.29140163e+23,"v":"Dock","en":"Aerospace Dock","tr":"Havacılık Rampası","col":"#778DA9"}],"value":1.162261467e+26,"pen":"Aero Crate","ptr":"Havacılık Sandığı","body":"#ADB5BD","accent":"#0077B6"},{"id":"robotics","order":18,"unlock":7.510492578744975e+35,"raw":4.261625379e+26,"elec":3.87420489e+24,"wage":7.74840978e+24,"pcap":69.8,"pcost":5.811307335e+28,"pgrow":1.55,"en":"Robotics Factory","tr":"Robotik Fabrikası","sup":"electronics","lines":[0,2.9056536674999996e+29,1.549681956e+31],"m":[{"st":0,"in":1,"out":1,"cy":0.8320000000000001,"up":3.486784401e+27,"g":1.2,"kw":4.74,"mt":2.324522934e+24,"v":"Unloader","en":"Chip Loader","tr":"Çip Yükleyici","col":"#3A3A3A"},{"st":1,"in":2,"out":1,"cy":1.872,"up":6.198727824e+27,"g":1.2,"kw":15.8,"mt":6.973568801999999e+24,"v":"Loom","en":"Servo Winder","tr":"Servo Sarıcı","col":"#8AC926"},{"st":2,"in":1,"out":1,"cy":2.496,"up":8.523250757999999e+27,"g":1.2,"kw":15.8,"mt":7.74840978e+24,"v":"RobotArm","en":"Robot Assembly","tr":"Robot Montajı","col":"#6A4C93"},{"st":3,"in":1,"out":1,"cy":1.56,"up":4.6490458679999997e+27,"g":1.2,"kw":3.792,"mt":3.87420489e+24,"v":"Packer","en":"Robot Crater","tr":"Robot Sandıklayıcı","col":"#C3B1E1"},{"st":4,"in":1,"out":1,"cy":0.55,"up":3.87420489e+27,"g":1.2,"kw":1.896,"mt":1.937102445e+24,"v":"Warehouse","en":"Robot Warehouse","tr":"Robot Deposu","col":"#C3B1E1"},{"st":5,"in":5,"out":5,"cy":7.800000000000001,"up":9.685512224999999e+27,"g":1.2,"kw":1.58,"mt":3.87420489e+24,"v":"Dock","en":"Robotics Dock","tr":"Robotik Rampası","col":"#C3B1E1"}],"value":6.586148313e+27,"pen":"Robot Crate","ptr":"Robot Sandığı","body":"#6A4C93","accent":"#8AC926"},{"id":"space","order":19,"unlock":3.604828513579658e+37,"raw":1.3947137604000001e+28,"elec":1.162261467e+26,"wage":2.324522934e+26,"pcap":72.4,"pcost":1.7433922004999999e+30,"pgrow":1.55,"en":"Space Technology","tr":"Uzay Teknolojisi","sup":"robotics","lines":[0,8.7169610025e+30,4.6490458679999994e+32],"m":[{"st":0,"in":1,"out":1,"cy":0.8640000000000001,"up":1.0460353203e+29,"g":1.2,"kw":4.92,"mt":6.9735688019999994e+25,"v":"Unloader","en":"Titanium Loader","tr":"Titanyum Yükleyici","col":"#B0B7C3"},{"st":1,"in":2,"out":1,"cy":1.9440000000000002,"up":1.8596183472e+29,"g":1.2,"kw":16.4,"mt":2.0920706405999997e+26,"v":"Oven","en":"Vacuum Furnace","tr":"Vakum Fırını","col":"#E5E5E5"},{"st":2,"in":1,"out":2,"cy":2.592,"up":2.5569752274e+29,"g":1.2,"kw":16.4,"mt":2.324522934e+26,"v":"RobotArm","en":"Clean-Room Assembly","tr":"Temiz Oda Montajı","col":"#FCA311"},{"st":3,"in":2,"out":1,"cy":1.62,"up":1.3947137603999998e+29,"g":1.2,"kw":3.9359999999999995,"mt":1.162261467e+26,"v":"Packer","en":"Container Packer","tr":"Konteyner Paketleyici","col":"#14213D"},{"st":4,"in":1,"out":1,"cy":0.55,"up":1.162261467e+29,"g":1.2,"kw":1.9679999999999997,"mt":5.811307335e+25,"v":"Warehouse","en":"Integration Hall","tr":"Entegrasyon Salonu","col":"#14213D"},{"st":5,"in":5,"out":5,"cy":8.100000000000001,"up":2.9056536674999996e+29,"g":1.2,"kw":1.64,"mt":1.162261467e+26,"v":"Dock","en":"Launch Dock","tr":"Fırlatma Rampası","col":"#14213D"}],"value":1.2784876137e+29,"pen":"Launch Container","ptr":"Fırlatma Konteyneri","body":"#14213D","accent":"#FCA311"}]}</script>
+<script>
+"use strict";
+// ======================================================================= data & tuning (mirrors the Unity game core)
+const C = JSON.parse(document.getElementById("content").textContent).factories;
+const T = { maxLv: 100, speedPerLv: 0.10, milestones: [10, 25, 50, 75, 100], maintPerLv: 0.06, powerPerLv: 0.06, powerCapPerLv: 0.5,
+  maxPower: 60, startCash: 60, offlineCapH: 8, offlineEff: 0.5, prestigeMin: 1e9, crownDiv: 1e8, crownLog: 2, crownBonus: 0.10,
+  seasonDays: 30, momentumPerDay: 0.15 };
+const STR = {
+  en: { perSec: "/s", lines: "Line", locked: "Locked", buy: "Buy", unlockLine: "Open line {0}", bottleneck: "Bottleneck", level: "Lv {0}",
+    cycle: "{0}s cycle", upgrade: "Upgrade", max: "MAX", maxLv: "Max level", power: "Power {0}/{1} kW · Plant Lv {2}", powerUp: "Plant {0}",
+    slow: "slowed to {0}%", map: "Factories", daily: "Daily", prestige: "Prestige", more: "More", welcome: "Welcome back, boss!",
+    away: "You were away for {0}. Your factories kept producing.", collect: "Collect", dailyT: "Daily reward", dailyB: "Come back every day — missing a day never resets your streak.",
+    claim: "Claim", tomorrow: "Come back tomorrow", day: "Day {0}", prestT: "Restructure", prestB: "Turn this run's earnings into Crowns. Each Crown permanently adds +10% to every sale. Factories, levels and cash start over; Crowns stay.",
+    prestGain: "You gain {0} Crowns (now {1})", prestNeed: "Needs {0} earned this run (now {1})", prestGo: "Restructure now", crowns: "♛ {0} Crowns · +{1}%",
+    moreT: "Settings", lang: "Language", reset: "Reset progress", resetSure: "Tap again to delete all progress", close: "Close", saved: "Saved",
+    drone: "Cargo drone!", got: "+{0}", supplied: "Supplier {0} ✓ (−20% cost, +10% price)", supplier: "Supplier: {0}", season: "Season day {0}/30",
+    companyPrompt: "Name your company", start: "Start building", hot: "★ In demand today", market: "Market {0}", needPrev: "Buy the previous factory first",
+    notEnough: "Not enough cash", sold: "{0} sold per minute", about: "Web preview of Factory King. The iPhone app adds 3D, managers, seasons, events and more.",
+    tapHint: "Tap a machine to upgrade it" },
+  tr: { perSec: "/sn", lines: "Hat", locked: "Kilitli", buy: "Satın al", unlockLine: "{0}. hattı aç", bottleneck: "Darboğaz", level: "Sv {0}",
+    cycle: "{0} sn döngü", upgrade: "Yükselt", max: "MAKS", maxLv: "Maks. seviye", power: "Elektrik {0}/{1} kW · Santral Sv {2}", powerUp: "Santral {0}",
+    slow: "%{0} hızda", map: "Fabrikalar", daily: "Günlük", prestige: "Prestij", more: "Diğer", welcome: "Tekrar hoş geldin patron!",
+    away: "{0} boyunca uzaktaydın. Fabrikaların üretmeye devam etti.", collect: "Topla", dailyT: "Günlük ödül", dailyB: "Her gün gel — bir gün kaçırmak serini sıfırlamaz.",
+    claim: "Al", tomorrow: "Yarın tekrar gel", day: "{0}. gün", prestT: "Yeniden yapılanma", prestB: "Bu turdaki kazancını Taç'a çevir. Her Taç tüm satışlara kalıcı +%10 ekler. Fabrikalar, seviyeler ve para sıfırlanır; Taçlar kalır.",
+    prestGain: "{0} Taç kazanırsın (şu an {1})", prestNeed: "Bu turda {0} kazanman gerekir (şu an {1})", prestGo: "Şimdi yeniden yapılan", crowns: "♛ {0} Taç · +%{1}",
+    moreT: "Ayarlar", lang: "Dil", reset: "İlerlemeyi sıfırla", resetSure: "Tüm ilerlemeyi silmek için tekrar dokun", close: "Kapat", saved: "Kaydedildi",
+    drone: "Kargo dronu!", got: "+{0}", supplied: "Tedarikçi {0} ✓ (−%20 gider, +%10 fiyat)", supplier: "Tedarikçi: {0}", season: "Sezon günü {0}/30",
+    companyPrompt: "Şirketine bir ad ver", start: "İnşaata başla", hot: "★ Günün gözde ürünü", market: "Piyasa {0}", needPrev: "Önce bir önceki fabrikayı al",
+    notEnough: "Para yetmiyor", sold: "Dakikada {0} satış", about: "Factory King'in web önizlemesi. iPhone uygulamasında 3D, yöneticiler, sezonlar, etkinlikler ve daha fazlası var.",
+    tapHint: "Yükseltmek için bir makineye dokun" } };
+
+// ======================================================================= state
+const fresh = () => ({ v: 1, cash: T.startCash, life: 0, run: 0, crowns: 0, prest: 0, active: C[0].id, lang: (navigator.language || "").startsWith("tr") ? "tr" : "en",
+  company: "", start: Date.now(), last: Date.now(), maxSeen: Date.now(), daily: { day: -1, idx: 0 }, drone: { next: Date.now() + 60000, until: 0 },
+  f: Object.fromEntries(C.map((f, i) => [f.id, { own: i === 0, lines: [i === 0, false, false], lv: [[1,1,1,1,1,1],[1,1,1,1,1,1],[1,1,1,1,1,1]], pw: 1 }])) });
+let S = fresh();
+const L = (k, ...a) => (STR[S.lang][k] || k).replace(/\{(\d)\}/g, (_, i) => a[i]);
+const byId = Object.fromEntries(C.map(f => [f.id, f]));
+let selected = null; // {f, line, i}
+
+// ======================================================================= number formatting
+const SUF = { en: ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc"], tr: ["", "B", "Mn", "Mr", "Tn", "Ktr", "Ktl", "Sks", "Spt", "Okt", "Non", "Des"] };
+function fmt(v) {
+  if (!isFinite(v)) return "∞";
+  const neg = v < 0; v = Math.abs(v);
+  let out;
+  if (v < 1000) out = v >= 100 ? Math.floor(v).toString() : (Math.floor(v * 10) / 10).toString();
+  else {
+    const e = Math.floor(Math.log10(v)), tier = Math.floor(e / 3), d = e % 3;
+    const m = Math.floor(v / Math.pow(10, e - 2)) / Math.pow(10, 2 - d);
+    let suf = SUF[S.lang][tier];
+    if (suf === undefined) { const k = tier - 12; suf = String.fromCharCode(97 + Math.floor(k / 26) % 26) + String.fromCharCode(97 + k % 26); }
+    out = m + (S.lang === "tr" ? " " : "") + suf;
+  }
+  if (S.lang === "tr") out = out.replace(".", ",");
+  return (neg ? "-" : "") + out;
+}
+const dur = s => { s = Math.max(0, Math.floor(s)); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60); return h ? `${h}h ${String(m).padStart(2, "0")}m` : m ? `${m}m ${String(s % 60).padStart(2, "0")}s` : `${s}s`; };
+
+// ======================================================================= economy (same formulas as the C# core)
+const speedMult = lv => { let s = 1 + T.speedPerLv * (lv - 1); for (const m of T.milestones) if (lv >= m) s *= 2; return s; };
+const kwAt = (m, lv) => m.kw * (1 + T.powerPerLv * (lv - 1));
+const upCost = (m, lv) => m.up * Math.pow(m.g, lv - 1);
+function upCostN(m, lv, n) { n = Math.min(n, T.maxLv - lv); if (n <= 0) return 0; return Math.abs(m.g - 1) < 1e-12 ? upCost(m, lv) * n : upCost(m, lv) * (Math.pow(m.g, n) - 1) / (m.g - 1); }
+function maxAfford(m, lv, cash) { let lo = 0, hi = T.maxLv - lv; while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (upCostN(m, lv, mid) <= cash) lo = mid; else hi = mid - 1; } return lo; }
+const dayIndex = t => Math.floor(t / 86400000);
+const seasonDay = () => Math.min(T.seasonDays, (Date.now() - S.start) / 86400000);
+const momentum = () => 1 + T.momentumPerDay * seasonDay();
+const hotFactory = () => C[(dayIndex(Date.now()) * 7919) % C.length].id;
+function market(f) { const h = Date.now() / 3600000, p = 5 + f.order * 1.5; let x = 1 + 0.15 * Math.sin((h / p + (f.order * 0.37) % 1) * 2 * Math.PI); if (hotFactory() === f.id) x += 0.25; return x; }
+const supplied = f => f.sup && S.f[f.sup] && S.f[f.sup].own;
+
+function analyze(f, line, speedMod = 1) {
+  const lv = S.f[f.id].lv[line], ms = f.m, n = ms.length;
+  const fpo = new Array(n); fpo[n - 1] = 1;
+  for (let i = n - 2; i >= 0; i--) { const nx = ms[i + 1]; fpo[i] = fpo[i + 1] * (nx.st === 5 ? 1 : nx.out / nx.in); }
+  const cap = [], cycle = [];
+  let bott = Infinity, bi = 0;
+  for (let i = 0; i < n; i++) {
+    cycle[i] = ms[i].cy / (speedMult(lv[i]) * speedMod);
+    const outs = ms[i].st === 5 ? ms[i].in : ms[i].out;
+    cap[i] = outs / cycle[i] * fpo[i];
+    if (cap[i] < bott) { bott = cap[i]; bi = i; }
+  }
+  const sup = supplied(f), costMod = sup ? 0.8 : 1;
+  const priceMod = (1 + T.crownBonus * S.crowns) * market(f) * momentum() * (sup ? 1.1 : 1);
+  let elec = 0, wage = 0, maint = 0, kw = 0;
+  for (let i = 0; i < n; i++) {
+    const u = Math.min(1, bott / cap[i]);
+    kw += u * kwAt(ms[i], lv[i]);
+    elec += u * kwAt(ms[i], lv[i]) * f.elec * costMod;
+    wage += u * f.wage * costMod;
+    maint += u * ms[i].mt * (1 + T.maintPerLv * (lv[i] - 1)) * costMod;
+  }
+  const revenue = bott * f.value * priceMod, raw = bott / fpo[0] * f.raw * costMod;
+  return { rate: bott, bi, cap, cycle, kw, revenue, net: revenue - raw - elec - wage - maint };
+}
+const powerCap = f => f.pcap * (1 + T.powerCapPerLv * (S.f[f.id].pw - 1));
+function throttle(f) { const st = S.f[f.id]; let d = 0; st.lines.forEach((on, l) => { if (on) d += analyze(f, l).kw; }); return d <= 0 ? 1 : Math.min(1, powerCap(f) / d); }
+const powerCost = f => f.pcost * Math.pow(f.pgrow, S.f[f.id].pw - 1);
+
+let cache = null;
+function recompute() {
+  const out = { total: 0, byF: {} };
+  for (const f of C) {
+    const st = S.f[f.id]; if (!st.own) continue;
+    const th = throttle(f), lines = [];
+    let net = 0, demand = 0;
+    st.lines.forEach((on, l) => { if (!on) { lines.push(null); return; } const a = analyze(f, l, th); lines.push(a); net += a.net; demand += analyze(f, l).kw; });
+    out.byF[f.id] = { th, lines, net, demand };
+    out.total += Math.max(0, net);
+  }
+  cache = out;
+}
+
+// ======================================================================= actions
+function spend(v) { if (S.cash + 1e-9 < v) { toast(L("notEnough")); return false; } S.cash -= v; return true; }
+function earn(v) { if (v > 0) { S.cash += v; S.life += v; S.run += v; } }
+function upgrade(f, line, i, count) {
+  const m = f.m[i], lv = S.f[f.id].lv[line][i];
+  if (lv >= T.maxLv) return;
+  const n = count === "max" ? Math.max(1, maxAfford(m, lv, S.cash)) : Math.min(count, T.maxLv - lv);
+  if (!spend(upCostN(m, lv, n))) return;
+  S.f[f.id].lv[line][i] = lv + n; beep(660); recompute(); render(); save();
+}
+function openLine(f, l) { if (!spend(f.lines[l])) return; S.f[f.id].lines[l] = true; beep(520); recompute(); render(); save(); }
+function buyFactory(f) {
+  const idx = C.indexOf(f);
+  if (idx > 0 && !S.f[C[idx - 1].id].own) { toast(L("needPrev")); return; }
+  if (!spend(f.unlock)) return;
+  S.f[f.id].own = true; S.f[f.id].lines[0] = true; S.active = f.id; selected = null; beep(880); recompute(); render(); save();
+}
+function upgradePower(f) { if (S.f[f.id].pw >= T.maxPower) return; if (!spend(powerCost(f))) return; S.f[f.id].pw++; beep(600); recompute(); render(); save(); }
+const crownsFor = run => run < T.prestigeMin ? 0 : Math.floor(T.crownLog * Math.log10(run / T.crownDiv) + 1e-9);
+function prestige() {
+  const gain = crownsFor(S.run); if (gain < 1) return;
+  const keep = { crowns: S.crowns + gain, prest: S.prest + 1, life: S.life, lang: S.lang, company: S.company, start: S.start, daily: S.daily };
+  S = Object.assign(fresh(), keep);
+  S.cash = T.startCash * (1 + S.crowns); S.f[C[0].id].lines[1] = true;
+  selected = null; recompute(); closeModal(); render(); save(); toast("♛ +" + gain);
+}
+
+// ======================================================================= persistence: per-viewer db doc when signed in, else browser storage
+let dbDoc = null;
+const LS_KEY = "factoryking.web.save.v1";
+function serialize() { S.last = Date.now(); S.maxSeen = Math.max(S.maxSeen || 0, S.last); return JSON.stringify(S); }
+function merge(raw) { try { const o = typeof raw === "string" ? JSON.parse(raw) : raw; if (!o || !o.f) return null; const b = fresh(); for (const f of C) if (o.f[f.id]) b.f[f.id] = Object.assign(b.f[f.id], o.f[f.id]); return Object.assign(b, o, { f: b.f }); } catch { return null; } }
+let saveTimer = 0;
+function save() {
+  const json = serialize();
+  try { localStorage.setItem(LS_KEY, json); } catch {}
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => { if (dbDoc) dbDoc.set({ json, life: S.life, at: Date.now() }).catch(() => {}); }, 1500);
+}
+async function load() {
+  let local = null; try { local = merge(localStorage.getItem(LS_KEY)); } catch {}
+  if (local) S = local;
+  try {
+    if (window.claude && window.claude.use) {
+      const timeout = new Promise(r => setTimeout(() => r(null), 6000));
+      const [db, user] = await Promise.race([Promise.all([claude.use("db"), claude.use("user")]), timeout.then(() => [null, null])]) || [null, null];
+      if (db && user) {
+        const id = await user.id();
+        if (id) {
+          dbDoc = db.collection("data/users/" + id).doc("save");
+          const snap = await Promise.race([dbDoc.get(), timeout]);
+          const remote = snap && snap.exists !== false && snap.data && snap.data() ? merge(snap.data().json) : null;
+          if (remote && remote.life > (S.life || 0)) S = remote;
+        }
+      }
+    }
+  } catch {}
+}
+
+// ======================================================================= offline earnings, daily reward, drone
+function offline() {
+  const now = Date.now();
+  if (now < (S.maxSeen || now) - 5 * 60000) { S.maxSeen = Math.max(S.maxSeen, now); return; } // clock moved back: nothing
+  const away = (now - (S.last || now)) / 1000;
+  if (away < 60) return;
+  recompute();
+  const credited = Math.min(away, T.offlineCapH * 3600), amount = cache.total * credited * T.offlineEff;
+  if (amount <= 0) return;
+  modal(`<h2>${L("welcome")}</h2><p>${L("away", dur(away))}</p><div class="big num">$ ${fmt(amount)}</div>
+    <button class="act" id="mCollect">${L("collect")}</button>`);
+  document.getElementById("mCollect").onclick = () => { earn(amount); beep(880); closeModal(); render(); save(); };
+}
+const DAILY = [300, 0, 900, 0, 1800, 0, 3600];
+function dailyReward(i) { return DAILY[i] ? { cash: Math.max(T.startCash, (cache ? cache.total : 0) * DAILY[i]) } : { crate: true }; }
+function openDaily() {
+  const can = dayIndex(Date.now()) > S.daily.day;
+  let html = `<h2>${L("dailyT")}</h2><p>${L("dailyB")}</p><div class="row3">`;
+  for (let i = 0; i < 7; i++) {
+    const r = DAILY[i] ? "$ " + fmt(Math.max(T.startCash, (cache ? cache.total : 0) * DAILY[i])) : "⚡ x2 · 10m";
+    html += `<div class="fitem" style="grid-template-columns:1fr;${i === S.daily.idx ? "box-shadow:inset 0 0 0 2px var(--amber)" : ""}"><span class="s">${L("day", i + 1)}</span><span class="n num">${r}</span></div>`;
+  }
+  html += `</div><button class="act" id="mDaily" ${can ? "" : "disabled"}>${can ? L("claim") : L("tomorrow")}</button><button class="ghost" id="mClose">${L("close")}</button>`;
+  modal(html);
+  document.getElementById("mClose").onclick = closeModal;
+  document.getElementById("mDaily").onclick = () => {
+    if (!(dayIndex(Date.now()) > S.daily.day)) return;
+    const i = S.daily.idx;
+    if (DAILY[i]) earn(Math.max(T.startCash, cache.total * DAILY[i])); else boostUntil = Date.now() + 600000;
+    S.daily = { day: dayIndex(Date.now()), idx: (i + 1) % 7 }; beep(880); closeModal(); render(); save();
+  };
+}
+let boostUntil = 0;
+
+// ======================================================================= rendering: DOM
+const $ = id => document.getElementById(id);
+function toast(t) { const d = document.createElement("div"); d.className = "toast"; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 1800); }
+function modal(html) { $("modalBox").innerHTML = html; $("modal").hidden = false; }
+function closeModal() { $("modal").hidden = true; }
+$("modal").addEventListener("click", e => { if (e.target.id === "modal") closeModal(); });
+
+function render() {
+  if (!cache) recompute();
+  const f = byId[S.active], st = S.f[f.id], fc = cache.byF[f.id];
+  $("coName").textContent = S.company || "Factory King";
+  $("langBtn").textContent = S.lang === "tr" ? "EN" : "TR";
+  $("crowns").textContent = S.crowns ? L("crowns", S.crowns, Math.round(S.crowns * T.crownBonus * 100)) : "";
+  $("season").textContent = L("season", Math.floor(seasonDay()) + 1);
+  // tabs
+  const tabs = $("tabs"); tabs.innerHTML = "";
+  let shownNext = false;
+  C.forEach((g, i) => {
+    const own = S.f[g.id].own, b = document.createElement("button");
+    if (own) { b.className = "tab" + (g.id === S.active ? " on" : ""); b.textContent = g[S.lang]; b.onclick = () => { S.active = g.id; selected = null; render(); }; }
+    else if (!shownNext) { shownNext = true; b.className = "tab buy"; b.innerHTML = `${g[S.lang]}<small>$ ${fmt(g.unlock)}</small>`; b.onclick = () => buyFactory(g); }
+    else return;
+    tabs.appendChild(b);
+  });
+  // power
+  const cap = powerCap(f), th = fc.th;
+  $("power").className = th < 0.999 ? "low" : "";
+  $("powerTxt").innerHTML = L("power", Math.round(fc.demand), Math.round(cap), st.pw) + (th < 0.999 ? ` <span class="warn">${L("slow", Math.round(th * 100))}</span>` : "");
+  $("powerBtn").textContent = st.pw >= T.maxPower ? L("max") : L("powerUp", "$" + fmt(powerCost(f)));
+  $("powerBtn").onclick = () => upgradePower(f);
+  renderSheet();
+  // bottom
+  $("bMap").textContent = L("map"); $("bDaily").textContent = L("daily"); $("bPrestige").textContent = L("prestige"); $("bMore").textContent = L("more");
+  $("bDaily").className = dayIndex(Date.now()) > S.daily.day ? "alert" : "";
+  $("bPrestige").className = crownsFor(S.run) >= 1 ? "alert" : "";
+}
+
+function renderSheet() {
+  const f = byId[S.active], st = S.f[f.id], fc = cache.byF[f.id], sh = $("sheet");
+  if (selected && selected.f === f.id && st.lines[selected.line]) {
+    const { line, i } = selected, m = f.m[i], lv = st.lv[line][i], a = fc.lines[line];
+    const cyc = a.cycle[i];
+    const opts = [1, 10, "max"].map(n => {
+      const k = n === "max" ? Math.max(1, maxAfford(m, lv, S.cash)) : Math.min(n, T.maxLv - lv);
+      const cost = upCostN(m, lv, k), dis = lv >= T.maxLv || cost > S.cash;
+      return `<button class="act" data-n="${n}" ${dis ? "disabled" : ""}>${lv >= T.maxLv ? L("maxLv") : (n === "max" ? L("max") : "x" + n) + " → " + (lv + k)}<small>${lv >= T.maxLv ? "" : "$ " + fmt(cost)}</small></button>`;
+    }).join("");
+    sh.innerHTML = `<div id="sheetHead"><div><div id="sheetTitle">${m[S.lang]}</div><div id="sheetMeta">${L("lines")} ${line + 1} · ${L("level", lv)} · ${L("cycle", cyc < 1 ? cyc.toFixed(2) : cyc.toFixed(1))}
+      ${a.bi === i ? ` <span class="chip bn">${L("bottleneck")}</span>` : ""}</div></div><button class="ghost" id="sClose" aria-label="${L("close")}">✕</button></div>
+      <div class="row3">${opts}</div>`;
+    sh.querySelectorAll(".act").forEach(b => b.onclick = () => upgrade(f, line, i, b.dataset.n === "max" ? "max" : +b.dataset.n));
+    $("sClose").onclick = () => { selected = null; renderSheet(); };
+    return;
+  }
+  let html = `<div id="sheetHead"><div id="sheetTitle">${f[S.lang]}</div><span class="chip">${hotFactory() === f.id ? L("hot") : L("market", (market(f) >= 1 ? "+" : "") + Math.round((market(f) - 1) * 100) + "%")}</span></div><div class="lines">`;
+  st.lines.forEach((on, l) => {
+    if (!on) return;
+    const a = fc.lines[l];
+    html += `<div>${L("lines")} ${l + 1}: <b class="num">$ ${fmt(a.net)}${L("perSec")}</b> · ${L("bottleneck")}: <b>${f.m[a.bi][S.lang]}</b></div>`;
+  });
+  if (f.sup) html += `<div>${supplied(f) ? L("supplied", byId[f.sup][S.lang]) : L("supplier", byId[f.sup][S.lang])}</div>`;
+  html += `<div>${L("tapHint")}</div></div>`;
+  const next = st.lines.indexOf(false);
+  if (next > 0) html += `<button class="act" id="sLine" ${f.lines[next] > S.cash ? "disabled" : ""}>${L("unlockLine", next + 1)}<small>$ ${fmt(f.lines[next])}</small></button>`;
+  sh.innerHTML = html;
+  if (next > 0) $("sLine").onclick = () => openLine(f, next);
+}
+
+// ======================================================================= rendering: canvas factory
+const cv = $("cv"), ctx = cv.getContext("2d");
+let W = 0, H = 0, DPR = 1, hit = [];
+function resize() { const r = cv.getBoundingClientRect(); DPR = Math.min(2, window.devicePixelRatio || 1); W = r.width; H = r.height; cv.width = W * DPR; cv.height = H * DPR; }
+window.addEventListener("resize", resize);
+function shade(hex, k) { const n = parseInt(hex.slice(1), 16); let r = n >> 16, g = (n >> 8) & 255, b = n & 255; const f = c => Math.max(0, Math.min(255, Math.round(k < 0 ? c * (1 + k) : c + (255 - c) * k))); return `rgb(${f(r)},${f(g)},${f(b)})`; }
+function box(x, y, w, h, d, col) { // simple extruded block (front + top + side)
+  ctx.fillStyle = shade(col, -0.35); ctx.beginPath(); ctx.moveTo(x + w, y); ctx.lineTo(x + w + d, y - d * 0.6); ctx.lineTo(x + w + d, y + h - d * 0.6); ctx.lineTo(x + w, y + h); ctx.fill();
+  ctx.fillStyle = shade(col, 0.25); ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + d, y - d * 0.6); ctx.lineTo(x + w + d, y - d * 0.6); ctx.lineTo(x + w, y); ctx.fill();
+  ctx.fillStyle = col; ctx.fillRect(x, y, w, h);
+}
+function drawMachine(m, x, y, w, h, col, acc, t, active, bott) {
+  const d = Math.max(4, w * 0.18);
+  box(x, y + h * 0.25, w, h * 0.75, d, col);
+  ctx.fillStyle = shade(acc, 0); ctx.fillRect(x, y + h * 0.25, w, Math.max(3, h * 0.08));
+  const cx = x + w / 2, cy = y + h * 0.6;
+  ctx.save(); ctx.strokeStyle = "rgba(255,255,255,.85)"; ctx.fillStyle = "rgba(255,255,255,.85)"; ctx.lineWidth = Math.max(1.5, w * 0.05);
+  const spin = active ? t * 4 : 0, bob = active ? Math.sin(t * 6) : 0;
+  switch (m.v) {
+    case "Furnace": case "Oven": box(x + w * 0.62, y - h * 0.05, w * 0.18, h * 0.32, d * 0.5, shade(col, -0.2));
+      ctx.fillStyle = active ? `rgba(255,${140 + 40 * Math.sin(t * 8)},40,.95)` : "rgba(120,60,30,.8)"; ctx.fillRect(x + w * 0.2, cy - h * 0.08, w * 0.4, h * 0.18); break;
+    case "Mill": case "Crusher": case "Extruder": ctx.beginPath(); for (let k = 0; k < 6; k++) { const a = spin + k * Math.PI / 3; ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(a) * w * 0.28, cy + Math.sin(a) * w * 0.28); } ctx.stroke(); break;
+    case "Press": case "Cutter": ctx.fillRect(x + w * 0.25, y + h * 0.3 + (bob + 1) * h * 0.08, w * 0.5, h * 0.08); ctx.fillRect(cx - 1, y + h * 0.28, 2, (bob + 1) * h * 0.08 + 2); break;
+    case "RobotArm": ctx.beginPath(); ctx.moveTo(cx, cy + h * 0.1); const a1 = -Math.PI / 2 + Math.sin(t * 3) * (active ? 0.8 : 0.2); ctx.lineTo(cx + Math.cos(a1) * w * 0.3, cy + Math.sin(a1) * w * 0.3); ctx.lineTo(cx + Math.cos(a1 + 0.9) * w * 0.45, cy + Math.sin(a1 + 0.9) * w * 0.3); ctx.stroke(); break;
+    case "Loom": for (let k = 0; k < 5; k++) ctx.fillRect(x + w * (0.2 + k * 0.14), y + h * 0.35, 1.5, h * 0.4); ctx.fillRect(x + w * 0.15, y + h * 0.5 + bob * h * 0.12, w * 0.7, 2); break;
+    case "Packer": ctx.strokeRect(x + w * 0.3, cy - h * 0.1, w * 0.4, h * 0.22); ctx.beginPath(); ctx.moveTo(x + w * 0.3, cy - h * 0.1); ctx.lineTo(x + w * 0.5, cy - h * 0.1 - (active ? Math.abs(bob) * h * 0.12 : 0)); ctx.stroke(); break;
+    case "Warehouse": for (let r = 0; r < 3; r++) ctx.fillRect(x + w * 0.15, y + h * (0.4 + r * 0.17), w * 0.7, 2); break;
+    case "Silo": case "Pump": case "Unloader": default: ctx.beginPath(); ctx.arc(cx, cy, w * 0.18, spin, spin + Math.PI * 1.5); ctx.stroke(); break;
+  }
+  ctx.restore();
+  if (bott) { ctx.strokeStyle = `rgba(255,176,46,${0.55 + 0.45 * Math.sin(t * 5)})`; ctx.lineWidth = 2; ctx.strokeRect(x - 2, y + h * 0.25 - 2, w + 4, h * 0.75 + 4); }
+  ctx.fillStyle = active ? "#3ddc97" : "#6b7380"; ctx.beginPath(); ctx.arc(x + w * 0.15, y + h * 0.18, Math.max(2.5, w * 0.06), 0, 7); ctx.fill();
+}
+let truckPhase = {};
+function draw(t) {
+  if (!W) resize();
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  const f = byId[S.active], st = S.f[f.id], fc = cache.byF[f.id];
+  const body = f.body || "#e2683c", acc = f.accent || "#2f4858";
+  ctx.fillStyle = "#0f1216"; ctx.fillRect(0, 0, W, H);
+  // floor grid
+  ctx.strokeStyle = "rgba(255,255,255,.04)"; ctx.lineWidth = 1;
+  for (let gx = 0; gx < W; gx += 24) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx - 40, H); ctx.stroke(); }
+  hit = [];
+  const top = 10, bottom = 52, rowH = (H - top - bottom) / 3;
+  const pad = 8, n = 6, mw = Math.min(56, (W - pad * 2) / n * 0.62), gap = (W - pad * 2 - mw * n) / (n - 1) - 2;
+  for (let l = 0; l < 3; l++) {
+    const y = top + l * rowH, mh = Math.min(rowH * 0.72, mw * 1.25), my = y + (rowH - mh) / 2;
+    if (!st.lines[l]) {
+      ctx.setLineDash([6, 6]); ctx.strokeStyle = "rgba(255,176,46,.5)"; ctx.strokeRect(pad, y + 6, W - pad * 2, rowH - 12); ctx.setLineDash([]);
+      ctx.fillStyle = "rgba(255,176,46,.85)"; ctx.font = `700 13px Barlow, system-ui`; ctx.textAlign = "center";
+      const firstLocked = st.lines.indexOf(false) === l;
+      ctx.fillText(firstLocked ? `${L("unlockLine", l + 1)} · $ ${fmt(f.lines[l])}` : L("locked"), W / 2, y + rowH / 2 + 4);
+      if (firstLocked) hit.push({ x: pad, y, w: W - pad * 2, h: rowH, line: -1, lockLine: l });
+      continue;
+    }
+    const a = fc.lines[l];
+    // belt
+    const beltY = my + mh * 0.82;
+    ctx.fillStyle = "#2a2f37"; ctx.fillRect(pad, beltY, W - pad * 2, 6);
+    ctx.fillStyle = "#3a414c"; const off = (t * 30 * Math.min(4, 0.6 + Math.sqrt(a.rate))) % 10;
+    for (let bx = pad - 10 + off; bx < W - pad; bx += 10) ctx.fillRect(bx, beltY + 2, 4, 2);
+    // crates moving on belts (density follows the real throughput)
+    const speed = 40, spacing = Math.max(14, speed / Math.max(0.05, a.rate * 2));
+    for (let i = 0; i < n - 1; i++) {
+      const x0 = pad + i * (mw + gap) + mw, x1 = x0 + gap;
+      ctx.fillStyle = f.m[i].col;
+      for (let cxp = x0 + ((t * speed) % spacing); cxp < x1 - 6; cxp += spacing) { ctx.fillRect(cxp, beltY - 6, 7, 6); ctx.fillStyle = shade(f.m[i].col, -0.3); ctx.fillRect(cxp, beltY - 6, 7, 1.5); ctx.fillStyle = f.m[i].col; }
+    }
+    for (let i = 0; i < n; i++) {
+      const x = pad + i * (mw + gap);
+      drawMachine(f.m[i], x, my, mw, mh, body, acc, t + i * 0.7 + l, true, a.bi === i);
+      const lv = st.lv[l][i];
+      ctx.fillStyle = "rgba(0,0,0,.55)"; ctx.fillRect(x, my + mh + 2, mw, 12);
+      ctx.fillStyle = "#eef1f5"; ctx.font = `700 10px "Barlow Condensed", system-ui`; ctx.textAlign = "center"; ctx.fillText(lv, x + mw / 2, my + mh + 11);
+      const prog = ((t / a.cycle[i]) % 1);
+      ctx.fillStyle = "#ffb02e"; ctx.fillRect(x, my + mh + 13, mw * prog, 2);
+      if (selected && selected.f === f.id && selected.line === l && selected.i === i) { ctx.strokeStyle = "#7fd8ff"; ctx.lineWidth = 2; ctx.strokeRect(x - 4, my - 4, mw + 8, mh + 22); }
+      hit.push({ x: x - gap / 2, y, w: mw + gap, h: rowH, line: l, i });
+    }
+    // truck leaving the dock on the last machine
+    const cyc = a.cycle[n - 1], ph = (t % cyc) / cyc, tx = W - pad - mw * 0.2 + (ph > 0.15 && ph < 0.9 ? Math.sin((ph - 0.15) / 0.75 * Math.PI) * 30 : 0);
+    ctx.globalAlpha = ph > 0.3 && ph < 0.75 ? 0.25 : 1;
+    ctx.fillStyle = acc; ctx.fillRect(tx - 4, my + mh * 0.48, 12, 9); ctx.fillStyle = body; ctx.fillRect(tx - 18, my + mh * 0.5, 15, 8);
+    ctx.globalAlpha = 1;
+  }
+}
+cv.addEventListener("click", e => {
+  const r = cv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+  for (const h of hit) if (x >= h.x && x <= h.x + h.w && y >= h.y && y <= h.y + h.h) {
+    if (h.lockLine !== undefined) { openLine(byId[S.active], h.lockLine); return; }
+    selected = { f: S.active, line: h.line, i: h.i }; beep(440); renderSheet(); return;
+  }
+});
+
+// ======================================================================= sound (starts after the first tap)
+let actx = null;
+function beep(freq) { try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); const o = actx.createOscillator(), g = actx.createGain(); o.frequency.value = freq; o.type = "triangle"; g.gain.setValueAtTime(0.06, actx.currentTime); g.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime + 0.18); o.connect(g).connect(actx.destination); o.start(); o.stop(actx.currentTime + 0.2); } catch {} }
+
+// ======================================================================= menus
+$("langBtn").onclick = () => { S.lang = S.lang === "tr" ? "en" : "tr"; render(); save(); };
+$("bDaily").onclick = openDaily;
+$("bMap").onclick = () => {
+  let html = `<h2>${L("map")}</h2><div class="flist">`;
+  C.forEach((g, i) => {
+    const own = S.f[g.id].own, net = own && cache.byF[g.id] ? cache.byF[g.id].net : 0;
+    html += `<div class="fitem"><span class="n">${g[S.lang]}</span><span class="s">${g["p" + S.lang]}${own ? " · $ " + fmt(net) + L("perSec") : " · $ " + fmt(g.unlock)}</span>
+      <button class="${own ? "ghost" : "act"}" data-f="${g.id}" ${!own && (i > 0 && !S.f[C[i - 1].id].own) ? "disabled" : ""}>${own ? "→" : L("buy")}</button></div>`;
+  });
+  modal(html + `</div><button class="ghost" id="mClose">${L("close")}</button>`);
+  $("mClose").onclick = closeModal;
+  document.querySelectorAll("[data-f]").forEach(b => b.onclick = () => { const g = byId[b.dataset.f]; if (S.f[g.id].own) { S.active = g.id; selected = null; closeModal(); render(); } else { buyFactory(g); closeModal(); } });
+};
+$("bPrestige").onclick = () => {
+  const gain = crownsFor(S.run);
+  modal(`<h2>${L("prestT")}</h2><p>${L("prestB")}</p><p class="num" style="color:var(--fg);font-size:18px">${gain >= 1 ? L("prestGain", gain, S.crowns) : L("prestNeed", "$" + fmt(T.prestigeMin), "$" + fmt(S.run))}</p>
+    <button class="act" id="mPrest" ${gain >= 1 ? "" : "disabled"}>${L("prestGo")}</button><button class="ghost" id="mClose">${L("close")}</button>`);
+  $("mClose").onclick = closeModal; $("mPrest").onclick = prestige;
+};
+$("bMore").onclick = () => {
+  let armed = false;
+  modal(`<h2>${L("moreT")}</h2><p>${L("about")}</p><button class="ghost" id="mLang">${L("lang")}: ${S.lang === "tr" ? "Türkçe" : "English"}</button>
+    <button class="ghost" id="mReset" style="color:var(--bad)">${L("reset")}</button><button class="ghost" id="mClose">${L("close")}</button>`);
+  $("mClose").onclick = closeModal;
+  $("mLang").onclick = () => { S.lang = S.lang === "tr" ? "en" : "tr"; closeModal(); render(); save(); };
+  $("mReset").onclick = () => { if (!armed) { armed = true; $("mReset").textContent = L("resetSure"); return; } S = fresh(); selected = null; recompute(); closeModal(); render(); save(); onboarding(); };
+};
+function onboarding() {
+  if (S.company) return;
+  modal(`<h2>Factory King</h2><p>${L("about")}</p><label for="coIn" style="font-weight:700">${L("companyPrompt")}</label>
+    <input id="coIn" maxlength="20" value="${S.lang === "tr" ? "Kral Sanayi" : "King Industries"}" style="font:inherit;font-size:18px;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--fg)">
+    <button class="act" id="mStart">${L("start")}</button>`);
+  $("mStart").onclick = () => { const v = $("coIn").value.replace(/[^\p{L}\p{N} .&'-]/gu, "").trim().slice(0, 20); S.company = v.length >= 3 ? v : (S.lang === "tr" ? "Kral Sanayi" : "King Industries"); closeModal(); render(); save(); beep(660); };
+}
+
+// drone: tap for a cash bonus
+const droneBtn = $("drone");
+droneBtn.onclick = () => { if (Date.now() > S.drone.until) return; const v = Math.max(T.startCash, cache.total * (60 + Math.random() * 120)); earn(v); S.drone.until = 0; droneBtn.hidden = true; beep(990); toast(L("drone") + " " + L("got", "$" + fmt(v))); render(); save(); };
+
+// ======================================================================= main loop
+let lastT = performance.now(), uiTimer = 0, recTimer = 0;
+function frame(now) {
+  const dt = Math.min(1, (now - lastT) / 1000); lastT = now;
+  const boost = Date.now() < boostUntil ? 2 : 1;
+  earn(cache.total * dt * boost);
+  const d = Date.now();
+  if (d > S.drone.next) { S.drone.until = d + 25000; S.drone.next = d + 180000 + Math.random() * 120000; }
+  const flying = d < S.drone.until;
+  droneBtn.hidden = !flying;
+  if (flying) { const p = 1 - (S.drone.until - d) / 25000; droneBtn.style.left = (p * ((W || 300) + 100) - 80) + "px"; droneBtn.style.top = (10 + Math.sin(p * 12) * 6) + "px"; }
+  draw(now / 1000);
+  uiTimer += dt; recTimer += dt;
+  if (recTimer > 5) { recTimer = 0; recompute(); }       // market & season drift
+  if (uiTimer > 0.25) {
+    uiTimer = 0;
+    $("cash").textContent = fmt(S.cash);
+    $("income").textContent = "+" + fmt(cache.total * boost) + L("perSec") + (boost > 1 ? " ⚡x2" : "");
+    if (selected) { const btns = document.querySelectorAll("#sheet .act"); if (btns.length) renderSheet(); }
+    else { const b = $("sLine"); if (b) b.disabled = byId[S.active].lines[S.f[S.active].lines.indexOf(false)] > S.cash; }
+  }
+  requestAnimationFrame(frame);
+}
+setInterval(save, 10000);
+document.addEventListener("visibilitychange", () => { if (document.hidden) save(); else { offline(); lastT = performance.now(); } });
+
+(async function start() {
+  await load();
+  recompute(); resize(); render();
+  offline();
+  if (!S.company) onboarding();
+  requestAnimationFrame(frame);
+})();
+</script>
