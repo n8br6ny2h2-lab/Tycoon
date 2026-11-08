@@ -7,34 +7,12 @@
     <false/>
     <key>NSPrivacyTrackingDomains</key>
     <array/>
+    <!-- No data is collected by the developer: saves stay on the device / the player's own iCloud, and the
+         analytics service has no network sink yet. If you add an analytics backend, declare
+         NSPrivacyCollectedDataTypeProductInteraction (not linked, not tracking, purpose Analytics) here and in
+         App Store Connect (see Docs/APPSTORE/AppPrivacy.md). -->
     <key>NSPrivacyCollectedDataTypes</key>
-    <array>
-        <!-- Optional, opt-in gameplay analytics (Settings). Not linked to identity, not used for tracking. -->
-        <dict>
-            <key>NSPrivacyCollectedDataType</key>
-            <string>NSPrivacyCollectedDataTypeProductInteraction</string>
-            <key>NSPrivacyCollectedDataTypeLinked</key>
-            <false/>
-            <key>NSPrivacyCollectedDataTypeTracking</key>
-            <false/>
-            <key>NSPrivacyCollectedDataTypePurposes</key>
-            <array>
-                <string>NSPrivacyCollectedDataTypePurposeAnalytics</string>
-            </array>
-        </dict>
-        <dict>
-            <key>NSPrivacyCollectedDataType</key>
-            <string>NSPrivacyCollectedDataTypePurchaseHistory</string>
-            <key>NSPrivacyCollectedDataTypeLinked</key>
-            <false/>
-            <key>NSPrivacyCollectedDataTypeTracking</key>
-            <false/>
-            <key>NSPrivacyCollectedDataTypePurposes</key>
-            <array>
-                <string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
-            </array>
-        </dict>
-    </array>
+    <array/>
     <key>NSPrivacyAccessedAPITypes</key>
     <array>
         <!-- PlayerPrefs / NSUserDefaults (language and settings). -->

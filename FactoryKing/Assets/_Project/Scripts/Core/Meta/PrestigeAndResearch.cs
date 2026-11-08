@@ -41,7 +41,7 @@ namespace FactoryKing.Core.Meta
         {
             if (!runEarnings.IsPositive) return 0;
             double ratio = (runEarnings / _s.Tuning.PrestigeCrownDivisor).ToDouble();
-            return Math.Floor(Math.Sqrt(Math.Max(0, ratio)));
+            return Math.Floor(Math.Pow(Math.Max(0, ratio), _s.Tuning.PrestigeExponent) + 1e-9);
         }
 
         public double MultiplierFor(double crowns) => 1d + crowns * _s.Tuning.PrestigeBonusPerCrown;
@@ -140,12 +140,12 @@ namespace FactoryKing.Core.Meta
 
         public static readonly List<ResearchDef> Defs = new List<ResearchDef>
         {
-            new ResearchDef { Id = "res_speed", NameKey = "research.res_speed", Stat = ModifierStat.ProductionSpeed, PerLevel = 0.05, MaxLevel = 20, BaseCost = 2500, CostGrowth = 3.2, RequiredCompanyLevel = 3 },
-            new ResearchDef { Id = "res_price", NameKey = "research.res_price", Stat = ModifierStat.SellPrice, PerLevel = 0.05, MaxLevel = 20, BaseCost = 4000, CostGrowth = 3.4, RequiredCompanyLevel = 4 },
-            new ResearchDef { Id = "res_cost", NameKey = "research.res_cost", Stat = ModifierStat.OperatingCost, PerLevel = 0.04, MaxLevel = 15, BaseCost = 1500, CostGrowth = 3.0, RequiredCompanyLevel = 2 },
-            new ResearchDef { Id = "res_storage", NameKey = "research.res_storage", Stat = ModifierStat.StorageCapacity, PerLevel = 0.10, MaxLevel = 10, BaseCost = 1000, CostGrowth = 2.8, RequiredCompanyLevel = 2 },
-            new ResearchDef { Id = "res_upgrade", NameKey = "research.res_upgrade", Stat = ModifierStat.UpgradeCost, PerLevel = 0.03, MaxLevel = 15, BaseCost = 6000, CostGrowth = 3.5, RequiredCompanyLevel = 6 },
-            new ResearchDef { Id = OfflineCapId, NameKey = "research.res_offline_cap", Stat = null, PerLevel = 1, MaxLevel = 4, BaseCost = 50000, CostGrowth = 12, RequiredCompanyLevel = 8 },
+            new ResearchDef { Id = "res_speed", NameKey = "research.res_speed", Stat = ModifierStat.ProductionSpeed, PerLevel = 0.05, MaxLevel = 20, BaseCost = 10000, CostGrowth = 3.2, RequiredCompanyLevel = 3 },
+            new ResearchDef { Id = "res_price", NameKey = "research.res_price", Stat = ModifierStat.SellPrice, PerLevel = 0.05, MaxLevel = 20, BaseCost = 16000, CostGrowth = 3.4, RequiredCompanyLevel = 4 },
+            new ResearchDef { Id = "res_cost", NameKey = "research.res_cost", Stat = ModifierStat.OperatingCost, PerLevel = 0.04, MaxLevel = 15, BaseCost = 6000, CostGrowth = 3.0, RequiredCompanyLevel = 2 },
+            new ResearchDef { Id = "res_storage", NameKey = "research.res_storage", Stat = ModifierStat.StorageCapacity, PerLevel = 0.10, MaxLevel = 10, BaseCost = 4000, CostGrowth = 2.8, RequiredCompanyLevel = 2 },
+            new ResearchDef { Id = "res_upgrade", NameKey = "research.res_upgrade", Stat = ModifierStat.UpgradeCost, PerLevel = 0.03, MaxLevel = 15, BaseCost = 25000, CostGrowth = 3.5, RequiredCompanyLevel = 6 },
+            new ResearchDef { Id = OfflineCapId, NameKey = "research.res_offline_cap", Stat = null, PerLevel = 1, MaxLevel = 4, BaseCost = 200000, CostGrowth = 12, RequiredCompanyLevel = 8 },
         };
 
         private readonly GameSession _s;

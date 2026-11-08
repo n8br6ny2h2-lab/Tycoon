@@ -27,8 +27,11 @@ namespace FactoryKing.Runtime.Bootstrap
         /// <summary>Set to false (e.g. from tests) to stop automatic creation in scenes without a bootstrap.</summary>
         public static bool AutoCreate = true;
 
-        /// <summary>App Store product id prefix; must match the products created in App Store Connect.</summary>
-        public static string StoreIdPrefix = "com.CHANGEME.factoryking.";
+        /// <summary>
+        /// App Store product id prefix. Defaults to "&lt;bundle id&gt;." so ids are e.g. "com.you.factoryking.vip";
+        /// create the products in App Store Connect with exactly these ids (Docs/APPSTORE/IAP.md).
+        /// </summary>
+        public static string StoreIdPrefix;
 
         public static GameBootstrap Instance { get; private set; }
 
@@ -74,7 +77,7 @@ namespace FactoryKing.Runtime.Bootstrap
 
             Save = gameObject.AddComponent<SaveManager>();
             var state = Save.Load(content, tuning);
-            Session = new GameSession(content, tuning, state, null, StoreCatalog.CreateDefault(StoreIdPrefix));
+            Session = new GameSession(content, tuning, state, null, StoreCatalog.CreateDefault(StoreIdPrefix ?? Application.identifier + "."));
             Save.Attach(Session);
 
             Localization = LoadLocalization(Session.State.Settings);
@@ -85,6 +88,7 @@ namespace FactoryKing.Runtime.Bootstrap
 
             Session.Ads.Provider = PlatformRegistry.AdsFactory?.Invoke()
                                    ?? (Application.isEditor || Debug.isDebugBuild ? new TestAdsProvider(this) : (IAdsProvider)new NoAdsProvider());
+            if (Debug.isDebugBuild) Session.Analytics.AddSink(new DebugAnalyticsSink());
             Store = new StoreController(Session, Save);
             GameCenter = new GameCenterService(Session);
             Notifications = new NotificationService(Session, Localization);

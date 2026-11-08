@@ -104,14 +104,15 @@ namespace FactoryKing.Core.Meta
                 case MissionTypes.Earn: target = Math.Max(500, Math.Round(netPerSec * 60 * minutes)); break;
                 case MissionTypes.Orders: target = daily ? 2 : 10; break;
                 case MissionTypes.ManagerLevels: target = 3; break;
-                case MissionTypes.ReachLevel: target = Math.Min(100, _s.State.Stats.HighestMachineLevel + 15); break;
+                case MissionTypes.ReachLevel: target = Math.Min(100, Math.Max(30, _s.State.Stats.HighestMachineLevel + 25)); break;
                 default: target = 1; break;
             }
             return new MissionState
             {
                 Id = id, Type = type, Target = target, Baseline = Current(type),
                 RewardDiamonds = daily ? 5 + rnd.Next(4) : 40,
-                RewardCashSeconds = daily ? 300 : 3600,
+                RewardCashSeconds = daily ? 300 : 900,
+                RewardCash = Math.Max(_s.Tuning.StartingCash, netPerSec * (daily ? 300 : 900)),
             };
         }
 
@@ -120,7 +121,7 @@ namespace FactoryKing.Core.Meta
             if (m == null || m.Claimed || !IsComplete(m)) return false;
             m.Claimed = true;
             _s.Wallet.AddDiamonds(m.RewardDiamonds);
-            _s.Wallet.Grant(_s.IncomeReward(m.RewardCashSeconds));
+            _s.Wallet.Grant(m.RewardCash > 0 ? BigDouble.FromDouble(m.RewardCash) : _s.IncomeReward(m.RewardCashSeconds));
             _s.Analytics.Track(AnalyticsEvents.MissionClaimed, "type", m.Type);
             Changed?.Invoke();
             return true;
@@ -188,7 +189,7 @@ namespace FactoryKing.Core.Meta
                     ProductId = product,
                     Quantity = Math.Max(8, (long)Math.Round(rate * (240 + rnd.Next(600)))),
                     Baseline = sold,
-                    RewardMultiplier = 1.8 + rnd.NextDouble() * 1.2,
+                    RewardMultiplier = 0.3 + rnd.NextDouble() * 0.3, // bonus on top of the normal sale price
                     ExpiresUtcTicks = _s.Time.TrustedNow.Add(Duration).Ticks,
                 });
                 changed = true;

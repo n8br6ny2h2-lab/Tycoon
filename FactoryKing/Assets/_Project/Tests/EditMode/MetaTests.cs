@@ -178,7 +178,7 @@ namespace FactoryKing.Tests
             _s.Managers.TryHire("mgr_kemal");
             _s.State.Research["res_speed"] = 3;
             _s.State.AchievementsUnlocked.Add("ach_first_upgrade");
-            _s.Wallet.Earn(1e8);
+            _s.Wallet.Earn(1e9);
             _s.Factories.TryUnlockFactory("food");
             _s.State.Cash = 1e9;
             _s.Upgrades.TryUpgrade(new MachineRef("steel", 0, 0), 30);
@@ -187,7 +187,7 @@ namespace FactoryKing.Tests
 
             var pv = _s.Prestige.Preview();
             Assert.That(pv.Available, Is.True);
-            Assert.That(pv.CrownsGained, Is.EqualTo(Math.Floor(Math.Sqrt(_s.State.RunEarnings.ToDouble() / 1e6))));
+            Assert.That(pv.CrownsGained, Is.EqualTo(Math.Floor(Math.Pow(_s.State.RunEarnings.ToDouble() / 1e7, 0.25) + 1e-9)));
             Assert.That(_s.Prestige.TryPrestige(), Is.True);
 
             Assert.That(_s.State.GetMachine(new MachineRef("steel", 0, 0)).Level, Is.EqualTo(1));
@@ -208,7 +208,7 @@ namespace FactoryKing.Tests
         [Test]
         public void Prestige_Survives_Save_Load()
         {
-            _s.Wallet.Earn(1e8);
+            _s.Wallet.Earn(1e9);
             _s.Prestige.TryPrestige();
             var loaded = new GameSession(_s.Content,
                 state: FactoryKing.Core.Persistence.SaveService.TryDecode(FactoryKing.Core.Persistence.SaveService.Encode(_s.State), _s.Content));

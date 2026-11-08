@@ -2,97 +2,110 @@
 
 Bu belge her aşamada **gerçekten** neyin yapıldığını, neyin doğrulandığını ve neyin eksik olduğunu kaydeder. Tamamlanmamış hiçbir özellik tamamlanmış gibi gösterilmez.
 
-Durum işaretleri: ✅ yapıldı ve otomatik testle doğrulandı · 🟡 yazıldı, Unity Editor'de henüz çalıştırılmadı · ⬜ yapılmadı
+Durum işaretleri:
+- ✅ yapıldı ve otomatik testle doğrulandı
+- 🟢 yazıldı ve UnityEngine referanslarına karşı derlendi, Unity'de henüz çalıştırılmadı
+- 🟡 yazıldı ama bu ortamda derlenemiyor (UnityEditor, URP, Unity IAP veya Xcode gerektirir)
+- ⬜ yapılmadı / sizin hesabınızı ya da cihazınızı gerektiriyor
 
----
+## Ortam
 
-## Ortam incelemesi (başlangıç)
+- Geliştirme ortamı bir Linux bulut konteyneri. **Unity Editor, macOS, Xcode ve Apple hesabı yok.**
+- Oyun mantığı Unity'den bağımsız C# çekirdeğinde (netstandard2.1, C# 9). .NET 8 ile derlenip test ediliyor.
+- Unity runtime kodu `UnityEngine.Modules 2021.3.33` referanslarına karşı derleniyor; bu API Unity 6'nın bir alt kümesi.
+- Editor betikleri, IAP adaptörü, iOS native eklentisi ve PlayMode testleri burada derlenemiyor.
+- Kontrol komutu: `FactoryKing/Tools/run-checks.sh`. Son sonuç: **127/127 test geçti, derleme uyarısı yok.**
 
-- Depo boştu: başka proje yok, silinen ya da üzerine yazılan bir şey yok. Proje ayrı bir `FactoryKing/` klasöründe.
-- Geliştirme ortamı Linux bulut konteyneri. **Unity Editor, Xcode, macOS ve Blender yok**, kurulamaz (Unity lisans/indirme ve Apple araçları gerekir).
-- Kurulan araç: .NET 8 SDK (Ubuntu deposundan). Unity bağımlılığı olmayan çekirdek bununla derlenip test ediliyor.
-- Unity runtime betikleri NuGet'teki `UnityEngine.Modules 2021.3.33` referans derlemelerine karşı derleme kontrolünden geçiyor. Bu API, Unity 6'nın bir alt kümesidir.
-- Hedef Unity sürümü: **6000.0.58f2 (Unity 6 LTS)**. Paketler: URP 17.0.4, Test Framework 1.4.5, uGUI 2.0.0 ve yerleşik modüller.
-
-## AŞAMA 1 — Proje, klasör yapısı, kamera, temel 3D sahne
-
+## Aşama 1 — Proje, sahne, kamera
 | İş | Durum |
 |---|---|
-| Unity proje iskeleti (`Packages/manifest.json`, `ProjectVersion.txt`, assembly definition'lar) | 🟡 |
-| Tek tıkla kurulum: URP varlığı ve renderer, iOS ayarları (IL2CPP, iOS 15+, iPhone+iPad, dikey, Linear), sahne, build listesi | 🟡 |
-| İzometrik kamera: kaydırma ve atalet, pinch/tekerlek zoom, sınırlar, dokunarak seçme, yumuşak odaklanma | 🟡 (derleme ✅) |
-| Prosedürel 3D: pahlı kenarlı mesh üretici, 15 makine arketipi, fabrika salonu, duvar/pencere, avlu, yol, ağaçlar, lambalar | 🟡 (derleme ✅) |
-| Animasyonlu makineler, hareketli bantlar, robot kol, forklift, kamyon, işçiler | 🟡 (derleme ✅) |
-| Gündüz/gece döngüsü, gölgeler, gece pencere ve lamba ışıkları | 🟡 (derleme ✅) |
-| Optimizasyon: paylaşılan mesh, SRP Batcher/instancing, LODGroup, nesne havuzu, tek Update döngüsü, kare başı tahsissiz bant | 🟡 (derleme ✅) |
-| iOS Xcode projesi üreten derleme betiği (`BuildScript.BuildIOS`) | 🟡 |
+| Unity 6 proje iskeleti, assembly definition'lar, paket manifesti | 🟡 |
+| Tek tıkla kurulum: URP, iOS ayarları, sahne, ikon, UI panel ayarları, shader'ların derlemeye dahil edilmesi | 🟡 |
+| İzometrik dokunmatik kamera, prosedürel 3D fabrika (15 makine tipi), bantlar, forklift, kamyon, işçiler, gündüz/gece | 🟢 |
+| Optimizasyon: paylaşılan mesh, SRP Batcher/instancing, LOD, nesne havuzu, tek Update döngüsü | 🟢 |
 
-**Oluşturulan dosyalar:** `FactoryKing/Assets/_Project/Scripts/Runtime/**` (17 dosya), `Scripts/Editor/ProjectSetup.cs`, `Scripts/Editor/BuildScript.cs`, 4 `.asmdef`, `Packages/manifest.json`, `ProjectSettings/ProjectVersion.txt`.
-
-**Eksikler / riskler:**
-- Sahne ve görseller hiç **görülmedi**. Unity'de ilk açılışta renk, ölçek, kamera açısı ve performans ayarı gerekecek.
-- Grafikler kod ile üretilen stilize modeller. "Premium" görünüm için sanatçı veya Blender modelleri, dokular ve post-processing gerekir. Mimari, `MachineModelFactory` yerine FBX prefab kullanmaya hazır. Blender otomasyon hattı henüz yazılmadı.
-- `ProjectSetup.SetupUrp()` URP 17 API'si ile yazıldı ama Editor'de denenmedi. Sorun çıkarsa README'deki "Universal 3D şablonu" yolunu kullanın.
-- `.meta` dosyaları ilk açılışta Unity tarafından üretilecek. İlk açılıştan sonra bunlar commit edilmeli.
-
-## AŞAMA 2 — Üretim motoru, makineler, ürünler, ekonomi
-
+## Aşama 2 — Üretim motoru ve ekonomi
 | İş | Durum |
 |---|---|
-| `BigDouble` büyük sayı tipi (taşma ve NaN güvenli, metin dönüşümlü) | ✅ |
-| TR/EN sayı biçimlendirme (1,23 B / 1.23K, aa-ab-… son ekleri) | ✅ |
-| 5 fabrika (Çelik, Gıda, Plastik, Tekstil, Elektronik), her biri 6 aşamalı zincir ve 3 hat | ✅ |
-| 30 makine varyasyonu, 8 kategorinin tamamı (≥25 şartı) | ✅ |
-| Gerçek tamponlu deterministik üretim simülasyonu (Starved/Blocked durumları) | ✅ |
-| Seviye 1–100: hız, kapasite, bakım, maliyet; x1/x10/MAKS | ✅ |
-| Giderler: hammadde, elektrik, işçi ücreti, bakım; net kâr, gelir/sn, satış/dk, saatlik kâr, şirket değeri | ✅ |
-| Kilitlenmeyen borç modeli | ✅ |
-| Kaynak kimlikli modifikatör yığını (yönetici, prestij ve araştırma için hazır) | ✅ |
-| Analitik hat raporu (darboğaz), simülasyonla tutarlılığı testli | ✅ |
-| İçerik doğrulayıcı (zincir uyumu, tampon/parti, her seviyede kârlılık) | ✅ |
-| TR/EN yerelleştirme tablosu (90 satır; tüm içerik anahtarları iki dilde) | ✅ |
-| Geçici geliştirici HUD'u: para, gelir, fabrika ve hat satın alma, makine detayı ve yükseltme, dil değiştirme | 🟡 (derleme ✅) |
+| BigDouble, TR/EN sayı biçimi, 5 fabrika, 30 makine, gerçek tamponlu deterministik simülasyon | ✅ |
+| Seviye 1–100, giderler, net kâr, şirket değeri, kilitlenmeyen borç modeli, darboğaz analizi | ✅ |
 
-**Test sonuçları (`FactoryKing/Tools/run-checks.sh`):**
-- Core derleme (netstandard2.1, C# 9, uyarılar hata sayılır): **başarılı, 0 uyarı**
-- NUnit: **76/76 geçti**: BigDouble (12), biçimlendirme (17), yükseltme formülleri (8), içerik (6), üretim (15), servisler (13), yerelleştirme (5)
-  - Simülasyon ile analitik model, 5 fabrikada seviye 1/10/25/60/100'de %5 içinde örtüşüyor
-  - Birim korunumu, tampon sınırları, determinizm, kare hızından bağımsızlık, sıfır parada kilitlenmeme, büyük/NaN/negatif adım güvenliği
-- Runtime derleme kontrolü (UnityEngine 2021.3 referansları): **başarılı, 0 uyarı**
-- Editor betikleri (`Scripts/Editor`) bu ortamda derlenemiyor (UnityEditor ve URP derlemesi yok).
+## Aşama 3 — Idle ve çevrimdışı kazanç, kayıt
+| İş | Durum |
+|---|---|
+| Çevrimdışı kazanç (kapalı form, 8 sa sınır + araştırma/VIP, ×2 alma) | ✅ |
+| Saat hilesi koruması (monotonik güvenilir zaman, geri alma tespiti, günlük ödül koruması) | ✅ |
+| JSON kayıt: sürümleme, sağlama toplamı, yedek dosya, bozuk kayıt kurtarma, v1→v2 geçişi | ✅ |
+| Dosya kaydı, otomatik kayıt (20 sn, arka plana geçiş, çıkış) | 🟢 |
 
-**Eksikler:**
-- Ekonomi değerleri şimdilik `DefaultContent.cs` (koddaki veri) ve `EconomyTuning` içinde. ScriptableObject veya JSON ile düzenleme Aşama 3'te eklenecek.
-- İlerleme hızı ayarlanmadı. Referans değerler `Docs/ARCHITECTURE.md` içinde.
+## Aşama 4 — Yöneticiler, görevler, prestij, araştırma
+| İş | Durum |
+|---|---|
+| 5 yönetici (4 nadirlik, seviye, fabrikaya atama, 5 farklı yetenek) | ✅ |
+| Günlük ve haftalık görevler, siparişler, 12 başarım, 7 günlük giriş takvimi, hafta sonu etkinliği, hızlandırma | ✅ |
+| Prestij ("Taç"): önizleme, kazanılan/korunan/sıfırlanan listesi, rozet ve dekorasyon, başlangıç bonusları | ✅ |
+| Araştırma ağacı (6 dal, kalıcı) | ✅ |
+| Denge koruması: "ideal oyuncu" botu testi | ✅ |
 
-## AŞAMA 3 — Idle kazanç, çevrimdışı kazanç, yükseltmeler (sıradaki)
+## Aşama 5 — Arayüz, ses, animasyon
+| İş | Durum |
+|---|---|
+| UI Toolkit arayüzü (kodla): HUD, makine detayı, eğitim, 13 sayfa, açılış ekranı, ana menü, çevrimdışı özeti, onay penceresi, prestij onayı, bildirim baloncukları, güvenli alan | 🟢 |
+| 16 ekranın karşılığı: açılış, menü, fabrika, makine detayı, yöneticiler, depo, siparişler, araştırma, harita, görevler, günlük ödüller, başarımlar ve koleksiyon, mağaza, etkinlikler, ayarlar, çevrimdışı özeti | 🟢 |
+| TR/EN metinler (~345 satır); kapsam testi koddaki her anahtarı iki dilde doğruluyor | ✅ |
+| Prosedürel ses: 8 efekt, çalışan makine sayısına göre değişen fabrika ambiyansı, üretken müzik; ses ayarları | 🟢 |
+| Koleksiyon dekorasyonlarının 3D sahnede görünmesi, yükseltmede parıltı ve büyüme efekti | 🟢 |
 
-⬜ SaveManager (JSON, sürümleme, yedek dosya, bozuk kayıt kurtarma) — ilerlemenin kaybolmaması için öncelikli
-⬜ OfflineEarningsManager: `LineAnalyzer` ile kapalı form hesap, 8 saat sınırı, özet ekranı verisi
-⬜ Saat hilesi koruması: son görülen UTC, monotonik süre ve geri giden saat tespiti
-⬜ Ekonomi verisinin ScriptableObject/JSON'a taşınması
-⬜ 2 kat çevrimdışı ödül için reklam arayüzü (kanca; gerçek SDK Aşama 6'da)
+## Aşama 6 — Reklam, satın alma, kayıt, Game Center
+| İş | Durum |
+|---|---|
+| Satın alma kuralları: her işlem bir kez, sahip olunan tekrar satılmaz, geri yükleme yalnızca kalıcı ürünler, geçersiz makbuz reddedilir | ✅ |
+| Mağaza katmanı: test mağazası (iptal ve red simülasyonu), grant → kaydet → onayla akışı | 🟢 |
+| Unity IAP 4.x adaptörü (paket kurulunca otomatik derlenir), makbuz doğrulama kancası | 🟡 |
+| Ödüllü reklam kuralları: yalnızca isteğe bağlı, izlenince ödül, günlük sınır, bekleme süresi, "reklamsız" ürünü | ✅ |
+| Gerçek reklam SDK'sı | ⬜ ağ seçimi ve kimlikler sizden |
+| iCloud anahtar-değer eşitleme (native .mm), çakışma çözümü (satın alımlar asla kaybolmaz) | ✅ çözücü / 🟡 native |
+| Game Center (giriş, başarımlar, 2 liderlik tablosu), isteğe bağlı yerel bildirimler | 🟢 / 🟡 native |
+| Xcode yetenekleri (iCloud, Game Center, IAP), Info.plist, gizlilik manifesti | 🟡 |
+| Onaya bağlı analitik (onay yoksa hiçbir şey gönderilmez; ATT gerekmez) | ✅ |
 
-## AŞAMA 4–8
+## Aşama 7 — Performans ve test
+| İş | Durum |
+|---|---|
+| Azami yük (5 fabrika × 3 hat × seviye 100): masaüstünde tik başına **0,23 ms** (sınır 1,5 ms) | ✅ |
+| Kayıt+yükleme 2 ms, 8,5 KB; çevrimdışı hesap anında | ✅ |
+| Test grupları: ekonomi, üretim, yükseltme, çevrimdışı, kayıt, saat değişikliği, satın alma, reklam, prestij, dil, performans, denge | ✅ (127 test) |
+| PlayMode duman testleri (oyun açılır, üretir, satar, hat açar, kare süresi) | 🟡 Unity Test Runner'da çalıştırılmalı |
+| Cihazda kare hızı, pil ve ısınma ölçümü; çözünürlük ve güvenli alan testleri | ⬜ cihaz gerekli |
 
-⬜ Aşama 4: yöneticiler (5 karakter, nadirlik, seviye, atama), görevler (günlük/haftalık), başarımlar, prestij, araştırma
-⬜ Aşama 5: UI Toolkit ile 16 ekran, ses ve müzik, animasyon cilası
-⬜ Aşama 6: reklam (ödüllü), StoreKit/Unity IAP, iCloud, Game Center
-⬜ Aşama 7: cihazda performans profilleme, çözünürlük testleri, hata ayıklama
-⬜ Aşama 8: App Store materyalleri, gizlilik beyanları, TestFlight
+## Aşama 8 — App Store materyalleri ve TestFlight
+| İş | Durum |
+|---|---|
+| 1024×1024 özgün ikon (alfa kanalı yok); kurulumda otomatik atanıyor | ✅ |
+| TR/EN mağaza metinleri, anahtar kelimeler, kategori | ✅ `Docs/APPSTORE/Metadata.md` |
+| Gizlilik politikası ve destek sayfası (TR/EN, KVKK) | ✅ şablon `Docs/web/`, şirket bilgileriniz eklenmeli |
+| App Privacy cevapları, yaş derecelendirmesi (4+), IAP, Game Center ve reklam yapılandırması | ✅ `Docs/APPSTORE/` |
+| TestFlight adımları ve cihaz test listesi, App Review notu | ✅ `Docs/APPSTORE/TestFlight.md` |
+| Ekran görüntüleri | ⬜ oyun Unity'de çalışınca yakalanacak (Editor menüsünde araç var) |
+| Bundle ID, imzalama, arşivleme, yükleme | ⬜ Apple hesabı gerekli |
 
-## Nihai kabul kriterlerine göre durum
-
+## Nihai kabul kriterleri
 | Kriter | Durum |
 |---|---|
-| Gerçek 3D fabrika sahnesi çalışmalı | 🟡 kod hazır, Unity'de doğrulanmadı |
+| Gerçek 3D fabrika sahnesi çalışmalı | 🟢 kod hazır ve derleniyor; Unity'de görülmedi |
 | Üretim gerçek hesaplamalarla işlemeli | ✅ |
-| Para kazanılabilmeli, makine yükseltilebilmeli | ✅ (Core) / 🟡 (HUD) |
-| Çevrimdışı kazanç | ⬜ Aşama 3 |
-| Beş fabrika oynanabilir | ✅ simülasyonda / 🟡 görselde |
-| Yönetici sistemi | ⬜ Aşama 4 |
-| Kayıt sistemi | ⬜ Aşama 3 |
-| Türkçe ve İngilizce | ✅ veri ve dil değiştirme / 🟡 HUD |
-| Reklam ve satın alma test edilebilir | ⬜ Aşama 6 |
-| iOS derlemesi alınabilmeli | 🟡 betik hazır, Mac + Unity + Xcode gerekir |
-| Kritik hata yok | Core testleri temiz, Unity'de doğrulanmadı |
+| Para kazanma, makine yükseltme | ✅ |
+| Çevrimdışı kazanç | ✅ |
+| Beş fabrika oynanabilir | ✅ mantık / 🟢 görsel |
+| Yönetici sistemi | ✅ |
+| Kayıt sistemi | ✅ çekirdek / 🟢 dosya, 🟡 iCloud |
+| Türkçe ve İngilizce | ✅ |
+| Reklam ve satın alma test edilebilir | ✅ birim testleri + test mağazası/reklam; gerçek SDK ⬜ |
+| iOS derlemesi alınabilmeli | 🟡 betik ve Xcode ayarları hazır; Mac + Unity + Xcode'da denenmeli |
+| Kritik hata yok | Otomatik testler temiz. Unity'de ilk açılışta derleme veya görsel düzeltme gerekebilir |
+
+## Bilinen riskler ve ilk Unity açılışında beklenenler
+1. **Editor/IAP/native kod burada derlenmedi.** İlk açılışta küçük API düzeltmeleri gerekebilir (URP 17, Unity IAP 4.x, Xcode API'leri).
+2. **Görsel ayar:** kamera açısı, renkler, ışık ve UI boyutları gerçek ekranda ince ayar isteyecek.
+3. **UI temasının yazı tipi:** UI Toolkit'e yerleşik `LegacyRuntime.ttf` atanıyor. Türkçe karakterler iOS sistem yazı tipine düşerek gösterilir; cihazda kontrol edilmeli.
+4. **Premium grafik:** modeller kodla üretiliyor. Mağazada rekabetçi bir görünüm için 3D sanatçı modelleri önerilir.

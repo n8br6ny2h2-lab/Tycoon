@@ -2,8 +2,10 @@
 
 iOS (iPhone ve iPad) için 3D idle fabrika tycoon oyunu. Unity 6 LTS, URP ve C# ile geliştiriliyor. Oyuncu küçük bir atölyeyle başlar ve beş fabrikadan oluşan bir endüstri imparatorluğu kurar: Demir-Çelik, Gıda, Plastik, Tekstil ve Elektronik.
 
-> **Durum:** Aşama 1 (proje, sahne, kamera) ve Aşama 2 (üretim motoru, makineler, ekonomi) tamamlandı.
-> Proje henüz Unity Editor'de açılıp çalıştırılmadı, çünkü geliştirme ortamında Unity yok. Ayrıntılar ve eksikler: [Docs/PHASES.md](Docs/PHASES.md).
+> **Durum:** Sekiz aşamanın tamamı kod ve doküman olarak yazıldı; 127 otomatik test geçiyor.
+> Proje henüz Unity Editor'de açılıp bir iPhone'da çalıştırılmadı, çünkü geliştirme ortamında Unity, Mac ve Xcode yok.
+> Yayından önce gerekenler: Unity'de ilk açılış ve düzeltmeler, cihaz testleri, Apple hesabı, reklam SDK'sı ve ekran görüntüleri.
+> Ayrıntılar: [Docs/PHASES.md](Docs/PHASES.md) · Sizden gerekenler: [Docs/USER_ACTIONS.md](Docs/USER_ACTIONS.md)
 
 ## Klasör yapısı
 
@@ -16,15 +18,28 @@ FactoryKing/                         Unity projesi (Unity Hub ile bu klasörü a
       Economy/                       Yükseltme formülleri, modifikatörler, cüzdan, gelir defteri, hat analizi
       Simulation/                    GameState, üretim simülatörü, servisler, GameSession
       Localization/                  TSV tabanlı TR/EN dil tablosu
-    Scripts/Runtime/                 Unity katmanı (görseller, kamera, girdi, gün/gece, geçici HUD)
-    Scripts/Editor/                  Tek tıkla kurulum (URP, iOS ayarları, sahne) ve iOS derleme betiği
+      Persistence/                   JSON, sürümlü/sağlamalı kayıt, yedekten kurtarma, iCloud çakışma çözümü
+      Time/                          Saat hilesi koruması (güvenilir zaman)
+      Meta/                          Çevrimdışı kazanç, yöneticiler, prestij, araştırma, görevler, siparişler,
+                                     başarımlar, günlük ödül, etkinlik, hızlandırma
+      Monetization/                  Mağaza kataloğu, satın alma işleme, ödüllü reklam, analitik
+    Scripts/Runtime/                 Unity katmanı: 3D görseller, kamera, UI Toolkit arayüzü, ses, kayıt,
+                                     iCloud, Game Center, bildirimler, mağaza/reklam adaptörleri
+    Scripts/Purchasing/              Unity IAP adaptörü (paket kurulunca derlenir)
+    Scripts/Editor/                  Kurulum, iOS derleme, Xcode yetenekleri, ekran görüntüsü aracı
     Tests/EditMode/                  NUnit testleri (Unity Test Runner ve dotnet test ortak kullanır)
+    Tests/PlayMode/                  Unity içinde oyun açılış testleri
+    Art/AppIcon.png                  1024x1024 uygulama ikonu
+  Assets/Plugins/iOS/                iCloud ve bildirim native eklentisi, gizlilik manifesti
     Resources/Localization/strings.txt   Türkçe/İngilizce metinler
   Packages/manifest.json
   ProjectSettings/ProjectVersion.txt
   Tools/run-checks.sh                Unity olmadan derleme ve test
   Tools/DotNet/                      Core derleme, test ve runtime derleme kontrolü projeleri
+  Tools/Icon/make_icon.py            İkon üreteci
 Docs/                                Mimari, aşama durumu, sizden gerekenler
+Docs/APPSTORE/                       Mağaza metinleri, gizlilik, yaş derecesi, IAP, Game Center, reklam, TestFlight
+Docs/web/                            Gizlilik politikası ve destek sayfası (TR/EN, yayınlanacak)
 ```
 
 ## Hızlı başlangıç (Mac + Unity)
@@ -45,10 +60,11 @@ Docs/                                Mimari, aşama durumu, sizden gerekenler
 FactoryKing/Tools/run-checks.sh     # .NET 8 SDK gerekir
 ```
 
-Bu betik üç şey yapar: çekirdeği Unity ile aynı ayarlarla (netstandard2.1 / C# 9) derler, 76 NUnit testini çalıştırır ve Unity runtime betiklerini UnityEngine referans derlemelerine karşı derleme kontrolünden geçirir.
+Bu betik üç şey yapar: çekirdeği Unity ile aynı ayarlarla (netstandard2.1 / C# 9) derler, 127 NUnit testini çalıştırır ve Unity runtime betiklerini UnityEngine referans derlemelerine karşı derleme kontrolünden geçirir.
 
 ## Belgeler
 
 - [Docs/PHASES.md](Docs/PHASES.md): her aşamada neyin bittiği, test sonuçları, eksikler ve sonraki adımlar
 - [Docs/ARCHITECTURE.md](Docs/ARCHITECTURE.md): sistem mimarisi ve ekonomi modeli
 - [Docs/USER_ACTIONS.md](Docs/USER_ACTIONS.md): sizden gereken hesaplar, kimlikler ve kurulum adımları
+- [Docs/APPSTORE/](Docs/APPSTORE/): App Store ve TestFlight hazırlığı

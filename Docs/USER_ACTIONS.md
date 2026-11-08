@@ -1,32 +1,34 @@
 # Sizden Gerekenler
 
-Aşağıdakiler hesap, cihaz veya kimlik bilgisi gerektirdiği için kod tarafında tamamlanamaz. Gerçek kimlikler verilene kadar projede **sahte SDK kimliği kullanılmayacak** ve yayın yapıldığı iddia edilmeyecek.
+Aşağıdaki adımlar hesap, cihaz veya kimlik bilgisi gerektirdiği için koddan tamamlanamaz. Gerçek kimlikler verilene kadar projede **sahte SDK kimliği yok** ve yayın yapıldığı iddia edilmiyor.
 
-## Şimdi (Aşama 1–2'yi denemek için)
+## 1. Oyunu çalıştırmak (Mac)
+1. Unity Hub'dan **Unity 6 LTS (6000.0.x)** sürümünü **iOS Build Support** modülüyle, ayrıca **Xcode 16+** kurun.
+2. `FactoryKing/` klasörünü Unity Hub'da açın. Menüden **Factory King → 1. Setup Project** çalıştırın, `Factory` sahnesini açıp **Play**'e basın.
+3. **Window → General → Test Runner**'da EditMode ve PlayMode testlerini çalıştırın.
+4. Console'daki hataları ve ekran görüntülerini bana iletin; düzeltmeleri hemen yaparım.
+5. Unity'nin ürettiği `.meta` dosyalarını ve `Assets/_Project/Settings`, `Scenes`, `Resources/UI`, `Resources/ShaderKeepAlive` klasörlerini commit edin.
 
-1. **Mac + Unity 6 LTS (6000.0.x) + iOS Build Support modülü + Xcode 16 veya üstü** kurun.
-2. Projeyi açıp **Factory King → 1. Setup Project** komutunu çalıştırın, sonra Play'e basın. Gördüğünüzü ve aldığınız hataları (Console) bize bildirin. Ekran görüntüsü çok işe yarar.
-3. Unity'nin ürettiği `.meta` dosyalarını ve `Assets/_Project/Settings`, `Scenes`, `Resources/ShaderKeepAlive` varlıklarını commit edin.
-
-## Onaylamanız gereken kimlikler
-
-| Değer | Şu anki durum | Nereye girilecek |
+## 2. Onaylamanız gereken kimlikler
+| Değer | Şu an | Nereye |
 |---|---|---|
-| **Bundle ID** (ör. `com.sirketiniz.factoryking`) | Yer tutucu: `com.CHANGEME.factoryking` | Player Settings veya `FK_BUNDLE_ID` ortam değişkeni |
-| **SKU** (App Store Connect) | Yok | App Store Connect |
-| **Şirket / geliştirici adı** | Yer tutucu: "Factory King Studio" | Player Settings |
-| **Apple Developer Team ID** | Yok | Player Settings veya `FK_APPLE_TEAM_ID` |
+| **Bundle ID** (ör. `com.sirketiniz.factoryking`) | yer tutucu `com.CHANGEME.factoryking` | Player Settings veya `FK_BUNDLE_ID` |
+| **SKU** | yok | App Store Connect (ör. `FACTORYKING001`) |
+| **Şirket adı, adres, e-posta** (KVKK veri sorumlusu) | yer tutucu | Player Settings, `Docs/web/privacy.html`, `support.html` |
+| **Apple Team ID** | yok | Xcode veya `FK_APPLE_TEAM_ID` |
+| **Gizlilik ve destek URL'leri** | `example.com` | `UiContext.PrivacyPolicyUrl` ve `SupportUrl` (`UiManager.cs`) |
 
-Başka bir uygulamanın Bundle ID değerini kullanmayın. Kimliği önce Apple Developer hesabınızda kaydedin.
+IAP ürün kimlikleri bundle ID'den otomatik türetilir (`<bundle id>.vip` gibi). Liste: `Docs/APPSTORE/IAP.md`.
 
-## Sonraki aşamalarda gerekecekler
+## 3. Hesaplar ve paketler
+- **Apple Developer Program** üyeliği; App Store Connect'te uygulama kaydı; Ücretli Uygulamalar sözleşmesi ile banka ve vergi bilgileri (IAP için şart).
+- **Unity In-App Purchasing 4.9+ (<5)** paketi: kurulunca gerçek StoreKit adaptörü otomatik devreye girer.
+- **Reklam ağı seçimi** (AdMob / LevelPlay / AppLovin MAX) ve ödüllü reklam birim kimlikleri. Entegrasyon adımları: `Docs/APPSTORE/Ads.md`.
+- App Store Connect'te 8 IAP ürünü, 12 başarım ve 2 liderlik tablosu (`IAP.md`, `GameCenter.md`).
+- iCloud capability (key-value storage) App ID'de açık olmalı.
 
-- **Apple Developer Program** üyeliği (yıllık ücretli), App Store Connect erişimi, imzalama sertifikaları ve provisioning (Xcode otomatik imzalama yeterli).
-- **IAP ürün kimlikleri:** elmas paketleri, reklam kaldırma, başlangıç paketi, VIP, kozmetik, sezon bileti. Ürünleri App Store Connect'te siz oluşturacaksınız. Önerilen kimlik listesini Aşama 6'da vereceğiz.
-- **Reklam ağı seçimi ve kimlikleri** (ör. Google AdMob / Unity LevelPlay / AppLovin MAX): App ID ve ödüllü reklam birim kimlikleri. Tercih ettiğiniz ağı belirtin.
-- **Game Center:** App Store Connect'te liderlik tablosu ve başarım kimlikleri.
-- **iCloud:** Xcode capability'si için iCloud container kimliği.
-- **Destek ve gizlilik politikası URL'leri** (yayınlanabilir bir web adresi).
-- **KVKK veri sorumlusu bilgileri** (gizlilik metni için şirket unvanı ve iletişim adresi).
-- **Test cihazları:** en az bir eski iPhone (performans tabanı), bir güncel iPhone ve bir iPad.
-- **Sanat yönü:** "premium" görünüm için 3D sanatçı/Blender modelleri isteyip istemediğiniz ya da prosedürel stilin geliştirilmesiyle devam edilip edilmeyeceği.
+## 4. Yayın öncesi
+- `Docs/APPSTORE/TestFlight.md` listesindeki cihaz testleri: en eski desteklediğiniz iPhone, güncel bir iPhone ve bir iPad.
+- Ekran görüntüleri: iPhone 6.9"/6.7" ve iPad 13"/12.9" boyutlarında 3–10 adet.
+- Başarım görselleri (Game Center).
+- **Sanat yönü kararı:** prosedürel stille mi devam, yoksa 3D sanatçı modelleriyle mi? Mimari model değişimine hazır.

@@ -39,6 +39,8 @@ namespace FactoryKing.EditorTools
             SetupUrp();
             SetupPlayer();
             CreateShaderKeepAlive();
+            SetupIcon();
+            CreatePanelSettings();
             CreateScene();
             AssetDatabase.SaveAssets();
             Debug.Log("[FactoryKing] Setup complete. Open Assets/_Project/Scenes/Factory.unity and press Play.");
@@ -156,6 +158,55 @@ namespace FactoryKing.EditorTools
             var m = new Material(shader) { enableInstancing = true };
             if (emission) m.EnableKeyword("_EMISSION");
             AssetDatabase.CreateAsset(m, path);
+        }
+
+        // ------------------------------------------------------------------ Icon & UI
+
+        public const string IconPath = Root + "/Art/AppIcon.png";
+
+        /// <summary>Uses the generated 1024x1024 icon (no alpha) as the default icon; Unity derives every iOS size.</summary>
+        public static void SetupIcon()
+        {
+            var importer = AssetImporter.GetAtPath(IconPath) as TextureImporter;
+            if (importer == null) { Debug.LogWarning("[FactoryKing] App icon not found at " + IconPath); return; }
+            importer.textureType = TextureImporterType.Default;
+            importer.npotScale = TextureImporterNPOTScale.None;
+            importer.mipmapEnabled = false;
+            importer.alphaSource = TextureImporterAlphaSource.None;
+            importer.textureCompression = TextureImporterCompression.Uncompressed;
+            importer.SaveAndReimport();
+            var tex = AssetDatabase.LoadAssetAtPath<Texture2D>(IconPath);
+            PlayerSettings.SetIconsForTargetGroup(BuildTargetGroup.Unknown, new[] { tex });
+            PlayerSettings.SplashScreen.backgroundColor = new Color(0.08f, 0.10f, 0.13f);
+        }
+
+        /// <summary>Runtime UI panel settings (1080x1920 reference, portrait) loaded by UiManager from Resources.</summary>
+        public static void CreatePanelSettings()
+        {
+            const string dir = Root + "/Resources/UI";
+            const string path = dir + "/FKPanelSettings.asset";
+            EnsureFolder(dir);
+            if (AssetDatabase.LoadAssetAtPath<UnityEngine.UIElements.PanelSettings>(path) != null) return;
+            var ps = ScriptableObject.CreateInstance<UnityEngine.UIElements.PanelSettings>();
+            ps.scaleMode = UnityEngine.UIElements.PanelScaleMode.ScaleWithScreenSize;
+            ps.referenceResolution = new Vector2Int(1080, 1920);
+            ps.screenMatchMode = UnityEngine.UIElements.PanelScreenMatchMode.MatchWidthOrHeight;
+            ps.match = 0.5f;
+            var themes = AssetDatabase.FindAssets("t:ThemeStyleSheet");
+            if (themes.Length > 0)
+                ps.themeStyleSheet = AssetDatabase.LoadAssetAtPath<UnityEngine.UIElements.ThemeStyleSheet>(AssetDatabase.GUIDToAssetPath(themes[0]));
+            AssetDatabase.CreateAsset(ps, path);
+        }
+
+        /// <summary>Saves a store screenshot of the Game view (set the Game view to 1290x2796 or 2048x2732 first).</summary>
+        [MenuItem("Factory King/Capture Store Screenshot", priority = 30)]
+        public static void CaptureScreenshot()
+        {
+            if (!Application.isPlaying) { Debug.LogWarning("[FactoryKing] Enter Play mode first."); return; }
+            Directory.CreateDirectory("Screenshots");
+            string file = $"Screenshots/FactoryKing_{Screen.width}x{Screen.height}_{System.DateTime.Now:yyyyMMdd_HHmmss}.png";
+            ScreenCapture.CaptureScreenshot(file, 1);
+            Debug.Log("[FactoryKing] Screenshot saved: " + file);
         }
 
         // ------------------------------------------------------------------ Scene

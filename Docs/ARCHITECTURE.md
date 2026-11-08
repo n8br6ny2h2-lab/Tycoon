@@ -50,17 +50,26 @@ Her hat altı aşamadan geçer: **Hammadde girişi → İşleme → Üretim → 
 - **Doğrulama:** Her fabrikanın her tekdüze seviyede (1–100) kârlı olması ve yeni fabrikanın kendini 2–60 dakikada amorti etmesi testlerle zorunlu tutuluyor.
 - **Şirket değeri:** nakit − borç + yatırım × 0,6 + net gelir/sn × 600. **Şirket seviyesi:** ömür boyu kazancın 10 tabanında logaritması × 2, artı 1.
 
-### İlerleme referansı (açgözlü bot, çevrimdışı gelir, yönetici ve prestij yokken)
+### İlerleme referansı ("ideal oyuncu" botu, `BalanceTests`)
 
-| Süre | Olay |
+Bot her 5 saniyede açgözlü harcama yapıyor ve tüm ödülleri topluyor. Gerçek oyuncular daha yavaş ilerler; bu değerler kabul edilebilir en hızlı tempoyu gösterir.
+
+| Olay | Süre |
 |---|---|
-| 12 dk | Çelik 2. hat |
-| 58 dk | Gıda fabrikası |
-| 83 dk | Çelik 3. hat, Gıda 2. hat |
-| 4,4 sa | Plastik fabrikası |
-| 6 sa | ~162B/sn net gelir, şirket seviyesi 18 |
+| Gıda fabrikası | ~8 dk |
+| Plastik fabrikası | ~33 dk |
+| İlk prestij | ~80 dk |
+| Beş fabrikanın tamamı | 2 saatten fazla (test sınırı) |
 
-Tekstil ve Elektronik fabrikaları; çevrimdışı gelir, yöneticiler, prestij ve araştırma eklendikten sonra (Aşama 3–4) dengelenecek.
+Prestij: Taç = ⌊(tur kazancı / 10⁷)^¼⌋; her Taç satış fiyatına kalıcı +%10 ekler. Dördüncü kök kullanılıyor, çünkü karekök denemesi kontrolsüz bir büyüme döngüsü yaratıyordu (24 saatlik bot testinde görüldü).
+
+## Meta sistemler (Core/Meta, Core/Monetization)
+
+- `OfflineEarningsService`: çevrimdışı kazanç `LineAnalyzer` ile kapalı formda hesaplanır, simülasyon yeniden oynatılmaz.
+- `TimeGuard`: oyun saati hiç geri gitmez. Saat geri alınırsa çevrimdışı süre ve günlük ödül verilmez.
+- Diğer servisler: `ManagerService`, `PrestigeService`, `ResearchService`, `MissionService`, `OrderService`, `AchievementService`, `DailyRewardService`, `LiveEventService`, `BoostService`. Hepsi `ModifierStack`'e kaynak kimliğiyle bağlanır; yükleme sonrası `ApplyAllModifiers` ile durumdan yeniden kurulur.
+- `PurchaseService`: işlem kimliğiyle tek seferlik teslim. `RewardedAdService`: isteğe bağlı reklam, sınır ve bekleme süresiyle. `AnalyticsService`: onay yoksa hiçbir şey göndermez.
+- Kayıt: `SaveSerializer` (toleranslı JSON), `SaveService` (FK1 başlık + FNV-1a sağlaması, yedek, `.corrupt` dosyası), `SaveConflictResolver` (iCloud).
 
 ## Unity katmanı
 
@@ -73,4 +82,6 @@ Tekstil ve Elektronik fabrikaları; çevrimdışı gelir, yöneticiler, prestij 
 - LOD: her makinede LODGroup var (uzakta yalnızca gövde, çok uzakta gizli).
 - `IsometricCameraController`: tek parmakla kaydırma (ataletli), iki parmakla yakınlaştırma, fare tekerleği, dokunarak seçme, yumuşak odaklanma, sınırlar.
 - `DayNightCycle`: güneş açısı, renk ve ortam ışığı geçişi. Gece pencereler ve sokak lambaları yanar.
-- `DevHud`: geçici IMGUI arayüzü (Aşama 5'te UI Toolkit ekranlarıyla değiştirilecek).
+- `UiManager` / `Hud` / `Screens`: UI Toolkit arayüzü kodla kuruluyor. Referans çözünürlük 1080x1920, güvenli alana uyuyor, dokunma hedefleri en az 96 px. Canlı değerler saniyede 5 kez güncelleniyor.
+- `AudioManager`: tüm sesler çalışma anında sentezleniyor; telif riski yok.
+- `SaveManager`, `NativeBridge` (iCloud ve bildirimler), `GameCenterService`, `StoreController` + `IStoreBackend`, `PlatformRegistry` (isteğe bağlı SDK assembly'leri kendilerini buraya kaydeder).

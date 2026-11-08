@@ -275,7 +275,7 @@ namespace FactoryKing.Core.Persistence
             var a = JsonValue.NewArray();
             foreach (var m in list)
                 a.Add(JsonValue.NewObject().Set("id", m.Id).Set("type", m.Type).Set("target", m.Target).Set("base", m.Baseline)
-                    .Set("dia", m.RewardDiamonds).Set("cashSec", m.RewardCashSeconds).Set("claimed", m.Claimed));
+                    .Set("dia", m.RewardDiamonds).Set("cashSec", m.RewardCashSeconds).Set("cash", m.RewardCash).Set("claimed", m.Claimed));
             return a;
         }
 
@@ -285,7 +285,7 @@ namespace FactoryKing.Core.Persistence
                 into.Add(new MissionState
                 {
                     Id = m.Str("id"), Type = m.Str("type"), Target = m.Dbl("target"), Baseline = m.Dbl("base"),
-                    RewardDiamonds = m.Lng("dia"), RewardCashSeconds = m.Dbl("cashSec"), Claimed = m.Bool("claimed"),
+                    RewardDiamonds = m.Lng("dia"), RewardCashSeconds = m.Dbl("cashSec"), RewardCash = m.Dbl("cash"), Claimed = m.Bool("claimed"),
                 });
         }
     }

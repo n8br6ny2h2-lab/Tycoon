@@ -70,6 +70,8 @@ namespace FactoryKing.Core.Simulation
         public double Baseline;
         public long RewardDiamonds;
         public double RewardCashSeconds;
+        /// <summary>Cash reward fixed when the mission is created (so it cannot be inflated before claiming).</summary>
+        public double RewardCash;
         public bool Claimed;
     }
 

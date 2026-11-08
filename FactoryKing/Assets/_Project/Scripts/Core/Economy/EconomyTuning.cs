@@ -40,9 +40,14 @@ namespace FactoryKing.Core.Economy
         public double OfflineMinimumSeconds = 60;
 
         /// <summary>Run earnings needed before prestige is offered.</summary>
-        public double PrestigeMinRunEarnings = 1e7;
-        /// <summary>Crowns = floor(sqrt(runEarnings / PrestigeCrownDivisor)).</summary>
-        public double PrestigeCrownDivisor = 1e6;
+        public double PrestigeMinRunEarnings = 1e8;
+        /// <summary>Crowns = floor((runEarnings / PrestigeCrownDivisor) ^ PrestigeExponent).</summary>
+        public double PrestigeCrownDivisor = 1e7;
+        /// <summary>
+        /// Fourth root: each extra crown needs much more income, so prestige multiplies progress without the
+        /// runaway loop a square root causes (verified by the 24 h progression probe).
+        /// </summary>
+        public double PrestigeExponent = 0.25;
         /// <summary>Permanent sell-price bonus per crown (0.1 = +10%).</summary>
         public double PrestigeBonusPerCrown = 0.10;
 
