@@ -46,6 +46,17 @@ namespace FactoryKing.Core.Economy
             Changed?.Invoke();
         }
 
+        /// <summary>Like <see cref="Set"/> but without raising <see cref="Changed"/> (for values refreshed every second).</summary>
+        public void SetQuiet(string sourceId, ModifierStat stat, double multiplier, string scopeFactoryId = null)
+        {
+            if (_bySource.TryGetValue(sourceId, out var list) && list.Count == 1)
+            {
+                list[0] = new Entry { Scope = scopeFactoryId, Stat = stat, Multiplier = multiplier };
+                return;
+            }
+            _bySource[sourceId] = new List<Entry> { new Entry { Scope = scopeFactoryId, Stat = stat, Multiplier = multiplier } };
+        }
+
         /// <summary>Adds another modifier to an existing source (e.g. a manager with two perks).</summary>
         public void Add(string sourceId, ModifierStat stat, double multiplier, string scopeFactoryId = null)
         {

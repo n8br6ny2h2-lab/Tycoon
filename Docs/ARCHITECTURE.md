@@ -50,18 +50,36 @@ Her hat altı aşamadan geçer: **Hammadde girişi → İşleme → Üretim → 
 - **Doğrulama:** Her fabrikanın her tekdüze seviyede (1–100) kârlı olması ve yeni fabrikanın kendini 2–60 dakikada amorti etmesi testlerle zorunlu tutuluyor.
 - **Şirket değeri:** nakit − borç + yatırım × 0,6 + net gelir/sn × 600. **Şirket seviyesi:** ömür boyu kazancın 10 tabanında logaritması × 2, artı 1.
 
-### İlerleme referansı ("ideal oyuncu" botu, `BalanceTests`)
+### İlerleme referansı ("ideal oyuncu" botu, `BalanceTests` + 24 saatlik deneme)
 
-Bot her 5 saniyede açgözlü harcama yapıyor ve tüm ödülleri topluyor. Gerçek oyuncular daha yavaş ilerler; bu değerler kabul edilebilir en hızlı tempoyu gösterir.
+Bot her 5 saniyede açgözlü harcama yapıyor, tüm ödülleri topluyor ve santrali gerektikçe yükseltiyor. Gerçek oyuncular 2–3 kat daha yavaş ilerler.
 
-| Olay | Süre |
-|---|---|
-| Gıda fabrikası | ~8 dk |
-| Plastik fabrikası | ~33 dk |
-| İlk prestij | ~80 dk |
-| Beş fabrikanın tamamı | 2 saatten fazla (test sınırı) |
+| Olay | Zorluk artışından önce | Şimdi |
+|---|---|---|
+| Gıda fabrikası | ~8 dk | ~13–15 dk |
+| Plastik fabrikası | ~33 dk | ~53–76 dk |
+| İlk prestij | ~80 dk | ~2,4–4 sa |
+| Beş fabrikanın tamamı | ~3,5 sa | ~7,5 sa (2. prestij turunda) |
+| 6. prestij | – | ~17,6 sa (her tur bir öncekinden uzun) |
 
-Prestij: Taç = ⌊(tur kazancı / 10⁷)^¼⌋; her Taç satış fiyatına kalıcı +%10 ekler. Dördüncü kök kullanılıyor, çünkü karekök denemesi kontrolsüz bir büyüme döngüsü yaratıyordu (24 saatlik bot testinde görüldü).
+## Benzer oyunlardan uyarlanan mekanikler (özgün uygulama)
+
+Sadece **tür mekanikleri** uyarlandı. Hiçbir oyunun adı, karakteri, görseli, metni ya da sayısal değerleri kopyalanmadı.
+
+| Mekanik | İlham (tür örneği) | Factory King'deki karşılığı |
+|---|---|---|
+| Darboğaz dengesi | Taşıma/depo darboğazlı maden ve fabrika idle oyunları | Altı aşamalı zincir; darboğaz göstergesi; depo doluluğu |
+| Enerji yönetimi | Enerji ve şebeke odaklı idle oyunlar | **Santral**: makineler seviyeyle daha çok elektrik çeker; talep kapasiteyi aşınca fabrikanın tamamı yavaşlar |
+| Aktif yönetici yeteneği | Bekleme süreli yönetici yetenekleri | Her yöneticinin **dokunarak kullanılan yeteneği** (Tam Gaz, Flaş Satış, Fazla Mesai vb.) |
+| Üstel maliyet / doğrusal gelir | İdle oyun matematiği (maliyet = taban × büyüme^seviye) | Fabrika başına artan büyüme: 1,15 → 1,19 |
+| Prestij çarpanı | Sıfırlama + kalıcı para birimi | Taç = ⌊(tur kazancı/10⁸)^¼⌋; eşik 10⁹ |
+| Değişken talep | Piyasa ve sipariş sistemleri | **Yaşayan piyasa**: ürün fiyatları ±%15 dalgalanır; "günün gözde ürünü" +%25 |
+
+## Zorluk ayarları
+- Fabrika fiyatları yükseltildi: Gıda 40B, Plastik 2Mn, Tekstil 90Mn, Elektronik 4,5Mr.
+- Yükseltme maliyet büyümesi fabrikaya göre artıyor: 1,15 / 1,16 / 1,17 / 1,18 / 1,19.
+- Elektrik çekişi seviye başına %6 artıyor; santral yükseltilmezse üretim düşüyor.
+- Çevrimdışı verim %60'tan %50'ye indi; prestij eşiği 10⁸'den 10⁹'a çıktı.
 
 ## Meta sistemler (Core/Meta, Core/Monetization)
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace FactoryKing.Core.Content
@@ -21,7 +22,7 @@ namespace FactoryKing.Core.Content
             var c = new GameContent();
 
             // ---------------- 1. Iron & Steel: ore -> molten steel -> beams -> bundles ----------------
-            AddFactory(c, Steel, order: 0, scale: 1, unlockCost: 0, rawCost: 1,
+            AddFactory(c, Steel, order: 0, scale: 1, unlockCost: 0, rawCost: 1, growth: 1.15,
                 products: new[]
                 {
                     P("iron_ore", "#7A5C4E", 0),
@@ -40,7 +41,7 @@ namespace FactoryKing.Core.Content
                 });
 
             // ---------------- 2. Food: wheat -> flour -> bread -> bread crates ----------------
-            AddFactory(c, Food, order: 1, scale: 30, unlockCost: 15000, rawCost: 0.5,
+            AddFactory(c, Food, order: 1, scale: 30, unlockCost: 40000, rawCost: 0.5, growth: 1.16,
                 products: new[]
                 {
                     P("wheat", "#E3C567", 0),
@@ -59,7 +60,7 @@ namespace FactoryKing.Core.Content
                 });
 
             // ---------------- 3. Plastic: crude feed -> granules -> moulded goods -> boxes ----------------
-            AddFactory(c, Plastic, order: 2, scale: 900, unlockCost: 600000, rawCost: 1.2,
+            AddFactory(c, Plastic, order: 2, scale: 900, unlockCost: 2000000, rawCost: 1.2, growth: 1.17,
                 products: new[]
                 {
                     P("crude_feed", "#2B2B33", 0),
@@ -78,7 +79,7 @@ namespace FactoryKing.Core.Content
                 });
 
             // ---------------- 4. Textile: cotton -> fabric -> garments -> folded packs ----------------
-            AddFactory(c, Textile, order: 3, scale: 27000, unlockCost: 25000000, rawCost: 0.8,
+            AddFactory(c, Textile, order: 3, scale: 27000, unlockCost: 90000000, rawCost: 0.8, growth: 1.18,
                 products: new[]
                 {
                     P("cotton", "#F5F5F0", 0),
@@ -97,7 +98,7 @@ namespace FactoryKing.Core.Content
                 });
 
             // ---------------- 5. Electronics: silicon -> circuits -> devices -> retail boxes ----------------
-            AddFactory(c, Electronics, order: 4, scale: 810000, unlockCost: 1200000000, rawCost: 1.5,
+            AddFactory(c, Electronics, order: 4, scale: 810000, unlockCost: 4500000000, rawCost: 1.5, growth: 1.19,
                 products: new[]
                 {
                     P("silicon_wafer", "#90A4AE", 0),
@@ -135,7 +136,7 @@ namespace FactoryKing.Core.Content
 
         /// <summary>Registers a factory; monetary values of products/machines are multiplied by <paramref name="scale"/>.</summary>
         private static void AddFactory(GameContent c, string id, int order, double scale, double unlockCost, double rawCost,
-            ProductDef[] products, MachineDef[] machines)
+            double growth, ProductDef[] products, MachineDef[] machines)
         {
             var lineCosts = new double[BaseLineCosts.Length];
             for (int i = 0; i < lineCosts.Length; i++) lineCosts[i] = BaseLineCosts[i] * scale;
@@ -158,13 +159,19 @@ namespace FactoryKing.Core.Content
                 p.BaseValue *= scale;
                 c.Products.Add(p);
             }
+            double chainKw = 0;
             foreach (var m in machines)
             {
+                chainKw += m.PowerKw;
+                m.UpgradeCostGrowth = growth; // later factories get steeper upgrade curves
                 m.BaseUpgradeCost *= scale;
                 m.MaintenancePerSecond *= scale;
                 c.Machines.Add(m);
                 factory.MachineChain.Add(m.Id);
             }
+            // The power plant comfortably feeds one level-1 line; more lines and upgrades need plant upgrades.
+            factory.BasePowerCapacityKw = Math.Round(chainKw * 1.6, 1);
+            factory.PowerUpgradeBaseCost = 150 * scale;
             c.Factories.Add(factory);
         }
     }

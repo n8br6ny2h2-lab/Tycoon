@@ -343,3 +343,25 @@ notif.offline.title	Your warehouses are full	Depoların doldu
 notif.offline.body	Collect your factory earnings!	Fabrika kazançlarını topla!
 notif.daily.title	Daily reward ready	Günlük ödül hazır
 notif.daily.body	Your next login reward is waiting.	Sıradaki giriş ödülün seni bekliyor.
+market.price	Market price: {0}	Piyasa fiyatı: {0}
+market.hot	In demand today	Günün gözde ürünü
+power.status	Power: {0}/{1} kW · Plant Lv.{2}	Elektrik: {0}/{1} kW · Santral Sv.{2}
+power.throttled	factory at {0}% speed	fabrika %{0} hızda
+power.upgrade	Upgrade plant: {0}	Santrali yükselt: {0}
+hud.power_low	Power shortage!	Elektrik yetersiz!
+hud.ability_ready	Manager skill ready	Yönetici yeteneği hazır
+ability.used	{0}: {1}!	{0}: {1}!
+ability.use	Use skill	Yeteneği kullan
+ability.active	Active: {0}	Aktif: {0}
+ability.cooldown	Ready in {0}	{0} sonra hazır
+ability.assign_first	Assign to a factory first	Önce bir fabrikaya ata
+ability.cost_freeze	Cost Freeze	Maliyet Dondurma
+ability.cost_freeze.desc	Operating costs -70% for 3 min.	3 dakika boyunca işletme giderleri -%70.
+ability.express	Express Logistics	Ekspres Lojistik
+ability.express.desc	Triple storage capacity for 5 min.	5 dakika boyunca 3 kat depo kapasitesi.
+ability.overdrive	Overdrive	Tam Gaz
+ability.overdrive.desc	Triple production speed for 2 min.	2 dakika boyunca 3 kat üretim hızı.
+ability.overtime	Overtime	Fazla Mesai
+ability.overtime.desc	Instantly earn 15 min of this factory's income.	Bu fabrikanın 15 dakikalık gelirini anında kazan.
+ability.flash_sale	Flash Sale	Flaş Satış
+ability.flash_sale.desc	Double sale prices for 2.5 min.	2,5 dakika boyunca satış fiyatları 2 kat.

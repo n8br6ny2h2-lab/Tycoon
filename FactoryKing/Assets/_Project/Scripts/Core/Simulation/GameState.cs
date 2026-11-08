@@ -46,6 +46,8 @@ namespace FactoryKing.Core.Simulation
     {
         public string FactoryId;
         public bool Unlocked;
+        /// <summary>Power plant level (1..MaxPowerLevel).</summary>
+        public int PowerLevel = 1;
         public List<LineState> Lines = new List<LineState>();
     }
 
@@ -142,6 +144,7 @@ namespace FactoryKing.Core.Simulation
             {
                 if (!byId.TryGetValue(def.Id, out var fs)) fs = new FactoryState { FactoryId = def.Id };
                 fs.Lines ??= new List<LineState>();
+                if (fs.PowerLevel < 1) fs.PowerLevel = 1;
                 while (fs.Lines.Count < def.LineCount) fs.Lines.Add(new LineState());
                 if (fs.Lines.Count > def.LineCount) fs.Lines.RemoveRange(def.LineCount, fs.Lines.Count - def.LineCount);
                 foreach (var line in fs.Lines)

@@ -71,11 +71,12 @@ namespace FactoryKing.Tests
         public void NonConsumable_Cannot_Be_Bought_Twice_And_Restore_Works()
         {
             var vip = Catalog.ById("vip");
+            double priceBefore = _s.Modifiers.Get(ModifierStat.SellPrice, "steel");
             Assert.That(_s.Purchases.CanPurchase(vip), Is.True);
             Assert.That(_s.Purchases.Process(vip.StoreId, "V1", true, false), Is.EqualTo(PurchaseResult.Granted));
             Assert.That(_s.Purchases.CanPurchase(vip), Is.False);
             Assert.That(_s.Purchases.Process(vip.StoreId, "V2", true, false), Is.EqualTo(PurchaseResult.AlreadyOwned));
-            Assert.That(_s.Modifiers.Get(ModifierStat.SellPrice, "steel"), Is.EqualTo(StoreCatalog.VipPriceBonus));
+            Assert.That(_s.Modifiers.Get(ModifierStat.SellPrice, "steel") / priceBefore, Is.EqualTo(StoreCatalog.VipPriceBonus).Within(1e-12));
             Assert.That(_s.Offline.CapSeconds, Is.EqualTo((8 + StoreCatalog.VipOfflineHours) * 3600));
 
             // New device: restore re-grants entitlements but never consumables.

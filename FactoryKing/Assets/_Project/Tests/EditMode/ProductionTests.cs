@@ -9,7 +9,8 @@ namespace FactoryKing.Tests
 {
     public class ProductionTests
     {
-        private static GameSession NewSession() => new GameSession(DefaultContent.Create());
+        private static GameSession NewSession() =>
+            new GameSession(DefaultContent.Create(), clock: new FactoryKing.Core.TimeKeeping.ManualClock());
 
         private static void Run(GameSession s, double seconds, double step = 0.1)
         {
@@ -100,10 +101,12 @@ namespace FactoryKing.Tests
                 fs.Unlocked = true;
                 fs.Lines[0].Unlocked = true;
                 foreach (var m in fs.Lines[0].Machines) m.Level = level;
-                var report = s.AnalyzeLine(factory.Id, 0);
+                fs.PowerLevel = s.Tuning.MaxPowerLevel; // isolate the production chain from the power grid
 
                 // Isolate this factory.
                 foreach (var other in s.State.Factories) if (other != fs) other.Unlocked = false;
+                s.ApplyAllModifiers();
+                var report = s.AnalyzeLine(factory.Id, 0);
 
                 Run(s, 120, 0.05); // warm-up: fill buffers
                 long soldBefore = s.State.TotalUnitsSold;

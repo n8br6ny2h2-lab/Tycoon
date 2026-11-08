@@ -18,6 +18,15 @@ namespace FactoryKing.Core.Meta
         public long HireDiamonds;
         public string ColorHex;
 
+        /// <summary>Active skill (tap to trigger): a strong temporary multiplier with a cooldown.</summary>
+        public string AbilityKey;
+        public ModifierStat AbilityStat;
+        public double AbilityMultiplier;
+        public double AbilitySeconds;
+        public double AbilityCooldownSeconds;
+        /// <summary>For an instant cash ability: seconds of current income paid out (0 = timed multiplier).</summary>
+        public double AbilityInstantIncomeSeconds;
+
         public int MaxLevel => 10 + 5 * (int)Rarity;          // 10 / 15 / 20 / 25
         public double BaseBonus => 0.10 + 0.05 * (int)Rarity;  // 10% .. 25%
         public double BonusPerLevel => 0.02 + 0.01 * (int)Rarity;
@@ -30,11 +39,16 @@ namespace FactoryKing.Core.Meta
 
         public static readonly List<ManagerDef> Defs = new List<ManagerDef>
         {
-            new ManagerDef { Id = "mgr_kemal", NameKey = "manager.mgr_kemal", TitleKey = "manager.title.cost", Rarity = Rarity.Common, Stat = ModifierStat.OperatingCost, HireDiamonds = 25, ColorHex = "#5B8DEF" },
-            new ManagerDef { Id = "mgr_baris", NameKey = "manager.mgr_baris", TitleKey = "manager.title.storage", Rarity = Rarity.Common, Stat = ModifierStat.StorageCapacity, HireDiamonds = 40, ColorHex = "#43B581" },
-            new ManagerDef { Id = "mgr_ayla", NameKey = "manager.mgr_ayla", TitleKey = "manager.title.speed", Rarity = Rarity.Rare, Stat = ModifierStat.ProductionSpeed, HireDiamonds = 120, ColorHex = "#F2994A" },
-            new ManagerDef { Id = "mgr_selin", NameKey = "manager.mgr_selin", TitleKey = "manager.title.offline", Rarity = Rarity.Epic, Stat = ModifierStat.OfflineEarnings, HireDiamonds = 220, ColorHex = "#9B51E0" },
-            new ManagerDef { Id = "mgr_deniz", NameKey = "manager.mgr_deniz", TitleKey = "manager.title.price", Rarity = Rarity.Legendary, Stat = ModifierStat.SellPrice, HireDiamonds = 380, ColorHex = "#F2C94C" },
+            new ManagerDef { Id = "mgr_kemal", NameKey = "manager.mgr_kemal", TitleKey = "manager.title.cost", Rarity = Rarity.Common, Stat = ModifierStat.OperatingCost, HireDiamonds = 25, ColorHex = "#5B8DEF",
+                AbilityKey = "ability.cost_freeze", AbilityStat = ModifierStat.OperatingCost, AbilityMultiplier = 0.3, AbilitySeconds = 180, AbilityCooldownSeconds = 1800 },
+            new ManagerDef { Id = "mgr_baris", NameKey = "manager.mgr_baris", TitleKey = "manager.title.storage", Rarity = Rarity.Common, Stat = ModifierStat.StorageCapacity, HireDiamonds = 40, ColorHex = "#43B581",
+                AbilityKey = "ability.express", AbilityStat = ModifierStat.StorageCapacity, AbilityMultiplier = 3, AbilitySeconds = 300, AbilityCooldownSeconds = 1800 },
+            new ManagerDef { Id = "mgr_ayla", NameKey = "manager.mgr_ayla", TitleKey = "manager.title.speed", Rarity = Rarity.Rare, Stat = ModifierStat.ProductionSpeed, HireDiamonds = 120, ColorHex = "#F2994A",
+                AbilityKey = "ability.overdrive", AbilityStat = ModifierStat.ProductionSpeed, AbilityMultiplier = 3, AbilitySeconds = 120, AbilityCooldownSeconds = 2400 },
+            new ManagerDef { Id = "mgr_selin", NameKey = "manager.mgr_selin", TitleKey = "manager.title.offline", Rarity = Rarity.Epic, Stat = ModifierStat.OfflineEarnings, HireDiamonds = 220, ColorHex = "#9B51E0",
+                AbilityKey = "ability.overtime", AbilityInstantIncomeSeconds = 900, AbilityCooldownSeconds = 7200 },
+            new ManagerDef { Id = "mgr_deniz", NameKey = "manager.mgr_deniz", TitleKey = "manager.title.price", Rarity = Rarity.Legendary, Stat = ModifierStat.SellPrice, HireDiamonds = 380, ColorHex = "#F2C94C",
+                AbilityKey = "ability.flash_sale", AbilityStat = ModifierStat.SellPrice, AbilityMultiplier = 2, AbilitySeconds = 150, AbilityCooldownSeconds = 2700 },
         };
 
         private readonly GameSession _s;
@@ -89,6 +103,71 @@ namespace FactoryKing.Core.Meta
             _s.State.Stats.ManagerLevelUps++;
             Apply();
             return true;
+        }
+
+        public const string AbilityPrefix = "ability.";
+
+        /// <summary>Ability duration grows 4% per manager level.</summary>
+        public static double AbilityDuration(ManagerDef def, int level) => def.AbilitySeconds * (1d + 0.04 * (level - 1));
+
+        public double AbilityCooldownRemaining(string id)
+        {
+            var m = GetOwned(id);
+            if (m == null) return 0;
+            return Math.Max(0, (m.AbilityReadyUtcTicks - _s.Time.TrustedNow.Ticks) / (double)TimeSpan.TicksPerSecond);
+        }
+
+        public double AbilityActiveRemaining(string id)
+        {
+            var m = GetOwned(id);
+            if (m == null) return 0;
+            return Math.Max(0, (m.AbilityEndUtcTicks - _s.Time.TrustedNow.Ticks) / (double)TimeSpan.TicksPerSecond);
+        }
+
+        /// <summary>Manager must be assigned to a factory; the effect applies to that factory.</summary>
+        public bool CanUseAbility(string id)
+        {
+            var m = GetOwned(id);
+            return m != null && m.AssignedFactoryId != null && AbilityCooldownRemaining(id) <= 0;
+        }
+
+        public bool TryUseAbility(string id)
+        {
+            if (!CanUseAbility(id)) return false;
+            var def = GetDef(id);
+            var m = GetOwned(id);
+            long now = _s.Time.TrustedNow.Ticks;
+            m.AbilityReadyUtcTicks = now + (long)(def.AbilityCooldownSeconds * TimeSpan.TicksPerSecond);
+            if (def.AbilityInstantIncomeSeconds > 0)
+            {
+                double factoryNet = 0;
+                var fs = _s.State.GetFactory(m.AssignedFactoryId);
+                for (int l = 0; l < fs.Lines.Count; l++)
+                    if (fs.Lines[l].Unlocked) factoryNet += Math.Max(0, _s.AnalyzeLine(fs.FactoryId, l).NetPerSecond);
+                double bonus = 1d + 0.05 * (m.Level - 1);
+                _s.Wallet.Grant(BigDouble.FromDouble(Math.Max(_s.Tuning.StartingCash, factoryNet * def.AbilityInstantIncomeSeconds * bonus)));
+            }
+            else
+            {
+                m.AbilityEndUtcTicks = now + (long)(AbilityDuration(def, m.Level) * TimeSpan.TicksPerSecond);
+            }
+            ApplyAbilities();
+            Changed?.Invoke();
+            return true;
+        }
+
+        /// <summary>Adds/removes timed ability modifiers (called every second).</summary>
+        public void ApplyAbilities()
+        {
+            long now = _s.Time.TrustedNow.Ticks;
+            foreach (var def in Defs)
+            {
+                string source = AbilityPrefix + def.Id;
+                var m = GetOwned(def.Id);
+                bool active = m != null && m.AssignedFactoryId != null && m.AbilityEndUtcTicks > now && def.AbilityInstantIncomeSeconds <= 0;
+                if (active) { if (!_s.Modifiers.HasSource(source)) _s.Modifiers.Set(source, def.AbilityStat, def.AbilityMultiplier, m.AssignedFactoryId); }
+                else if (_s.Modifiers.HasSource(source)) _s.Modifiers.Remove(source);
+            }
         }
 
         /// <summary>Assigns to an owned factory (one manager per factory). Null factory unassigns.</summary>

@@ -21,6 +21,8 @@ namespace FactoryKing.Core.Economy
         public double ElectricityPerSecond;
         public double WagesPerSecond;
         public double MaintenancePerSecond;
+        /// <summary>Average electrical demand of the line in steady state (kW).</summary>
+        public double PowerDemandKw;
 
         public double CostsPerSecond => RawCostPerSecond + ElectricityPerSecond + WagesPerSecond + MaintenancePerSecond;
         public double NetPerSecond => RevenuePerSecond - CostsPerSecond;
@@ -92,7 +94,9 @@ namespace FactoryKing.Core.Economy
             {
                 double util = Math.Min(1d, bottleneck / report.MachineCapacityPerSecond[i]);
                 report.Utilization[i] = util;
-                report.ElectricityPerSecond += util * defs[i].PowerKw * factory.ElectricityPricePerKwSecond * costMod;
+                double kw = UpgradeMath.PowerKw(defs[i], levels[i], tuning);
+                report.PowerDemandKw += util * kw;
+                report.ElectricityPerSecond += util * kw * factory.ElectricityPricePerKwSecond * costMod;
                 report.WagesPerSecond += util * factory.WagePerMachineSecond * costMod;
                 report.MaintenancePerSecond += util * UpgradeMath.MaintenancePerSecond(defs[i], levels[i], tuning) * costMod;
             }

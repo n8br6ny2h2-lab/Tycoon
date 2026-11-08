@@ -114,6 +114,7 @@ namespace FactoryKing.Tests
         public void Modifiers_Combine_Multiplicatively_And_Respect_Scope()
         {
             var m = _s.Modifiers;
+            foreach (var f in _s.Content.Factories) m.Remove("market." + f.Id); // isolate from the living market
             m.Set("prestige", ModifierStat.SellPrice, 2);
             m.Set("manager.steel", ModifierStat.SellPrice, 1.5, DefaultContent.Steel);
             Assert.That(m.Get(ModifierStat.SellPrice, DefaultContent.Steel), Is.EqualTo(3).Within(1e-12));

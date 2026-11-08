@@ -54,6 +54,8 @@ namespace FactoryKing.Tests
                         }
                     }
                     foreach (var r in ResearchService.Defs) bought |= s.Research.TryBuy(r.Id);
+                    foreach (var fs in s.State.Factories)
+                        if (fs.Unlocked && s.Power.Throttle(fs.FactoryId) < 0.999) bought |= s.Power.TryUpgrade(fs.FactoryId);
                 }
                 if (ms.Food < 0 && s.State.GetFactory("food").Unlocked) ms.Food = t / 60;
                 if (ms.Plastic < 0 && s.State.GetFactory("plastic").Unlocked) ms.Plastic = t / 60;
@@ -67,10 +69,10 @@ namespace FactoryKing.Tests
         {
             var m = RunBot(4);
             TestContext.WriteLine($"food {m.Food:0} min, plastic {m.Plastic:0} min, prestige {m.FirstPrestige:0} min, all five {m.AllFive:0} min");
-            Assert.That(m.Food, Is.InRange(3, 45), "second factory");
-            Assert.That(m.Plastic, Is.InRange(20, 150), "third factory");
-            Assert.That(m.FirstPrestige, Is.GreaterThan(45).Or.EqualTo(-1), "first prestige should not come too early");
-            Assert.That(m.AllFive < 0 || m.AllFive > 120, Is.True, "all five factories must take more than 2 hours");
+            Assert.That(m.Food, Is.InRange(8, 60), "second factory");
+            Assert.That(m.Plastic, Is.InRange(30, 240), "third factory");
+            Assert.That(m.FirstPrestige, Is.GreaterThan(90).Or.EqualTo(-1), "first prestige should not come too early");
+            Assert.That(m.AllFive < 0 || m.AllFive > 180, Is.True, "all five factories must take more than 3 hours");
         }
     }
 }

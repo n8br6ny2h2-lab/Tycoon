@@ -27,7 +27,7 @@ namespace FactoryKing.Tests
         {
             var t = Table();
             string scripts = Path.GetDirectoryName(TestPaths.ProjectFile("Assets/_Project/Scripts/Runtime/FactoryKing.Runtime.asmdef"));
-            var keyPattern = new Regex("\"((?:ui|screen|nav|hud|tutorial|map|managers|missions|orders|warehouse|research|daily|achievements|collection|events|prestige|shop|ads|settings|menu|consent|offline|notif|gc|save|debug|achievement)\\.[a-z0-9_.]*[a-z0-9_])\"(?!\\s*\\+)");
+            var keyPattern = new Regex("\"((?:ui|screen|nav|hud|market|power|ability|tutorial|map|managers|missions|orders|warehouse|research|daily|achievements|collection|events|prestige|shop|ads|settings|menu|consent|offline|notif|gc|save|debug|achievement)\\.[a-z0-9_.]*[a-z0-9_])\"(?!\\s*\\+)");
             int found = 0;
             foreach (var file in Directory.GetFiles(scripts, "*.cs", SearchOption.AllDirectories))
             foreach (Match m in keyPattern.Matches(File.ReadAllText(file)))
@@ -42,7 +42,7 @@ namespace FactoryKing.Tests
         public void All_Dynamic_Keys_Exist()
         {
             var t = Table();
-            foreach (var m in ManagerService.Defs) { AssertKey(t, m.NameKey); AssertKey(t, m.TitleKey); AssertKey(t, "rarity." + m.Rarity); AssertKey(t, "stat." + m.Stat); }
+            foreach (var m in ManagerService.Defs) { AssertKey(t, m.NameKey); AssertKey(t, m.TitleKey); AssertKey(t, m.AbilityKey); AssertKey(t, m.AbilityKey + ".desc"); AssertKey(t, "rarity." + m.Rarity); AssertKey(t, "stat." + m.Stat); }
             foreach (var r in ResearchService.Defs) { AssertKey(t, r.NameKey); AssertKey(t, r.NameKey + ".desc"); }
             foreach (var a in AchievementService.Defs) { AssertKey(t, a.NameKey); AssertKey(t, a.NameKey + ".desc"); }
             foreach (var p in StoreCatalog.CreateDefault().Products) { AssertKey(t, p.NameKey); AssertKey(t, p.DescriptionKey); }

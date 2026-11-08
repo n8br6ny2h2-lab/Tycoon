@@ -108,6 +108,12 @@ namespace FactoryKing.Core.Content
         /// <summary>Operator wage per running machine per second.</summary>
         public double WagePerMachineSecond = 0.02;
 
+        /// <summary>Power plant capacity at level 1 (kW). Demand above capacity throttles the whole factory.</summary>
+        public double BasePowerCapacityKw = 20;
+        /// <summary>Price of power plant level 2; grows geometrically.</summary>
+        public double PowerUpgradeBaseCost = 150;
+        public double PowerUpgradeGrowth = 1.55;
+
         public int LineCount => LineUnlockCosts.Length;
     }
 

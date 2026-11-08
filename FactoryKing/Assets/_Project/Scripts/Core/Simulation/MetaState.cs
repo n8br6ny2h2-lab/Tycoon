@@ -50,6 +50,9 @@ namespace FactoryKing.Core.Simulation
         public string Id;
         public int Level = 1;
         public string AssignedFactoryId;
+        /// <summary>Active skill: running until / available again at (UTC ticks).</summary>
+        public long AbilityEndUtcTicks;
+        public long AbilityReadyUtcTicks;
     }
 
     [Serializable]

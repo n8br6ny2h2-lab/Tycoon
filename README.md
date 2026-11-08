@@ -2,7 +2,7 @@
 
 iOS (iPhone ve iPad) için 3D idle fabrika tycoon oyunu. Unity 6 LTS, URP ve C# ile geliştiriliyor. Oyuncu küçük bir atölyeyle başlar ve beş fabrikadan oluşan bir endüstri imparatorluğu kurar: Demir-Çelik, Gıda, Plastik, Tekstil ve Elektronik.
 
-> **Durum:** Sekiz aşamanın tamamı kod ve doküman olarak yazıldı; 127 otomatik test geçiyor.
+> **Durum:** Sekiz aşamanın tamamı kod ve doküman olarak yazıldı; 137 otomatik test geçiyor.
 > Proje henüz Unity Editor'de açılıp bir iPhone'da çalıştırılmadı, çünkü geliştirme ortamında Unity, Mac ve Xcode yok.
 > Yayından önce gerekenler: Unity'de ilk açılış ve düzeltmeler, cihaz testleri, Apple hesabı, reklam SDK'sı ve ekran görüntüleri.
 > Ayrıntılar: [Docs/PHASES.md](Docs/PHASES.md) · Sizden gerekenler: [Docs/USER_ACTIONS.md](Docs/USER_ACTIONS.md)
@@ -60,7 +60,7 @@ Docs/web/                            Gizlilik politikası ve destek sayfası (TR
 FactoryKing/Tools/run-checks.sh     # .NET 8 SDK gerekir
 ```
 
-Bu betik üç şey yapar: çekirdeği Unity ile aynı ayarlarla (netstandard2.1 / C# 9) derler, 127 NUnit testini çalıştırır ve Unity runtime betiklerini UnityEngine referans derlemelerine karşı derleme kontrolünden geçirir.
+Bu betik üç şey yapar: çekirdeği Unity ile aynı ayarlarla (netstandard2.1 / C# 9) derler, 137 NUnit testini çalıştırır ve Unity runtime betiklerini UnityEngine referans derlemelerine karşı derleme kontrolünden geçirir.
 
 ## Belgeler
 

@@ -100,7 +100,7 @@ namespace FactoryKing.Core.Simulation
                     double worked = StepMachine(factory, line, i, sub, costMod);
                     if (worked <= 0) continue;
                     var def = _defs[i];
-                    workedElectricity += worked * def.PowerKw * factory.ElectricityPricePerKwSecond * costMod;
+                    workedElectricity += worked * UpgradeMath.PowerKw(def, line.Machines[i].Level, _tuning) * factory.ElectricityPricePerKwSecond * costMod;
                     workedWages += worked * factory.WagePerMachineSecond * costMod;
                     workedMaintenance += worked * UpgradeMath.MaintenancePerSecond(def, line.Machines[i].Level, _tuning) * costMod;
                 }

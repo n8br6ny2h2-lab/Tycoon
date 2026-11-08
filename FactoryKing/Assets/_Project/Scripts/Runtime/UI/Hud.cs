@@ -113,6 +113,20 @@ namespace FactoryKing.Runtime.UI
                 UiKit.Warn, () => C.Ui.Open("orders"));
             Chip("event", () => T("hud.event_live"), () => S.Events.Active().Count > 0, UiKit.Diamond, () => C.Ui.Open("events"));
             Chip("prestige", () => T("hud.prestige_ready"), () => S.Prestige.Preview().Available, UiKit.Accent, () => C.Ui.Open("prestige"));
+            Chip("power", () => T("hud.power_low"), () => S.Power.Throttle(S.State.ActiveFactoryId) < 0.999, UiKit.Bad, () => Select(null));
+            Chip("ability", () => T("hud.ability_ready"), () =>
+            {
+                var m = S.Managers.AssignedTo(S.State.ActiveFactoryId);
+                return m != null && S.Managers.CanUseAbility(m.Id);
+            }, UiKit.Good, () =>
+            {
+                var m = S.Managers.AssignedTo(S.State.ActiveFactoryId);
+                if (m != null && S.Managers.TryUseAbility(m.Id))
+                {
+                    C.Audio?.Play(Sfx.Success);
+                    C.Ui.Toast(C.TF("ability.used", T(ManagerService.GetDef(m.Id).NameKey), T(ManagerService.GetDef(m.Id).AbilityKey)), UiKit.Good);
+                }
+            });
             return row;
         }
 
@@ -165,6 +179,33 @@ namespace FactoryKing.Runtime.UI
                 });
                 box.Add(lbl);
             }
+            // Market price of this factory's product (living market).
+            box.Add(B.Text(UiKit.Label("", 28, false, UiKit.Diamond), () =>
+            {
+                double f = S.Market.PriceFactor(fid);
+                string pct = (f >= 1 ? "+" : "") + Mathf.RoundToInt((float)((f - 1) * 100)) + "%";
+                string hot = S.Market.HotFactoryId(S.Time.TrustedNow) == fid ? "  ★ " + T("market.hot") : "";
+                return C.TF("market.price", pct) + hot;
+            }));
+
+            // Power plant: demand vs capacity and its upgrade.
+            var powerRow = UiKit.Row(0, Justify.SpaceBetween);
+            var powerLabel = UiKit.Label("", 28, false, UiKit.Muted);
+            powerLabel.style.flexShrink = 1;
+            B.Text(powerLabel, () =>
+            {
+                double demand = S.Power.DemandKw(fid), cap = S.Power.CapacityKw(fid);
+                string text = C.TF("power.status", Mathf.RoundToInt((float)demand), Mathf.RoundToInt((float)cap), S.Power.Level(fid));
+                double t = S.Power.Throttle(fid);
+                return t < 0.999 ? text + "  ⚠ " + C.TF("power.throttled", Mathf.RoundToInt((float)(t * 100))) : text;
+            });
+            powerRow.Add(powerLabel);
+            var powerUp = UiKit.Button("", () => { if (S.Power.TryUpgrade(fid)) C.Audio?.Play(Sfx.Upgrade); }, UiKit.Warn, 26, 80);
+            B.Button(powerUp, () => S.Power.IsMax(fid) ? T("ui.max_level") : C.TF("power.upgrade", C.M(S.Power.UpgradeCost(fid))),
+                () => !S.Power.IsMax(fid) && S.Wallet.CanAfford(S.Power.UpgradeCost(fid)));
+            powerRow.Add(powerUp);
+            box.Add(powerRow);
+
             var unlock = UiKit.Button("", () =>
             {
                 int next = NextLockedLine(fid);

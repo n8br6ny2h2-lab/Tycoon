@@ -32,6 +32,12 @@ namespace FactoryKing.Runtime.UI
                 card.Add(head);
                 var final = s.Content.GetProduct(s.Content.GetMachine(def.MachineChain[def.MachineChain.Count - 1]).OutputProductId);
                 card.Add(UiKit.Label(TF("map.product", T(final.NameKey)), 28, false, UiKit.Muted));
+                card.Add(B.Text(UiKit.Label("", 28, false, UiKit.Diamond), () =>
+                {
+                    double f = s.Market.PriceFactor(def.Id);
+                    string pct = (f >= 1 ? "+" : "") + Mathf.RoundToInt((float)((f - 1) * 100)) + "%";
+                    return TF("market.price", pct) + (s.Market.HotFactoryId(s.Time.TrustedNow) == def.Id ? "  ★ " + T("market.hot") : "");
+                }));
 
                 if (owned)
                 {
@@ -134,6 +140,21 @@ namespace FactoryKing.Runtime.UI
                 assign.style.flexGrow = 1;
                 row.Add(assign);
                 card.Add(row);
+
+                card.Add(UiKit.Label(T(d.AbilityKey) + " — " + T(d.AbilityKey + ".desc"), 26, false, UiKit.Diamond, true));
+                var ability = UiKit.Button("", () =>
+                {
+                    if (s.Managers.TryUseAbility(d.Id)) C.Audio?.Play(Sfx.Success);
+                }, UiKit.Good);
+                B.Button(ability, () =>
+                {
+                    double active = s.Managers.AbilityActiveRemaining(d.Id);
+                    if (active > 0) return TF("ability.active", NumberFormatter.FormatDuration(active));
+                    double cd = s.Managers.AbilityCooldownRemaining(d.Id);
+                    if (cd > 0) return TF("ability.cooldown", NumberFormatter.FormatDuration(cd));
+                    return owned.AssignedFactoryId == null ? T("ability.assign_first") : T("ability.use");
+                }, () => s.Managers.CanUseAbility(d.Id));
+                card.Add(ability);
             }
         }
 

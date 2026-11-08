@@ -37,6 +37,13 @@ namespace FactoryKing.Core.Economy
         /// <summary>Maximum units loaded per shipping cycle (truck size). Partial loads are allowed.</summary>
         public static int ShippingBatch(MachineDef def, int level, EconomyTuning t) => def.InputPerCycle;
 
+        /// <summary>Electrical load while running; bigger (upgraded) machines draw more power.</summary>
+        public static double PowerKw(MachineDef def, int level, EconomyTuning t)
+        {
+            level = ClampLevel(level, t);
+            return def.PowerKw * (1d + t.PowerPerLevel * (level - 1));
+        }
+
         public static double MaintenancePerSecond(MachineDef def, int level, EconomyTuning t)
         {
             level = ClampLevel(level, t);

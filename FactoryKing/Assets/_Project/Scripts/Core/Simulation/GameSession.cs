@@ -37,6 +37,8 @@ namespace FactoryKing.Core.Simulation
         public BoostService Boosts { get; }
         public PurchaseService Purchases { get; }
         public RewardedAdService Ads { get; }
+        public PowerService Power { get; }
+        public MarketService Market { get; }
 
         private double _metaTimer;
 
@@ -69,9 +71,14 @@ namespace FactoryKing.Core.Simulation
             Boosts = new BoostService(this);
             Purchases = new PurchaseService(this, catalog ?? StoreCatalog.CreateDefault());
             Ads = new RewardedAdService(this);
+            Power = new PowerService(this);
+            Market = new MarketService(this);
 
             ApplyAllModifiers();
 
+            Upgrades.MachineUpgraded += (r, from, to) => Power.Apply();
+            Factories.LineUnlocked += (f, l) => Power.Apply();
+            Factories.FactoryUnlocked += f => Power.Apply();
             Upgrades.MachineUpgraded += (r, from, to) =>
             {
                 if (State.Stats.Upgrades == to - from) Analytics.Track(AnalyticsEvents.FirstUpgrade, "machine", r.ToString());
@@ -87,6 +94,9 @@ namespace FactoryKing.Core.Simulation
             Managers.Apply();
             Purchases.ApplyEntitlements();
             Boosts.Apply();
+            Managers.ApplyAbilities();
+            Market.Apply();
+            Power.Apply(); // last: demand depends on the other modifiers only through utilisation ratios
         }
 
         /// <summary>
@@ -97,6 +107,11 @@ namespace FactoryKing.Core.Simulation
         {
             bool rollback = Time.IsRolledBack;
             double away = Time.ConsumeElapsedSinceSave();
+            // Expire boosts/abilities and refresh market prices before valuing the time away.
+            Boosts.Apply();
+            Managers.ApplyAbilities();
+            Market.Apply();
+            Power.Apply();
             var report = Offline.Begin(away, rollback);
             State.Stats.SessionCount++;
             MetaTick();
@@ -122,6 +137,9 @@ namespace FactoryKing.Core.Simulation
         public void MetaTick()
         {
             Boosts.Apply();
+            Managers.ApplyAbilities();
+            Market.Apply();
+            Power.Apply();
             Missions.Refresh();
             Orders.Refresh();
             Achievements.Evaluate();

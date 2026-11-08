@@ -14,7 +14,7 @@ Durum işaretleri:
 - Oyun mantığı Unity'den bağımsız C# çekirdeğinde (netstandard2.1, C# 9). .NET 8 ile derlenip test ediliyor.
 - Unity runtime kodu `UnityEngine.Modules 2021.3.33` referanslarına karşı derleniyor; bu API Unity 6'nın bir alt kümesi.
 - Editor betikleri, IAP adaptörü, iOS native eklentisi ve PlayMode testleri burada derlenemiyor.
-- Kontrol komutu: `FactoryKing/Tools/run-checks.sh`. Son sonuç: **127/127 test geçti, derleme uyarısı yok.**
+- Kontrol komutu: `FactoryKing/Tools/run-checks.sh`. Son sonuç: **137/137 test geçti, derleme uyarısı yok.**
 
 ## Aşama 1 — Proje, sahne, kamera
 | İş | Durum |
@@ -46,6 +46,7 @@ Durum işaretleri:
 | Prestij ("Taç"): önizleme, kazanılan/korunan/sıfırlanan listesi, rozet ve dekorasyon, başlangıç bonusları | ✅ |
 | Araştırma ağacı (6 dal, kalıcı) | ✅ |
 | Denge koruması: "ideal oyuncu" botu testi | ✅ |
+| Benzer oyunlardan uyarlanan yeni mekanikler: santral/elektrik şebekesi, yaşayan piyasa, yönetici yetenekleri, artırılmış zorluk eğrisi | ✅ çekirdek / 🟢 UI ve 3D santral |
 
 ## Aşama 5 — Arayüz, ses, animasyon
 | İş | Durum |

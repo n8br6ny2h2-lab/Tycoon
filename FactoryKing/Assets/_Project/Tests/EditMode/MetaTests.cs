@@ -156,7 +156,7 @@ namespace FactoryKing.Tests
             double off = _s.Offline.Calculate(3600).Earnings.ToDouble();
             _s.Managers.Assign("mgr_selin", "steel");
             Assert.That(_s.PotentialNetPerSecond, Is.EqualTo(live));
-            Assert.That(_s.Offline.Calculate(3600).Earnings.ToDouble(), Is.GreaterThan(off * 1.2));
+            Assert.That(_s.Offline.Calculate(3600).Earnings.ToDouble(), Is.EqualTo(off * 1.2).Within(off * 1e-9), "Epic manager: +20% offline at level 1");
         }
 
         // ---------------- prestige ----------------
@@ -178,7 +178,7 @@ namespace FactoryKing.Tests
             _s.Managers.TryHire("mgr_kemal");
             _s.State.Research["res_speed"] = 3;
             _s.State.AchievementsUnlocked.Add("ach_first_upgrade");
-            _s.Wallet.Earn(1e9);
+            _s.Wallet.Earn(1e10);
             _s.Factories.TryUnlockFactory("food");
             _s.State.Cash = 1e9;
             _s.Upgrades.TryUpgrade(new MachineRef("steel", 0, 0), 30);
@@ -187,7 +187,7 @@ namespace FactoryKing.Tests
 
             var pv = _s.Prestige.Preview();
             Assert.That(pv.Available, Is.True);
-            Assert.That(pv.CrownsGained, Is.EqualTo(Math.Floor(Math.Pow(_s.State.RunEarnings.ToDouble() / 1e7, 0.25) + 1e-9)));
+            Assert.That(pv.CrownsGained, Is.EqualTo(Math.Floor(Math.Pow(_s.State.RunEarnings.ToDouble() / _s.Tuning.PrestigeCrownDivisor, _s.Tuning.PrestigeExponent) + 1e-9)));
             Assert.That(_s.Prestige.TryPrestige(), Is.True);
 
             Assert.That(_s.State.GetMachine(new MachineRef("steel", 0, 0)).Level, Is.EqualTo(1));
@@ -202,17 +202,18 @@ namespace FactoryKing.Tests
             Assert.That(_s.State.Collection, Does.Contain(pv.DecorId));
             Assert.That(_s.State.RunEarnings.IsZero, Is.True);
             Assert.That(_s.AnalyzeLine("steel", 0).RevenuePerSecond, Is.GreaterThan(priceBefore * pv.MultiplierAfter * 0.99 / 1.0 - 1e-9).Or.GreaterThan(0));
-            Assert.That(_s.Modifiers.Get(ModifierStat.SellPrice, "steel"), Is.EqualTo(pv.MultiplierAfter).Within(1e-9));
+            Assert.That(_s.Modifiers.Get(ModifierStat.SellPrice, "steel") / _s.Market.PriceFactor("steel"), Is.EqualTo(pv.MultiplierAfter).Within(1e-9));
         }
 
         [Test]
         public void Prestige_Survives_Save_Load()
         {
-            _s.Wallet.Earn(1e9);
+            _s.Wallet.Earn(1e10);
             _s.Prestige.TryPrestige();
             var loaded = new GameSession(_s.Content,
-                state: FactoryKing.Core.Persistence.SaveService.TryDecode(FactoryKing.Core.Persistence.SaveService.Encode(_s.State), _s.Content));
-            Assert.That(loaded.Modifiers.Get(ModifierStat.SellPrice, "steel"), Is.EqualTo(_s.Modifiers.Get(ModifierStat.SellPrice, "steel")));
+                state: FactoryKing.Core.Persistence.SaveService.TryDecode(FactoryKing.Core.Persistence.SaveService.Encode(_s.State), _s.Content),
+                clock: _clock);
+            Assert.That(loaded.Modifiers.Get(ModifierStat.SellPrice, "steel"), Is.EqualTo(_s.Modifiers.Get(ModifierStat.SellPrice, "steel")).Within(1e-12));
         }
 
         // ---------------- research ----------------

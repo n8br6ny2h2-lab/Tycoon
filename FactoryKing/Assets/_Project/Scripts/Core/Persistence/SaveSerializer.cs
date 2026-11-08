@@ -30,7 +30,7 @@ namespace FactoryKing.Core.Persistence
             var factories = JsonValue.NewArray();
             foreach (var f in s.Factories)
             {
-                var fo = JsonValue.NewObject().Set("id", f.FactoryId).Set("unlocked", f.Unlocked);
+                var fo = JsonValue.NewObject().Set("id", f.FactoryId).Set("unlocked", f.Unlocked).Set("power", f.PowerLevel);
                 var lines = JsonValue.NewArray();
                 foreach (var l in f.Lines)
                 {
@@ -69,7 +69,8 @@ namespace FactoryKing.Core.Persistence
 
             var managers = JsonValue.NewArray();
             foreach (var m in s.Managers)
-                managers.Add(JsonValue.NewObject().Set("id", m.Id).Set("lv", m.Level).Set("at", m.AssignedFactoryId));
+                managers.Add(JsonValue.NewObject().Set("id", m.Id).Set("lv", m.Level).Set("at", m.AssignedFactoryId)
+                    .Set("abEnd", m.AbilityEndUtcTicks.ToString()).Set("abReady", m.AbilityReadyUtcTicks.ToString()));
             o.Set("managers", managers);
 
             o.Set("prestige", JsonValue.NewObject().Set("count", s.Prestige.Count).Set("crowns", s.Prestige.Crowns)
@@ -131,7 +132,7 @@ namespace FactoryKing.Core.Persistence
             foreach (var fo in o.Arr("factories").Items)
             {
                 if (fo.Type != JsonType.Object) continue;
-                var f = new FactoryState { FactoryId = fo.Str("id"), Unlocked = fo.Bool("unlocked") };
+                var f = new FactoryState { FactoryId = fo.Str("id"), Unlocked = fo.Bool("unlocked"), PowerLevel = fo.Int("power", 1) };
                 foreach (var lo in fo.Arr("lines").Items)
                 {
                     var l = new LineState { Unlocked = lo.Bool("unlocked") };
@@ -180,7 +181,11 @@ namespace FactoryKing.Core.Persistence
             s.Time.ClockRollbacksDetected = t.Int("rollbacks");
 
             foreach (var mo in o.Arr("managers").Items)
-                s.Managers.Add(new ManagerState { Id = mo.Str("id"), Level = mo.Int("lv", 1), AssignedFactoryId = mo.Str("at") });
+                s.Managers.Add(new ManagerState
+                {
+                    Id = mo.Str("id"), Level = mo.Int("lv", 1), AssignedFactoryId = mo.Str("at"),
+                    AbilityEndUtcTicks = Ticks(mo.Str("abEnd")), AbilityReadyUtcTicks = Ticks(mo.Str("abReady")),
+                });
 
             var p = o.Obj("prestige");
             s.Prestige.Count = p.Int("count");

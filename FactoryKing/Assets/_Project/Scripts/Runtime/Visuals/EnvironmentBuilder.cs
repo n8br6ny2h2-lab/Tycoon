@@ -93,6 +93,30 @@ namespace FactoryKing.Runtime.Visuals
                 for (float z = -38f; z < 38f; z += 3f) b.Box(new Vector3(26f, 0.025f, z), new Vector3(0.18f, 0.01f, 1.4f), 0f);
             }, false);
 
+            // Power plant beside the hall: transformers and a cooling tower (feeds the factory grid).
+            _kit.Part(root, "Env.PowerPlant", new Vector3(hallMin.x - 6f, 0, hallMax.y - 4f), b =>
+            {
+                b.Slot = (int)Mat.Concrete;
+                b.Box(new Vector3(0, 0.1f, 0), new Vector3(7f, 0.2f, 7f), 0.05f);
+                b.Slot = (int)Mat.Wall;
+                b.Frustum(new Vector3(-1.4f, 0.2f, 1.2f), 1.8f, 1.2f, 4.2f, 18, false, false);
+                b.Slot = (int)Mat.Accent;
+                b.Cylinder(new Vector3(-1.4f, 4.2f, 1.2f), 1.22f, 0.25f, 18, false);
+                b.Slot = (int)Mat.Metal;
+                for (int i = 0; i < 3; i++)
+                {
+                    b.Box(new Vector3(1.6f, 0.9f, -2.2f + i * 1.6f), new Vector3(1.4f, 1.4f, 1.1f), 0.06f);
+                    b.Slot = (int)Mat.Chrome;
+                    for (int k = -1; k <= 1; k++) b.Cylinder(new Vector3(1.6f + k * 0.4f, 1.6f, -2.2f + i * 1.6f), 0.08f, 0.5f, 6);
+                    b.Slot = (int)Mat.Metal;
+                }
+                b.Slot = (int)Mat.Hazard;
+                b.Box(new Vector3(0, 0.22f, -3.4f), new Vector3(6.8f, 0.02f, 0.12f), 0f);
+                b.Slot = (int)Mat.Metal;
+                b.Box(new Vector3(3.2f, 3.5f, 0), new Vector3(0.12f, 7f, 0.12f), 0f);   // pylon to the hall
+                b.Box(new Vector3(5.4f, 6.9f, 0), new Vector3(4.4f, 0.06f, 0.06f), 0f);  // cable
+            });
+
             // Lamp posts along the yard.
             for (int i = 0; i < 4; i++)
             {

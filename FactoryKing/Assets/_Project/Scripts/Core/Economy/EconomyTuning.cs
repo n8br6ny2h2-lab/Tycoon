@@ -16,6 +16,12 @@ namespace FactoryKing.Core.Economy
 
         /// <summary>Linear output-buffer growth per level (0.05 = +5% per level).</summary>
         public double CapacityPerLevel = 0.05;
+        /// <summary>Linear growth of a machine's power draw per level.</summary>
+        public double PowerPerLevel = 0.06;
+        /// <summary>Power plant capacity gained per level (0.5 = +50% of base).</summary>
+        public double PowerCapacityPerLevel = 0.5;
+        public int MaxPowerLevel = 60;
+
         /// <summary>Linear maintenance growth per level.</summary>
         public double MaintenancePerLevel = 0.06;
 
@@ -35,14 +41,14 @@ namespace FactoryKing.Core.Economy
         /// <summary>Base offline earnings window (hours).</summary>
         public double OfflineCapHours = 8;
         /// <summary>Share of steady-state profit credited while away (the rewarded ad doubles it).</summary>
-        public double OfflineEfficiency = 0.6;
+        public double OfflineEfficiency = 0.5;
         /// <summary>Away time below this is not reported as offline earnings (seconds).</summary>
         public double OfflineMinimumSeconds = 60;
 
         /// <summary>Run earnings needed before prestige is offered.</summary>
-        public double PrestigeMinRunEarnings = 1e8;
+        public double PrestigeMinRunEarnings = 1e9;
         /// <summary>Crowns = floor((runEarnings / PrestigeCrownDivisor) ^ PrestigeExponent).</summary>
-        public double PrestigeCrownDivisor = 1e7;
+        public double PrestigeCrownDivisor = 1e8;
         /// <summary>
         /// Fourth root: each extra crown needs much more income, so prestige multiplies progress without the
         /// runaway loop a square root causes (verified by the 24 h progression probe).
