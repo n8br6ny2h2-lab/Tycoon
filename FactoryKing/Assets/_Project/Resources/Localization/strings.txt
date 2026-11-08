@@ -1,0 +1,90 @@
+# Factory King localisation table. Columns: key<TAB>English<TAB>Türkçe. UTF-8. "\n" = new line.
+game.title	Factory King	Fabrika Kralı
+factory.steel	Iron & Steel Works	Demir Çelik Fabrikası
+factory.food	Food Factory	Gıda Fabrikası
+factory.plastic	Plastics Plant	Plastik Fabrikası
+factory.textile	Textile Mill	Tekstil Fabrikası
+factory.electronics	Electronics Factory	Elektronik Fabrikası
+product.iron_ore	Iron Ore	Demir Cevheri
+product.molten_steel	Molten Steel	Erimiş Çelik
+product.steel_beam	Steel Beam	Çelik Kiriş
+product.steel_bundle	Steel Bundle	Çelik Paket
+product.wheat	Wheat	Buğday
+product.flour	Flour	Un
+product.bread	Bread	Ekmek
+product.bread_crate	Bread Crate	Ekmek Kasası
+product.crude_feed	Crude Feedstock	Petrol Girdisi
+product.plastic_granule	Plastic Granules	Plastik Granül
+product.plastic_part	Plastic Part	Plastik Ürün
+product.plastic_box	Plastic Goods Box	Plastik Ürün Kolisi
+product.cotton	Cotton	Pamuk
+product.fabric	Fabric	Kumaş
+product.garment	Garment	Giysi
+product.garment_pack	Garment Pack	Giysi Paketi
+product.silicon_wafer	Silicon Wafer	Silikon Pul
+product.circuit_board	Circuit Board	Devre Kartı
+product.smart_device	Smart Device	Akıllı Cihaz
+product.device_box	Device Box	Cihaz Kutusu
+machine.steel_ore_unloader	Ore Unloader	Cevher Boşaltıcı
+machine.steel_blast_furnace	Blast Furnace	Yüksek Fırın
+machine.steel_beam_cutter	Beam Cutter	Kiriş Kesici
+machine.steel_bundler	Beam Bundler	Kiriş Paketleyici
+machine.steel_yard	Steel Yard	Çelik Sahası
+machine.steel_flatbed_dock	Flatbed Dock	Tır Rampası
+machine.food_grain_silo	Grain Silo	Tahıl Silosu
+machine.food_flour_mill	Flour Mill	Un Değirmeni
+machine.food_bread_oven	Tunnel Oven	Tünel Fırın
+machine.food_wrapper	Bread Wrapper	Ekmek Paketleyici
+machine.food_cold_store	Cold Store	Soğuk Hava Deposu
+machine.food_reefer_dock	Reefer Dock	Frigorifik Rampa
+machine.plastic_crude_pump	Feedstock Pump	Girdi Pompası
+machine.plastic_pelletizer	Pelletizer	Granül Makinesi
+machine.plastic_injection_molder	Injection Molder	Enjeksiyon Kalıplama
+machine.plastic_box_packer	Box Packer	Koli Paketleyici
+machine.plastic_warehouse	Plastics Warehouse	Plastik Deposu
+machine.plastic_container_dock	Container Dock	Konteyner Rampası
+machine.textile_cotton_gin	Cotton Gin	Çırçır Makinesi
+machine.textile_loom	Power Loom	Dokuma Tezgâhı
+machine.textile_cut_and_sew	Cut & Sew Line	Kesim ve Dikim Hattı
+machine.textile_folder	Garment Folder	Giysi Katlayıcı
+machine.textile_warehouse	Textile Warehouse	Tekstil Deposu
+machine.textile_box_truck_dock	Box Truck Dock	Kamyon Rampası
+machine.elec_wafer_loader	Wafer Loader	Pul Yükleyici
+machine.elec_pcb_etcher	PCB Etcher	Devre Aşındırıcı
+machine.elec_robot_assembly	Robot Assembly Cell	Robotik Montaj Hücresi
+machine.elec_retail_packer	Retail Packer	Perakende Paketleyici
+machine.elec_cleanroom_store	Clean-Room Store	Temiz Oda Deposu
+machine.elec_courier_dock	Courier Dock	Kargo Rampası
+stage.RawInput	Raw Input	Hammadde Girişi
+stage.Processing	Processing	İşleme
+stage.Production	Production	Üretim
+stage.Packaging	Packaging	Paketleme
+stage.Storage	Storage	Depolama
+stage.Shipping	Shipping	Satış ve Sevkiyat
+status.Idle	Idle	Boşta
+status.Working	Working	Çalışıyor
+status.Starved	Waiting for input	Girdi bekliyor
+status.Blocked	Output full	Çıkış dolu
+ui.cash	Cash	Para
+ui.diamonds	Diamonds	Elmas
+ui.income_per_sec	{0}/s	{0}/sn
+ui.net_per_hour	Profit/hour: {0}	Saatlik kâr: {0}
+ui.company_value	Company value: {0}	Şirket değeri: {0}
+ui.company_level	Company Lv. {0}	Şirket Sv. {0}
+ui.level	Level {0}	Seviye {0}
+ui.upgrade	Upgrade	Yükselt
+ui.upgrade_x1	x1	x1
+ui.upgrade_x10	x10	x10
+ui.upgrade_max	MAX	MAKS
+ui.max_level	Max level	Maksimum seviye
+ui.unlock_line	Unlock line {0}: {1}	{0}. hattı aç: {1}
+ui.unlock_factory	Buy factory: {0}	Fabrikayı satın al: {0}
+ui.locked	Locked	Kilitli
+ui.cycle_time	Cycle: {0}s	Döngü: {0} sn
+ui.capacity	Capacity: {0}	Kapasite: {0}
+ui.buffer	Stock: {0}/{1}	Stok: {0}/{1}
+ui.bottleneck	Bottleneck	Darboğaz
+ui.debt	Unpaid costs: {0}	Ödenmemiş gider: {0}
+ui.language	Language: English	Dil: Türkçe
+ui.sold_per_min	Sold/min: {0}	Satış/dk: {0}
+ui.close	Close	Kapat

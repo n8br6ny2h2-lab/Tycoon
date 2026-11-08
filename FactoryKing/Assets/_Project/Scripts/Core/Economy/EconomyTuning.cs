@@ -1,0 +1,37 @@
+using System;
+
+namespace FactoryKing.Core.Economy
+{
+    /// <summary>Global economy knobs. Serializable so the Unity layer can mirror it in a ScriptableObject.</summary>
+    [Serializable]
+    public sealed class EconomyTuning
+    {
+        public int MaxMachineLevel = 100;
+
+        /// <summary>Linear speed gain per level (0.1 = +10% per level).</summary>
+        public double SpeedPerLevel = 0.10;
+        /// <summary>Levels that double speed when reached.</summary>
+        public int[] SpeedMilestones = { 10, 25, 50, 75, 100 };
+        public double MilestoneSpeedMultiplier = 2.0;
+
+        /// <summary>Linear output-buffer growth per level (0.05 = +5% per level).</summary>
+        public double CapacityPerLevel = 0.05;
+        /// <summary>Linear maintenance growth per level.</summary>
+        public double MaintenancePerLevel = 0.06;
+
+        /// <summary>Levels at which a machine's visual tier changes (index = tier).</summary>
+        public int[] VisualTierLevels = { 1, 10, 25, 50, 75, 100 };
+
+        public double StartingCash = 60;
+        public long StartingDiamonds = 25;
+
+        /// <summary>Company value = cash + invested * InvestedAssetWeight + netIncomePerSecond * IncomeValuationSeconds.</summary>
+        public double InvestedAssetWeight = 0.6;
+        public double IncomeValuationSeconds = 600;
+
+        /// <summary>Rolling window for income statistics, seconds.</summary>
+        public int StatsWindowSeconds = 60;
+
+        public static EconomyTuning CreateDefault() => new EconomyTuning();
+    }
+}

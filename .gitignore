@@ -1,0 +1,33 @@
+# Unity
+FactoryKing/[Ll]ibrary/
+FactoryKing/[Tt]emp/
+FactoryKing/[Oo]bj/
+FactoryKing/[Bb]uild/
+FactoryKing/[Bb]uilds/
+FactoryKing/[Ll]ogs/
+FactoryKing/[Uu]ser[Ss]ettings/
+FactoryKing/MemoryCaptures/
+FactoryKing/*.csproj
+FactoryKing/*.sln
+FactoryKing/*.slnx
+FactoryKing/.vs/
+FactoryKing/.idea/
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+sysinfo.txt
+crashlytics-build.properties
+
+# .NET tooling (outside Assets)
+FactoryKing/Tools/**/bin/
+FactoryKing/Tools/**/obj/
+FactoryKing/Tools/**/TestResults/
+
+# Xcode / iOS output
+*.ipa
+*.dSYM.zip
+*.xcarchive
+
+# OS
+.DS_Store
+Thumbs.db
