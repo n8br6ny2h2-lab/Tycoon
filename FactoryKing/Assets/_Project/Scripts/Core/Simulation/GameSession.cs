@@ -39,6 +39,8 @@ namespace FactoryKing.Core.Simulation
         public RewardedAdService Ads { get; }
         public PowerService Power { get; }
         public MarketService Market { get; }
+        public CosmeticService Cosmetics { get; }
+        public SeasonService Seasons { get; }
 
         private double _metaTimer;
 
@@ -73,6 +75,9 @@ namespace FactoryKing.Core.Simulation
             Ads = new RewardedAdService(this);
             Power = new PowerService(this);
             Market = new MarketService(this);
+            Cosmetics = new CosmeticService(this);
+            Seasons = new SeasonService(this);
+            Seasons.EnsureStarted();
 
             ApplyAllModifiers();
 
@@ -96,6 +101,7 @@ namespace FactoryKing.Core.Simulation
             Boosts.Apply();
             Managers.ApplyAbilities();
             Market.Apply();
+            Seasons.Apply();
             Power.Apply(); // last: demand depends on the other modifiers only through utilisation ratios
         }
 
@@ -107,6 +113,7 @@ namespace FactoryKing.Core.Simulation
         {
             bool rollback = Time.IsRolledBack;
             double away = Time.ConsumeElapsedSinceSave();
+            Seasons.Tick(); // a season that ended while away resets before offline earnings are valued
             // Expire boosts/abilities and refresh market prices before valuing the time away.
             Boosts.Apply();
             Managers.ApplyAbilities();
@@ -143,6 +150,7 @@ namespace FactoryKing.Core.Simulation
             Missions.Refresh();
             Orders.Refresh();
             Achievements.Evaluate();
+            Seasons.Tick();
         }
 
         public LineReport AnalyzeLine(string factoryId, int line) =>

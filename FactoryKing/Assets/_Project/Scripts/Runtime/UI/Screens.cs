@@ -422,7 +422,7 @@ namespace FactoryKing.Runtime.UI
                 card.Add(B.Text(UiKit.Label("", 28), () =>
                     TF("events.progress", (long)Math.Min(p.Target, s.Events.Value(ev)), (long)p.Target,
                        NumberFormatter.FormatDuration((ev.EndUtc - s.Time.TrustedNow).TotalSeconds))));
-                long dia = ev.RewardDiamonds * (s.Purchases.Owns(StoreCatalog.EntitlementSeasonPass) ? 2 : 1);
+                long dia = ev.RewardDiamonds * (s.Seasons.HasPremium ? 2 : 1);
                 card.Add(UiKit.Label(TF("events.reward", dia, T("decor." + ev.RewardDecorId)), 28, false, UiKit.Warn, true));
                 var claim = UiKit.Button("", () => { if (s.Events.TryClaim(ev)) { C.Audio?.Play(Sfx.Success); Rebuild(); } }, UiKit.Good);
                 B.Button(claim, () => p.Claimed ? T("ui.claimed") : T("ui.claim"), () => !p.Claimed && s.Events.Value(ev) >= p.Target);
@@ -490,6 +490,7 @@ namespace FactoryKing.Runtime.UI
         {
             (string key, string id)[] items =
             {
+                ("screen.season", "season"), ("screen.cosmetics", "cosmetics"),
                 ("screen.orders", "orders"), ("screen.research", "research"), ("screen.warehouse", "warehouse"),
                 ("screen.daily", "daily"), ("screen.achievements", "achievements"), ("screen.events", "events"),
                 ("screen.prestige", "prestige"), ("screen.settings", "settings"),

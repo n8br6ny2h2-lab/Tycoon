@@ -40,8 +40,8 @@ namespace FactoryKing.Core.Meta
         public double CrownsFor(BigDouble runEarnings)
         {
             if (!runEarnings.IsPositive) return 0;
-            double ratio = (runEarnings / _s.Tuning.PrestigeCrownDivisor).ToDouble();
-            return Math.Floor(Math.Pow(Math.Max(0, ratio), _s.Tuning.PrestigeExponent) + 1e-9);
+            double log = runEarnings.Log10() - Math.Log10(_s.Tuning.PrestigeCrownDivisor);
+            return log <= 0 ? 0 : Math.Floor(_s.Tuning.PrestigeLogFactor * log + 1e-9);
         }
 
         public double MultiplierFor(double crowns) => 1d + crowns * _s.Tuning.PrestigeBonusPerCrown;

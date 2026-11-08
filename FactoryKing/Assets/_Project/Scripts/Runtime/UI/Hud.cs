@@ -79,6 +79,8 @@ namespace FactoryKing.Runtime.UI
             right.style.alignItems = Align.FlexEnd;
             right.Add(B.Text(UiKit.Label("", 42, true, UiKit.Diamond), () => "◆ " + S.Wallet.Diamonds));
             right.Add(B.Text(UiKit.Label("", 30, false, UiKit.Muted), () => C.TF("ui.company_level", S.CompanyLevel)));
+            right.Add(B.Text(UiKit.Label("", 26, false, UiKit.Warn), () =>
+                C.TF("hud.season_left", S.Seasons.Number, NumberFormatter.FormatDuration(S.Seasons.SecondsLeft))));
             row.Add(right);
             bar.Add(row);
             var debt = B.Text(UiKit.Label("", 28, false, UiKit.Warn), () => C.TF("ui.debt", C.M(S.Wallet.Debt)));
@@ -113,6 +115,8 @@ namespace FactoryKing.Runtime.UI
                 UiKit.Warn, () => C.Ui.Open("orders"));
             Chip("event", () => T("hud.event_live"), () => S.Events.Active().Count > 0, UiKit.Diamond, () => C.Ui.Open("events"));
             Chip("prestige", () => T("hud.prestige_ready"), () => S.Prestige.Preview().Available, UiKit.Accent, () => C.Ui.Open("prestige"));
+            Chip("season", () => C.TF("hud.season_reward", S.Seasons.ClaimableCount), () => S.Seasons.ClaimableCount > 0,
+                UiKit.Diamond, () => C.Ui.Open("season"));
             Chip("power", () => T("hud.power_low"), () => S.Power.Throttle(S.State.ActiveFactoryId) < 0.999, UiKit.Bad, () => Select(null));
             Chip("ability", () => T("hud.ability_ready"), () =>
             {

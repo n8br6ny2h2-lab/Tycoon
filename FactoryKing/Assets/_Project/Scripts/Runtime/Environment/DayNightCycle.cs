@@ -36,6 +36,9 @@ namespace FactoryKing.Runtime.EnvironmentFx
 
         public float NightAmount { get; private set; }
 
+        /// <summary>Sky cosmetic tint (null = natural sky).</summary>
+        public Color? SkyTint { get; set; }
+
         public void Init(Light sun, Camera backgroundCamera)
         {
             _sun = sun;
@@ -71,7 +74,14 @@ namespace FactoryKing.Runtime.EnvironmentFx
             RenderSettings.ambientEquatorColor = _equatorColor.Evaluate(timeOfDay);
             RenderSettings.ambientGroundColor = _groundColor.Evaluate(timeOfDay);
             RenderSettings.fogColor = _equatorColor.Evaluate(timeOfDay);
-            if (_camera != null) _camera.backgroundColor = Color.Lerp(RenderSettings.ambientSkyColor, RenderSettings.fogColor, 0.5f);
+            var sky = Color.Lerp(RenderSettings.ambientSkyColor, RenderSettings.fogColor, 0.5f);
+            if (SkyTint.HasValue)
+            {
+                var tint = SkyTint.Value * Mathf.Lerp(0.35f, 1f, daylight);
+                sky = Color.Lerp(sky, tint, 0.7f);
+                RenderSettings.fogColor = Color.Lerp(RenderSettings.fogColor, tint, 0.5f);
+            }
+            if (_camera != null) _camera.backgroundColor = sky;
 
             NightAmount = 1f - daylight;
             // Notify only when crossing thresholds to avoid per-frame material swaps.

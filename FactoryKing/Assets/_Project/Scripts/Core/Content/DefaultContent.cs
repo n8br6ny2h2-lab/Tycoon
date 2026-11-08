@@ -7,7 +7,7 @@ namespace FactoryKing.Core.Content
     /// Built-in game catalogue: 5 factories x 6 machines (30 machine variants), each factory with 3 production lines.
     /// All numbers are tuning data; the Unity layer may override them from a ScriptableObject/JSON later.
     /// </summary>
-    public static class DefaultContent
+    public static partial class DefaultContent
     {
         public const string Steel = "steel";
         public const string Food = "food";
@@ -16,6 +16,16 @@ namespace FactoryKing.Core.Content
         public const string Electronics = "electronics";
 
         private static readonly double[] BaseLineCosts = { 0, 750, 40000 };
+
+        /// <summary>Total number of factories (5 hand-made + 15 generated from <see cref="ExtraFactories"/>).</summary>
+        public const int FactoryCount = 20;
+        /// <summary>Value scale between consecutive factories.</summary>
+        public const double ScaleRatio = 30;
+        /// <summary>
+        /// Unlock price growth between consecutive factories from the 6th on, tuned with the season pacing test so an
+        /// average player (4 short sessions a day) reaches the 20th factory near the end of a 30-day season.
+        /// </summary>
+        public const double UnlockRatioStart = 85, UnlockRatioDecay = 0.96;
 
         public static GameContent Create()
         {
@@ -60,7 +70,7 @@ namespace FactoryKing.Core.Content
                 });
 
             // ---------------- 3. Plastic: crude feed -> granules -> moulded goods -> boxes ----------------
-            AddFactory(c, Plastic, order: 2, scale: 900, unlockCost: 2000000, rawCost: 1.2, growth: 1.17,
+            AddFactory(c, Plastic, order: 2, scale: 900, unlockCost: 6000000, rawCost: 1.2, growth: 1.17,
                 products: new[]
                 {
                     P("crude_feed", "#2B2B33", 0),
@@ -79,7 +89,7 @@ namespace FactoryKing.Core.Content
                 });
 
             // ---------------- 4. Textile: cotton -> fabric -> garments -> folded packs ----------------
-            AddFactory(c, Textile, order: 3, scale: 27000, unlockCost: 90000000, rawCost: 0.8, growth: 1.18,
+            AddFactory(c, Textile, order: 3, scale: 27000, unlockCost: 400000000, rawCost: 0.8, growth: 1.18,
                 products: new[]
                 {
                     P("cotton", "#F5F5F0", 0),
@@ -98,7 +108,7 @@ namespace FactoryKing.Core.Content
                 });
 
             // ---------------- 5. Electronics: silicon -> circuits -> devices -> retail boxes ----------------
-            AddFactory(c, Electronics, order: 4, scale: 810000, unlockCost: 4500000000, rawCost: 1.5, growth: 1.19,
+            AddFactory(c, Electronics, order: 4, scale: 810000, unlockCost: 30000000000, rawCost: 1.5, growth: 1.19,
                 products: new[]
                 {
                     P("silicon_wafer", "#90A4AE", 0),
@@ -115,6 +125,38 @@ namespace FactoryKing.Core.Content
                     M("elec_cleanroom_store", MachineCategory.Storage, StageType.Storage, MachineVisual.Warehouse, "device_box", 1, "device_box", 1, 0.6, 30, 11, 1.5, 0.006),
                     M("elec_courier_dock", MachineCategory.Shipping, StageType.Shipping, MachineVisual.Dock, "device_box", 4, "device_box", 4, 8.0, 0, 26, 0.5, 0.01),
                 });
+
+            // ---------------- 6..20: generated industries ----------------
+            double unlock = 30000000000;
+            for (int i = 0; i < ExtraFactories.Length; i++)
+            {
+                var spec = ExtraFactories[i];
+                int order = 5 + i;
+                unlock *= UnlockRatioStart * System.Math.Pow(UnlockRatioDecay, i); // steep mid-game, gentler finish
+                double scale = System.Math.Pow(ScaleRatio, order);
+                double cycleMul = 1 + 0.04 * (i % 4);
+                double kwMul = 1 + 0.12 * order;
+                bool doubleProduction = i % 2 == 0;
+                string[] p = { spec.Products[0].id, spec.Products[1].id, spec.Products[2].id, spec.Products[3].id };
+                AddFactory(c, spec.Id, order, scale, unlock, rawCost: 0.8 + 0.1 * (i % 5), growth: 1.20,
+                    products: new[]
+                    {
+                        P(p[0], spec.Products[0].color, 0),
+                        P(p[1], spec.Products[1].color, 0),
+                        P(p[2], spec.Products[2].color, 0),
+                        P(p[3], spec.Products[3].color, doubleProduction ? 9 + i % 4 : 14 + i % 5),
+                    },
+                    machines: new[]
+                    {
+                        M(spec.Machines[0].id, spec.Machines[0].cat, StageType.RawInput, spec.Machines[0].visual, null, 1, p[0], 1, 0.8 * cycleMul, 14, 9, 1.5 * kwMul, 0.006),
+                        M(spec.Machines[1].id, spec.Machines[1].cat, StageType.Processing, spec.Machines[1].visual, p[0], 2, p[1], 1, 1.8 * cycleMul, 10, 16, 5 * kwMul, 0.018),
+                        M(spec.Machines[2].id, spec.Machines[2].cat, StageType.Production, spec.Machines[2].visual, p[1], 1, p[2], doubleProduction ? 2 : 1, 2.4 * cycleMul, 12, 22, 5 * kwMul, 0.02),
+                        M(spec.Machines[3].id, spec.Machines[3].cat, StageType.Packaging, spec.Machines[3].visual, p[2], doubleProduction ? 2 : 1, p[3], 1, 1.5 * cycleMul, 10, 12, 1.2 * kwMul, 0.01),
+                        M(spec.Machines[4].id, spec.Machines[4].cat, StageType.Storage, spec.Machines[4].visual, p[3], 1, p[3], 1, 0.55, 36, 10, 0.6 * kwMul, 0.005),
+                        M(spec.Machines[5].id, spec.Machines[5].cat, StageType.Shipping, spec.Machines[5].visual, p[3], 5, p[3], 5, 7.5 * cycleMul, 0, 25, 0.5 * kwMul, 0.01),
+                    });
+                c.Factories[c.Factories.Count - 1].ThemeId = spec.Id;
+            }
 
             c.InvalidateLookups();
             return c;
@@ -173,6 +215,27 @@ namespace FactoryKing.Core.Content
             factory.BasePowerCapacityKw = Math.Round(chainKw * 1.6, 1);
             factory.PowerUpgradeBaseCost = 150 * scale;
             c.Factories.Add(factory);
+        }
+    }
+}
+
+namespace FactoryKing.Core.Content
+{
+    /// <summary>Compact description of a generated factory (see Tools/ContentGen/factories.py).</summary>
+    internal sealed class ExtraFactorySpec
+    {
+        public readonly string Id;
+        public readonly string[] Theme;
+        public readonly (string id, string color)[] Products;
+        public readonly (string id, MachineCategory cat, MachineVisual visual)[] Machines;
+
+        public ExtraFactorySpec(string id, string[] theme, (string id, string color)[] products,
+            (string id, MachineCategory cat, MachineVisual visual)[] machines)
+        {
+            Id = id;
+            Theme = theme;
+            Products = products;
+            Machines = machines;
         }
     }
 }

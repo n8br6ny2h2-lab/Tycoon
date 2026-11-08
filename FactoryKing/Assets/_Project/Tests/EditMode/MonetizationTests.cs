@@ -41,7 +41,7 @@ namespace FactoryKing.Tests
         [Test]
         public void Catalog_Has_All_Required_Products()
         {
-            foreach (var id in new[] { "diamonds_small", "diamonds_medium", "diamonds_large", "no_ads", "starter_pack", "vip", "cosmetic_gold", "season_pass_s1" })
+            foreach (var id in new[] { "diamonds_small", "diamonds_medium", "diamonds_large", "no_ads", "starter_pack", "vip", "cosmetic_gold", "cosmetic_neon", "season_pass" })
                 Assert.That(Catalog.ById(id), Is.Not.Null, id);
             var custom = StoreCatalog.CreateDefault("com.acme.fk.");
             Assert.That(custom.ById("vip").StoreId, Is.EqualTo("com.acme.fk.vip"));

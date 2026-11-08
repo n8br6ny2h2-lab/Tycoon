@@ -187,7 +187,7 @@ namespace FactoryKing.Tests
 
             var pv = _s.Prestige.Preview();
             Assert.That(pv.Available, Is.True);
-            Assert.That(pv.CrownsGained, Is.EqualTo(Math.Floor(Math.Pow(_s.State.RunEarnings.ToDouble() / _s.Tuning.PrestigeCrownDivisor, _s.Tuning.PrestigeExponent) + 1e-9)));
+            Assert.That(pv.CrownsGained, Is.EqualTo(Math.Floor(_s.Tuning.PrestigeLogFactor * Math.Log10(_s.State.RunEarnings.ToDouble() / _s.Tuning.PrestigeCrownDivisor) + 1e-9)));
             Assert.That(_s.Prestige.TryPrestige(), Is.True);
 
             Assert.That(_s.State.GetMachine(new MachineRef("steel", 0, 0)).Level, Is.EqualTo(1));

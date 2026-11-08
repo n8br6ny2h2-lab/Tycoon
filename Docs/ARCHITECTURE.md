@@ -103,3 +103,21 @@ Sadece **tür mekanikleri** uyarlandı. Hiçbir oyunun adı, karakteri, görseli
 - `UiManager` / `Hud` / `Screens`: UI Toolkit arayüzü kodla kuruluyor. Referans çözünürlük 1080x1920, güvenli alana uyuyor, dokunma hedefleri en az 96 px. Canlı değerler saniyede 5 kez güncelleniyor.
 - `AudioManager`: tüm sesler çalışma anında sentezleniyor; telif riski yok.
 - `SaveManager`, `NativeBridge` (iCloud ve bildirimler), `GameCenterService`, `StoreController` + `IStoreBackend`, `PlatformRegistry` (isteğe bağlı SDK assembly'leri kendilerini buraya kaydeder).
+
+## Sezonlar, 20 fabrika ve dekorasyon
+
+- **20 fabrika:** 5 elle tasarlanmış ve 15 üretilmiş sanayi kolu (`Tools/ContentGen/factories.py` → `ExtraFactories.cs`, `ThemeExtra.cs` ve TR/EN metinler). Toplam 120 makine.
+- **Sezon (30 gün, oyuncunun kendi başlangıcından itibaren):** fabrika sayısı eşiklerine (2…20) bağlı 12 ödül kademesi var: elmas, miras yıldızı ve dekorasyon. Sezon bitince ya da 20 fabrika tamamlanıp oyuncu isterse tur sıfırlanır.
+  - Kalıcı olanlar: elmaslar, dekorasyonlar, başarımlar, yöneticiler (seviye 1'e döner), miras yıldızları (yıldız başına +%5 satış fiyatı), satın alımlar ve istatistikler.
+  - Sıfırlananlar: fabrikalar, para, araştırma, taçlar ve siparişler.
+- **Sezon ivmesi:** sezon günü başına +%15 satış fiyatı. Az oynayanların geç fabrikalara ulaşmasını sağlar ve ilerlemenin bir duvara takılmasını önler.
+- **Sezon Bileti** (her sezon yeniden alınabilir): çift elmas, özel dekorasyonlar, geriye dönük uygulanır.
+- **Dekorasyon:** 4 bölüm (zemin, duvar, dış alan, gökyüzü), 27 öğe. Kaynaklar: standart, elmasla satın alma, sezon ödülü, Sezon Bileti ödülü, başarım ödülü, gerçek parayla satın alınan paket (Altın, Neon). Desenler (fayans, dama, çizgi) kodla üretilen dokularla çiziliyor.
+- **Prestij:** Taç = ⌊2·log10(tur kazancı/10⁸)⌋. Logaritmik eğri, 20 fabrikanın ~30 kat büyüklük farkında kontrolsüz büyümeyi önlüyor.
+
+### Sezon temposu (`BalanceTests`, analitik 30 günlük simülasyon)
+| Oyuncu tipi | 5 fabrika | 10 | 15 | 20 |
+|---|---|---|---|---|
+| Ortalama (günde 4 × 15 dk) | 2,6. gün | 6,2. gün | 12. gün | **25,2. gün** |
+| Yoğun (günde 12 × 45 dk) | – | 2,6. gün | 9. gün | 23,2. gün (acele etmek mümkün değil) |
+| Az oynayan (günde 2 × 9 dk) | – | 11,6. gün | 18,6. gün | sezon içinde bitmez (en az 15 fabrika) |

@@ -115,6 +115,7 @@ namespace FactoryKing.Tests
         {
             var m = _s.Modifiers;
             foreach (var f in _s.Content.Factories) m.Remove("market." + f.Id); // isolate from the living market
+            m.Remove(FactoryKing.Core.Meta.SeasonService.MomentumSource);
             m.Set("prestige", ModifierStat.SellPrice, 2);
             m.Set("manager.steel", ModifierStat.SellPrice, 1.5, DefaultContent.Steel);
             Assert.That(m.Get(ModifierStat.SellPrice, DefaultContent.Steel), Is.EqualTo(3).Within(1e-12));
@@ -152,7 +153,7 @@ namespace FactoryKing.Tests
             state.Factories[0].Lines[0].Machines[1].Progress = double.NaN;
             state.ActiveFactoryId = "deleted_factory";
             state.EnsureConsistent(content);
-            Assert.That(state.Factories.Count, Is.EqualTo(5));
+            Assert.That(state.Factories.Count, Is.EqualTo(DefaultContent.FactoryCount));
             Assert.That(state.Factories[0].Lines[0].Machines.Count, Is.EqualTo(6));
             Assert.That(state.Factories[0].Lines[0].Machines[0].Level, Is.EqualTo(1));
             Assert.That(state.Factories[0].Lines[0].Machines[1].Progress, Is.EqualTo(0));

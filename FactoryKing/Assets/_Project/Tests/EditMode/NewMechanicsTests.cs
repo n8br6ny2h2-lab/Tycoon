@@ -155,9 +155,10 @@ namespace FactoryKing.Tests
             foreach (var f in _s.Content.Factories)
             {
                 double g = _s.Content.GetMachine(f.MachineChain[1]).UpgradeCostGrowth;
-                Assert.That(g, Is.GreaterThan(prev));
+                Assert.That(g, Is.GreaterThanOrEqualTo(prev));
                 prev = g;
             }
+            Assert.That(prev, Is.GreaterThan(_s.Content.GetMachine(_s.Content.Factories[0].MachineChain[1]).UpgradeCostGrowth));
         }
     }
 }

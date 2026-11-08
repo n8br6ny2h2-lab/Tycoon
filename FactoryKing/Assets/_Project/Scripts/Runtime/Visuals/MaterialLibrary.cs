@@ -29,7 +29,7 @@ namespace FactoryKing.Runtime.Visuals
     }
 
     /// <summary>Colour set of one factory theme.</summary>
-    public readonly struct Theme
+    public readonly partial struct Theme
     {
         public readonly Color Body, Accent, Floor, Wall;
 
@@ -46,6 +46,7 @@ namespace FactoryKing.Runtime.Visuals
 
         public static Theme For(string themeId)
         {
+            if (TryExtra(themeId, out var extra)) return extra;
             switch (themeId)
             {
                 case "food": return new Theme("#F2B134", "#E5533D", "#D9CBB4", "#F3E9DA");
@@ -134,6 +135,63 @@ namespace FactoryKing.Runtime.Visuals
             mats[(int)Mat.White] = Shared("White", "#F4F6F8", 0.4f, 0f);
             _themes[themeId] = mats;
             return mats;
+        }
+
+        private readonly Dictionary<string, Material> _cosmetics = new Dictionary<string, Material>();
+
+        /// <summary>
+        /// Material for an equipped cosmetic (floor, wall, ground). Patterns are generated textures tinted with the
+        /// cosmetic's two colours; geometry UVs are world-planar, so tiles keep a constant size everywhere.
+        /// Returns <paramref name="fallback"/> for the default (theme) cosmetic.
+        /// </summary>
+        public Material ForCosmetic(FactoryKing.Core.Meta.CosmeticDef def, Material fallback)
+        {
+            if (def == null || string.IsNullOrEmpty(def.ColorHex)) return fallback;
+            if (_cosmetics.TryGetValue(def.Id, out var m)) return m;
+            var a = Theme.Hex(def.ColorHex);
+            var b = string.IsNullOrEmpty(def.SecondaryHex) ? a * 0.85f : Theme.Hex(def.SecondaryHex);
+            bool shiny = def.Id.Contains("gold") || def.Id.Contains("marble") || def.Id.Contains("glass");
+            if (def.Pattern == FactoryKing.Core.Meta.CosmeticPattern.Solid)
+            {
+                m = Create("Cosmetic." + def.Id, a, shiny ? 0.8f : 0.25f, def.Id.Contains("gold") ? 0.8f : 0f);
+            }
+            else
+            {
+                m = Create("Cosmetic." + def.Id, Color.white, shiny ? 0.75f : 0.3f, def.Id.Contains("gold") ? 0.6f : 0f);
+                m.mainTexture = PatternTexture(def.Pattern, a, b);
+                m.mainTextureScale = new Vector2(0.5f, 0.5f); // one tile per 2 world units
+            }
+            _cosmetics[def.Id] = m;
+            return m;
+        }
+
+        private static Texture2D PatternTexture(FactoryKing.Core.Meta.CosmeticPattern pattern, Color a, Color b)
+        {
+            const int size = 64;
+            var tex = new Texture2D(size, size, TextureFormat.RGBA32, true) { wrapMode = TextureWrapMode.Repeat, anisoLevel = 4 };
+            var px = new Color32[size * size];
+            Color32 ca = a, cb = b, grout = Color.Lerp(b, Color.black, 0.35f);
+            for (int y = 0; y < size; y++)
+            for (int x = 0; x < size; x++)
+            {
+                Color32 c;
+                switch (pattern)
+                {
+                    case FactoryKing.Core.Meta.CosmeticPattern.Checker:
+                        c = ((x / 32) + (y / 32)) % 2 == 0 ? ca : cb;
+                        break;
+                    case FactoryKing.Core.Meta.CosmeticPattern.Stripes:
+                        c = (y % 16) < 11 ? ca : cb;
+                        break;
+                    default: // tiles with grout lines
+                        c = (x % 32 < 2 || y % 32 < 2) ? grout : ((x / 32 + y / 32) % 2 == 0 ? ca : (Color32)Color.Lerp(a, b, 0.4f));
+                        break;
+                }
+                px[y * size + x] = c;
+            }
+            tex.SetPixels32(px);
+            tex.Apply(true, true);
+            return tex;
         }
 
         /// <summary>Material for a product/crate colour (cached by hex).</summary>

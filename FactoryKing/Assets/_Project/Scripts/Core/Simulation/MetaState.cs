@@ -18,6 +18,7 @@ namespace FactoryKing.Core.Simulation
         public long ResearchBought;
         public long DailyRewardsClaimed;
         public int HighestMachineLevel = 1;
+        public long SeasonsCompleted;
         public double SessionCount;
         public Dictionary<string, long> SoldByProduct = new Dictionary<string, long>(StringComparer.Ordinal);
     }
@@ -114,6 +115,21 @@ namespace FactoryKing.Core.Simulation
         public long Day = -1;
         public Dictionary<string, int> ShownToday = new Dictionary<string, int>(StringComparer.Ordinal);
         public Dictionary<string, long> LastShownUtcTicks = new Dictionary<string, long>(StringComparer.Ordinal);
+    }
+
+    [Serializable]
+    public sealed class SeasonState
+    {
+        public int Number = 1;
+        public long StartUtcTicks;
+        public int BestFactories = 1;
+        public bool PremiumPass;
+        /// <summary>Permanent: each star = +5% sale price in every future season.</summary>
+        public int LegacyStars;
+        public HashSet<int> ReachedTiers = new HashSet<int>();
+        public HashSet<int> ClaimedTiers = new HashSet<int>();
+        /// <summary>"seasonNumber:factoriesReached" entries.</summary>
+        public List<string> History = new List<string>();
     }
 
     [Serializable]

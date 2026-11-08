@@ -54,7 +54,7 @@ namespace FactoryKing.Core.Persistence
                 .Set("produced", st.UnitsProduced).Set("sold", st.UnitsSold).Set("upgrades", st.Upgrades)
                 .Set("orders", st.OrdersCompleted).Set("mgrUps", st.ManagerLevelUps).Set("ads", st.AdsWatched)
                 .Set("factories", st.FactoriesBought).Set("lines", st.LinesBought).Set("research", st.ResearchBought)
-                .Set("daily", st.DailyRewardsClaimed).Set("highest", st.HighestMachineLevel).Set("sessions", st.SessionCount)
+                .Set("daily", st.DailyRewardsClaimed).Set("highest", st.HighestMachineLevel).Set("seasons", st.SeasonsCompleted).Set("sessions", st.SessionCount)
                 .Set("soldBy", LongMap(st.SoldByProduct)));
 
             var se = s.Settings;
@@ -101,6 +101,16 @@ namespace FactoryKing.Core.Persistence
             foreach (var kv in s.Events)
                 events.Set(kv.Key, JsonValue.NewObject().Set("b", kv.Value.Baseline).Set("t", kv.Value.Target).Set("c", kv.Value.Claimed));
             o.Set("events", events);
+
+            var se2 = s.Season;
+            var reached = JsonValue.NewArray(); foreach (var t in se2.ReachedTiers) reached.Add(JsonValue.From((double)t));
+            var claimed = JsonValue.NewArray(); foreach (var t in se2.ClaimedTiers) claimed.Add(JsonValue.From((double)t));
+            o.Set("season", JsonValue.NewObject().Set("n", se2.Number).Set("start", se2.StartUtcTicks.ToString())
+                .Set("best", se2.BestFactories).Set("premium", se2.PremiumPass).Set("stars", se2.LegacyStars)
+                .Set("reached", reached).Set("claimed", claimed).Set("history", StrArray(se2.History)));
+            var equipped = JsonValue.NewObject();
+            foreach (var kv in s.EquippedCosmetics) equipped.Set(kv.Key, kv.Value);
+            o.Set("equipped", equipped);
 
             var shown = JsonValue.NewObject();
             foreach (var kv in s.Ads.ShownToday) shown.Set(kv.Key, kv.Value);
@@ -162,6 +172,7 @@ namespace FactoryKing.Core.Persistence
             s.Stats.ResearchBought = st.Lng("research");
             s.Stats.DailyRewardsClaimed = st.Lng("daily");
             s.Stats.HighestMachineLevel = st.Int("highest", 1);
+            s.Stats.SeasonsCompleted = st.Lng("seasons");
             s.Stats.SessionCount = st.Dbl("sessions");
             ReadLongMap(st.Obj("soldBy"), s.Stats.SoldByProduct);
 
@@ -223,6 +234,18 @@ namespace FactoryKing.Core.Persistence
                 var e = ev.Get(k);
                 s.Events[k] = new EventProgress { EventId = k, Baseline = e.Dbl("b"), Target = e.Dbl("t"), Claimed = e.Bool("c") };
             }
+
+            var sea = o.Obj("season");
+            s.Season.Number = Math.Max(1, sea.Int("n", 1));
+            s.Season.StartUtcTicks = Ticks(sea.Str("start"));
+            s.Season.BestFactories = Math.Max(1, sea.Int("best", 1));
+            s.Season.PremiumPass = sea.Bool("premium");
+            s.Season.LegacyStars = Math.Max(0, sea.Int("stars"));
+            foreach (var v in sea.Arr("reached").Items) s.Season.ReachedTiers.Add(v.AsInt());
+            foreach (var v in sea.Arr("claimed").Items) s.Season.ClaimedTiers.Add(v.AsInt());
+            foreach (var v in sea.Arr("history").Items) if (v.AsString() != null) s.Season.History.Add(v.AsString());
+            var eq = o.Obj("equipped");
+            foreach (var k in eq.Keys) if (eq.Str(k) != null) s.EquippedCosmetics[k] = eq.Str(k);
 
             var ads = o.Obj("ads");
             s.Ads.Day = ads.Lng("day", -1);

@@ -118,6 +118,8 @@ namespace FactoryKing.Runtime.Bootstrap
             DayNight = gameObject.AddComponent<DayNightCycle>();
             DayNight.NightAmountChanged += FactoryView.SetNightAmount;
             DayNight.Init(sun, cam);
+            ApplySkyCosmetic();
+            Session.Cosmetics.Changed += ApplySkyCosmetic;
 
             Ui = gameObject.AddComponent<UiManager>();
             var ctx = new UiContext
@@ -129,7 +131,7 @@ namespace FactoryKing.Runtime.Bootstrap
             {
                 new MapScreen(), new ManagersScreen(), new MissionsScreen(), new ShopScreen(), new MoreScreen(),
                 new OrdersScreen(), new ResearchScreen(), new WarehouseScreen(), new DailyScreen(), new AchievementsScreen(),
-                new EventsScreen(), new PrestigeScreen(), new SettingsScreen(),
+                new EventsScreen(), new PrestigeScreen(), new SettingsScreen(), new SeasonScreen(), new CosmeticsScreen(),
             });
             CameraController.IsPointerOverUi = Ui.IsPointerOverUi;
             CameraController.Tapped += OnTapped;
@@ -143,6 +145,12 @@ namespace FactoryKing.Runtime.Bootstrap
             Ui.ShowSplash(() => Ui.ShowMainMenu(StartPlaying));
             if (Save.LastLoadOutcome == Core.Persistence.LoadOutcome.RecoveredFromBackup || Save.LastLoadOutcome == Core.Persistence.LoadOutcome.CorruptReset)
                 Ui.Toast(Localization.Get("save.recovered"), UiKit.Warn);
+        }
+
+        private void ApplySkyCosmetic()
+        {
+            var sky = Session.Cosmetics.EquippedDef(CosmeticSlot.Sky);
+            DayNight.SkyTint = sky != null && !string.IsNullOrEmpty(sky.ColorHex) ? Theme.Hex(sky.ColorHex) : (Color?)null;
         }
 
         private void StartPlaying()
@@ -168,6 +176,12 @@ namespace FactoryKing.Runtime.Bootstrap
             Session.Factories.FactoryUnlocked += _ => Save.SaveNow();
             Session.Prestige.Prestiged += () => GameCenter.ReportScores();
             Session.Purchases.Granted += _ => Audio.Play(Sfx.Success);
+            Session.Seasons.SeasonEnded += (season, reached) =>
+            {
+                Audio.Play(Sfx.Success);
+                Save.SaveNow();
+                Ui.ShowSeasonSummary(season, reached);
+            };
         }
 
         private void Update()

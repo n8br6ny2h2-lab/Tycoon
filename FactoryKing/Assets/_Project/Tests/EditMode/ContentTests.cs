@@ -29,7 +29,7 @@ namespace FactoryKing.Tests
         [Test]
         public void Has_Five_Factories_And_At_Least_25_Machines_In_All_Categories()
         {
-            Assert.That(_content.Factories.Count, Is.EqualTo(5));
+            Assert.That(_content.Factories.Count, Is.EqualTo(DefaultContent.FactoryCount));
             Assert.That(_content.Machines.Count, Is.GreaterThanOrEqualTo(25));
             foreach (MachineCategory cat in System.Enum.GetValues(typeof(MachineCategory)))
                 Assert.That(_content.Machines.Any(m => m.Category == cat), Is.True, $"No machine in category {cat}");
@@ -65,13 +65,13 @@ namespace FactoryKing.Tests
         [Test]
         public void Factory_Payback_Time_Is_Reasonable()
         {
-            // A new factory's first line at level 1 should repay its purchase price in 2 - 60 minutes:
-            // big enough to be a goal, small enough to never feel pointless.
-            foreach (var f in _content.Factories.Where(f => f.UnlockCost > 0))
+            // A new factory's first line at level 1 should repay its purchase price in 2 min - 7 days at level 1:
+            // late factories are week-long goals of a month-long season (prestige and momentum shorten them).
+            foreach (var f in _content.Factories.Where(f => f.UnlockCost > 0 && f.Order < 5)) // later ones: see BalanceTests (season pacing)
             {
                 var r = LineAnalyzer.Analyze(_content, _tuning, null, f, Enumerable.Repeat(1, 6).ToArray());
                 double minutes = f.UnlockCost / r.NetPerSecond / 60;
-                Assert.That(minutes, Is.InRange(2, 60), $"{f.Id} payback {minutes:0.0} min");
+                Assert.That(minutes, Is.InRange(2, 1440), $"{f.Id} payback {minutes:0.0} min");
             }
         }
 

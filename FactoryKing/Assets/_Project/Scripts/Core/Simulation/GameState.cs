@@ -109,6 +109,9 @@ namespace FactoryKing.Core.Simulation
         public Dictionary<string, EventProgress> Events = new Dictionary<string, EventProgress>(StringComparer.Ordinal);
         public AdState Ads = new AdState();
         public long BoostEndUtcTicks;
+        public SeasonState Season = new SeasonState();
+        /// <summary>Cosmetic slot name -> equipped cosmetic id.</summary>
+        public Dictionary<string, string> EquippedCosmetics = new Dictionary<string, string>(StringComparer.Ordinal);
         public int TutorialStep;
 
         public static GameState CreateNew(GameContent content, EconomyTuning tuning)
@@ -188,6 +191,13 @@ namespace FactoryKing.Core.Simulation
             ProcessedTransactions ??= new HashSet<string>(StringComparer.Ordinal);
             Collection ??= new HashSet<string>(StringComparer.Ordinal);
             Events ??= new Dictionary<string, EventProgress>(StringComparer.Ordinal);
+            Season ??= new SeasonState();
+            Season.ReachedTiers ??= new HashSet<int>();
+            Season.ClaimedTiers ??= new HashSet<int>();
+            Season.History ??= new List<string>();
+            if (Season.Number < 1) Season.Number = 1;
+            if (Season.LegacyStars < 0) Season.LegacyStars = 0;
+            EquippedCosmetics ??= new Dictionary<string, string>(StringComparer.Ordinal);
             Ads ??= new AdState();
             Ads.ShownToday ??= new Dictionary<string, int>(StringComparer.Ordinal);
             Ads.LastShownUtcTicks ??= new Dictionary<string, long>(StringComparer.Ordinal);

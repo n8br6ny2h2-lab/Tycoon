@@ -23,5 +23,8 @@ Enable Game Center for the App ID (the Xcode capability is added automatically b
 | factoryking.first_manager | Team Builder | Ekip Kurucusu | 5 |
 | factoryking.research_10 | Innovator | Yenilikçi | 5 |
 | factoryking.streak_7 | Loyal Boss | Sadık Patron | 5 |
+| factoryking.ten_factories | Tycoon | Sanayi Devi | 15 |
+| factoryking.twenty_factories | Factory King | Fabrika Kralı | 30 |
+| factoryking.first_season | Season Veteran | Sezon Gazisi | 15 |
 
 Descriptions are the `achievement.<id>.desc` entries in `strings.txt`. Achievement artwork (512×512 or 1024×1024) is still needed.

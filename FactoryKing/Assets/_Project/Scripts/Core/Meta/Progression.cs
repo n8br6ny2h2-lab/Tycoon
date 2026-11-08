@@ -217,6 +217,8 @@ namespace FactoryKing.Core.Meta
         public long RewardDiamonds;
         public Func<GameSession, double> Value;
         public double Target;
+        /// <summary>Optional cosmetic granted on claim.</summary>
+        public string RewardCosmetic;
         /// <summary>Game Center achievement id (configure in App Store Connect with the same id).</summary>
         public string GameCenterId;
     }
@@ -230,7 +232,10 @@ namespace FactoryKing.Core.Meta
             A("ach_ten_machines", 15, s => s.OwnedMachineCount, 10),
             A("ach_first_million", 25, s => s.State.LifetimeEarnings.ToDouble(), 1e6),
             A("ach_first_prestige", 50, s => s.State.Prestige.Count, 1),
-            A("ach_five_factories", 100, s => s.State.Factories.FindAll(f => f.Unlocked).Count, 5),
+            A("ach_five_factories", 100, s => s.State.Factories.FindAll(f => f.Unlocked).Count, 5, "floor_marble"),
+            A("ach_ten_factories", 150, s => s.State.Factories.FindAll(f => f.Unlocked).Count, 10, "wall_glass"),
+            A("ach_twenty_factories", 300, s => s.State.Factories.FindAll(f => f.Unlocked).Count, 20),
+            A("ach_first_season", 100, s => s.State.Stats.SeasonsCompleted, 1, "ground_city"),
             A("ach_first_billion", 60, s => s.State.LifetimeEarnings.ToDouble(), 1e9),
             A("ach_level_100", 40, s => s.State.Stats.HighestMachineLevel, 100),
             A("ach_orders_10", 20, s => s.State.Stats.OrdersCompleted, 10),
@@ -239,9 +244,9 @@ namespace FactoryKing.Core.Meta
             A("ach_streak_7", 30, s => s.State.Stats.DailyRewardsClaimed, 7),
         };
 
-        private static AchievementDef A(string id, long dia, Func<GameSession, double> value, double target) => new AchievementDef
+        private static AchievementDef A(string id, long dia, Func<GameSession, double> value, double target, string cosmetic = null) => new AchievementDef
         {
-            Id = id, NameKey = "achievement." + id, RewardDiamonds = dia, Value = value, Target = target,
+            Id = id, NameKey = "achievement." + id, RewardDiamonds = dia, Value = value, Target = target, RewardCosmetic = cosmetic,
             GameCenterId = "factoryking." + id.Substring(4),
         };
 
@@ -272,6 +277,7 @@ namespace FactoryKing.Core.Meta
             var d = Defs.Find(x => x.Id == id);
             if (d == null || !_s.State.AchievementsUnlocked.Contains(id) || !_s.State.AchievementsClaimed.Add(id)) return false;
             _s.Wallet.AddDiamonds(d.RewardDiamonds);
+            if (d.RewardCosmetic != null) _s.Cosmetics.Grant(d.RewardCosmetic);
             return true;
         }
     }
@@ -401,7 +407,7 @@ namespace FactoryKing.Core.Meta
             if (p.Claimed || Value(e) < p.Target) return false;
             p.Claimed = true;
             long dia = e.RewardDiamonds;
-            if (_s.State.Entitlements.Contains(StoreCatalog.EntitlementSeasonPass)) dia *= 2;
+            if (_s.Seasons.HasPremium) dia *= 2;
             _s.Wallet.AddDiamonds(dia);
             if (e.RewardDecorId != null) _s.State.Collection.Add(e.RewardDecorId);
             return true;

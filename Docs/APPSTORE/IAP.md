@@ -11,8 +11,11 @@ Example with bundle id `com.yourcompany.factoryking`: `com.yourcompany.factoryki
 | no_ads | Non-consumable | Rewarded-video rewards without watching | 3.99 | Ad-free Rewards |
 | starter_pack | Non-consumable | 300 diamonds, 2 h of income, manager Ayla | 1.99 | Starter Pack |
 | vip | Non-consumable | +10% sale price, +2 h offline cap (permanent) | 7.99 | VIP |
-| cosmetic_gold | Non-consumable | 3 golden decorations (cosmetic only) | 2.99 | Golden Look |
-| season_pass_s1 | Non-consumable | 150 diamonds and double event diamonds for season 1 | 4.99 | Season Pass S1 |
+| cosmetic_gold | Non-consumable | Golden floor, walls, sky and statue (cosmetic only, permanent) | 2.99 | Golden Look |
+| cosmetic_neon | Non-consumable | Neon floor, walls and sky (cosmetic only, permanent) | 2.99 | Neon Look |
+| season_pass | **Consumable** (one per season) | Current 30-day season: 150 diamonds, double season and event diamonds, premium decorations | 4.99 | Season Pass |
+
+The Season Pass is consumable because it is bought again each season. The save (and iCloud) remembers that it is active for the current season, and it cannot be bought twice in one season. Decorations it unlocks are permanent.
 
 Localised display names and descriptions for each product are the `shop.<id>` and `shop.<id>.desc` entries in `FactoryKing/Assets/_Project/Resources/Localization/strings.txt` (EN/TR).
 

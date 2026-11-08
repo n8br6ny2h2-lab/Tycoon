@@ -23,9 +23,9 @@ Start with a small iron workshop and grow it into a five-factory industrial empi
 
 Factory King is a relaxing 3D idle tycoon where every crate you see is real production. Raw materials roll in, machines smelt, cut, assemble and pack, forklifts stock the warehouse and trucks drive your goods to market — even while you are away.
 
-BUILD FIVE INDUSTRIES
-• Iron & Steel, Food, Plastics, Textile and Electronics — each with its own machines, products and economy
-• 30 animated machines across six production stages
+BUILD TWENTY INDUSTRIES
+• From iron & steel and food to cars, solar panels, robotics and space technology
+• 120 machines across six production stages, each industry with its own products and economy
 • Open up to three production lines per factory
 
 UPGRADE SMART
@@ -37,6 +37,11 @@ GROW WHILE YOU REST
 • Your factories keep producing for up to 8 hours offline
 • Hire five managers with unique perks and assign them to factories
 • Research permanent upgrades and restructure your company with Crowns for permanent bonuses
+
+MONTHLY SEASONS
+• Every season is a fresh 30-day race to all 20 factories
+• Season rewards, legacy stars and decorations are yours forever
+• Customise floors, walls, grounds and skies
 
 ALWAYS SOMETHING TO DO
 • Daily and weekly missions, customer orders and a 7-day login calendar
@@ -66,9 +71,9 @@ Küçük bir demir atölyesiyle başla, beş fabrikalı bir sanayi imparatorluğ
 
 Fabrika Kralı, ekranda gördüğün her kasanın gerçek üretim olduğu, rahatlatıcı bir 3D idle tycoon oyunu. Hammadde gelir, makineler eritir, keser, birleştirir ve paketler; forkliftler depoyu doldurur, tırlar ürünlerini pazara taşır. Üstelik sen yokken bile.
 
-BEŞ SANAYİ KOLU
-• Demir-Çelik, Gıda, Plastik, Tekstil ve Elektronik: her birinin kendine özgü makineleri, ürünleri ve ekonomisi var
-• Altı üretim aşamasında 30 animasyonlu makine
+YİRMİ SANAYİ KOLU
+• Demir-çelik ve gıdadan otomobile, güneş paneline, robotiğe ve uzay teknolojisine
+• Altı üretim aşamasında 120 makine; her sanayi kolunun kendi ürünleri ve ekonomisi var
 • Her fabrikada üç üretim hattına kadar genişle
 
 AKILLICA YÜKSELT
@@ -80,6 +85,11 @@ SEN DİNLENİRKEN BÜYÜ
 • Fabrikaların çevrimdışıyken 8 saate kadar üretmeye devam eder
 • Farklı yeteneklere sahip beş yöneticiyi işe al ve fabrikalara ata
 • Kalıcı araştırmalar yap, Taç'larla şirketini yeniden yapılandırıp kalıcı bonuslar kazan
+
+AYLIK SEZONLAR
+• Her sezon 20 fabrikaya ulaşmak için 30 günlük yeni bir yarış
+• Sezon ödülleri, miras yıldızları ve dekorasyonlar sonsuza dek senin
+• Zemini, duvarları, dış alanı ve gökyüzünü kişiselleştir
 
 HER ZAMAN YAPACAK BİR ŞEY VAR
 • Günlük ve haftalık görevler, müşteri siparişleri ve 7 günlük giriş takvimi

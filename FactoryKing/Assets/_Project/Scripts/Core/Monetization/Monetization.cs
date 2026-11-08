@@ -21,6 +21,10 @@ namespace FactoryKing.Core.Meta
         public double IncomeSeconds;
         public string ManagerId;
         public string[] DecorIds = Array.Empty<string>();
+        /// <summary>Cosmetics added to the permanent collection.</summary>
+        public string[] CosmeticIds = Array.Empty<string>();
+        /// <summary>Activates the premium track of the current season (re-purchasable each season).</summary>
+        public bool SeasonPass;
         /// <summary>Suggested App Store price tier in USD (display fallback only; real prices come from StoreKit).</summary>
         public string FallbackPrice;
     }
@@ -31,8 +35,8 @@ namespace FactoryKing.Core.Meta
         public const string EntitlementNoAds = "no_ads";
         public const string EntitlementVip = "vip";
         public const string EntitlementStarter = "starter_pack";
-        public const string EntitlementSeasonPass = "season_pass_s1";
         public const string EntitlementCosmeticGold = "cosmetic_gold";
+        public const string EntitlementCosmeticNeon = "cosmetic_neon";
         public const double VipOfflineHours = 2;
         public const double VipPriceBonus = 1.10;
 
@@ -62,9 +66,15 @@ namespace FactoryKing.Core.Meta
             Add("vip", ProductKind.NonConsumable, "$7.99", p => p.Entitlement = EntitlementVip);
             Add("cosmetic_gold", ProductKind.NonConsumable, "$2.99", p =>
             {
-                p.Entitlement = EntitlementCosmeticGold; p.DecorIds = new[] { "decor_gold_trucks", "decor_gold_trim", "decor_gold_statue" };
+                p.Entitlement = EntitlementCosmeticGold; p.DecorIds = new[] { "decor_gold_statue" };
+                p.CosmeticIds = new[] { "floor_gold", "wall_gold", "sky_gold" };
             });
-            Add("season_pass_s1", ProductKind.NonConsumable, "$4.99", p => { p.Entitlement = EntitlementSeasonPass; p.Diamonds = 150; });
+            Add("cosmetic_neon", ProductKind.NonConsumable, "$2.99", p =>
+            {
+                p.Entitlement = EntitlementCosmeticNeon; p.CosmeticIds = new[] { "floor_neon", "wall_neon", "sky_neon" };
+            });
+            // Bought once per season (consumable in App Store Connect; the save remembers it for the season).
+            Add("season_pass", ProductKind.Consumable, "$4.99", p => { p.SeasonPass = true; p.Diamonds = 150; });
             return c;
         }
 
@@ -97,7 +107,8 @@ namespace FactoryKing.Core.Meta
 
         /// <summary>False for non-consumables already owned (the shop hides/disables them).</summary>
         public bool CanPurchase(StoreProductDef p) =>
-            p != null && !(p.Kind == ProductKind.NonConsumable && p.Entitlement != null && Owns(p.Entitlement));
+            p != null && !(p.Kind == ProductKind.NonConsumable && p.Entitlement != null && Owns(p.Entitlement))
+                      && !(p.SeasonPass && _s.Seasons.HasPremium);
 
         public PurchaseResult Process(string storeId, string transactionId, bool receiptValid, bool isRestore)
         {
@@ -129,6 +140,8 @@ namespace FactoryKing.Core.Meta
                 if (p.ManagerId != null) _s.Managers.Grant(p.ManagerId);
                 foreach (var d in p.DecorIds) _s.State.Collection.Add(d);
             }
+            foreach (var c in p.CosmeticIds) _s.Cosmetics.Grant(c); // restored too: cosmetics are permanent
+            if (p.SeasonPass) _s.Seasons.ActivatePremium();
             ApplyEntitlements();
             _s.Analytics.Track(AnalyticsEvents.Purchase, "product", p.Id);
             Granted?.Invoke(p);

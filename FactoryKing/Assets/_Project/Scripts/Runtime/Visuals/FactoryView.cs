@@ -65,7 +65,16 @@ namespace FactoryKing.Runtime.Visuals
             _session.Upgrades.MachineUpgraded += OnMachineUpgraded;
             _session.Factories.LineUnlocked += OnLineUnlocked;
             _session.Factories.ActiveFactoryChanged += Build;
+            _session.Cosmetics.Changed += RebuildCurrent;
+            _session.Seasons.SeasonEnded += OnSeasonEnded;
         }
+
+        private void RebuildCurrent()
+        {
+            if (_factory != null) Build(_factory.Id);
+        }
+
+        private void OnSeasonEnded(int season, int reached) => Build(_session.State.ActiveFactoryId);
 
         private void OnDestroy()
         {
@@ -73,13 +82,20 @@ namespace FactoryKing.Runtime.Visuals
             _session.Upgrades.MachineUpgraded -= OnMachineUpgraded;
             _session.Factories.LineUnlocked -= OnLineUnlocked;
             _session.Factories.ActiveFactoryChanged -= Build;
+            _session.Cosmetics.Changed -= RebuildCurrent;
+            _session.Seasons.SeasonEnded -= OnSeasonEnded;
         }
 
         public void Build(string factoryId)
         {
             Teardown();
             _factory = _session.Content.GetFactory(factoryId);
-            _theme = _materials.ForTheme(_factory.ThemeId);
+            _theme = (Material[])_materials.ForTheme(_factory.ThemeId).Clone();
+            // Equipped cosmetics replace the floor, wall and outdoor ground materials (permanent player choices).
+            var cos = _session.Cosmetics;
+            _theme[(int)Mat.Floor] = _materials.ForCosmetic(cos.EquippedDef(FactoryKing.Core.Meta.CosmeticSlot.Floor), _theme[(int)Mat.Floor]);
+            _theme[(int)Mat.Wall] = _materials.ForCosmetic(cos.EquippedDef(FactoryKing.Core.Meta.CosmeticSlot.Wall), _theme[(int)Mat.Wall]);
+            _theme[(int)Mat.Ground] = _materials.ForCosmetic(cos.EquippedDef(FactoryKing.Core.Meta.CosmeticSlot.Ground), _theme[(int)Mat.Ground]);
             _kit.Theme = _theme;
 
             _root = ModelKit.Pivot(transform, "Factory." + factoryId, Vector3.zero);

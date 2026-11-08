@@ -211,8 +211,8 @@ achievement.ach_first_million	First Million	İlk Milyon
 achievement.ach_first_million.desc	Earn 1 million in total.	Toplam 1 milyon kazan.
 achievement.ach_first_prestige	Fresh Start	Taze Başlangıç
 achievement.ach_first_prestige.desc	Restructure your company once.	Şirketini bir kez yeniden yapılandır.
-achievement.ach_five_factories	Industrial Empire	Sanayi İmparatorluğu
-achievement.ach_five_factories.desc	Own all five factories.	Beş fabrikanın hepsine sahip ol.
+achievement.ach_five_factories	Industrialist	Sanayici
+achievement.ach_five_factories.desc	Own 5 factories in one season.	Bir sezonda 5 fabrikaya sahip ol.
 achievement.ach_first_billion	Billionaire	Milyarder
 achievement.ach_first_billion.desc	Earn 1 billion in total.	Toplam 1 milyar kazan.
 achievement.ach_level_100	Perfection	Kusursuzluk
@@ -290,9 +290,7 @@ shop.starter_pack.desc	300 diamonds, 2 hours of income and Ayla (Rare manager). 
 shop.vip	VIP Membership	VIP Üyelik
 shop.vip.desc	Permanent +10% sale price and +2 hours offline earnings.	Kalıcı +%10 satış fiyatı ve +2 saat çevrimdışı kazanç.
 shop.cosmetic_gold	Golden Look	Altın Görünüm
-shop.cosmetic_gold.desc	Cosmetic golden statue, trim and trucks for your collection. No gameplay effect.	Koleksiyonun için kozmetik altın heykel, süs ve kamyonlar. Oynanışa etkisi yok.
-shop.season_pass_s1	Season Pass — Season 1	Sezon Bileti — 1. Sezon
-shop.season_pass_s1.desc	150 diamonds now and double diamond rewards from events this season.	Hemen 150 elmas ve bu sezon etkinliklerden çift elmas ödülü.
+shop.cosmetic_gold.desc	Golden floor, walls, sky and a golden statue. Cosmetic only, kept forever.	Altın zemin, duvar, gökyüzü ve altın heykel. Yalnızca görünüm, kalıcı.
 shop.msg.thanks	Thank you! Your purchase has been added.	Teşekkürler! Satın alımın eklendi.
 shop.msg.owned	You already own this.	Buna zaten sahipsin.
 shop.msg.unavailable	The store is not available right now. Please try again later.	Mağaza şu anda kullanılamıyor. Lütfen daha sonra tekrar dene.
@@ -365,3 +363,245 @@ ability.overtime	Overtime	Fazla Mesai
 ability.overtime.desc	Instantly earn 15 min of this factory's income.	Bu fabrikanın 15 dakikalık gelirini anında kazan.
 ability.flash_sale	Flash Sale	Flaş Satış
 ability.flash_sale.desc	Double sale prices for 2.5 min.	2,5 dakika boyunca satış fiyatları 2 kat.
+# --- generated factories begin ---
+factory.glass	Glassworks	Cam Fabrikası
+product.glass_sand	Silica Sand	Silis Kumu
+product.glass_molten_glass	Molten Glass	Erimiş Cam
+product.glass_glass_pane	Glass Pane	Cam Levha
+product.glass_glass_crate	Glass Crate	Cam Kasası
+machine.glass_sand_hopper	Sand Hopper	Kum Bunkeri
+machine.glass_melting_furnace	Melting Furnace	Ergitme Fırını
+machine.glass_float_cutter	Float Line Cutter	Float Hattı Kesici
+machine.glass_crate_packer	Crate Packer	Kasa Paketleyici
+machine.glass_warehouse	Glass Warehouse	Cam Deposu
+machine.glass_dock	Glass Dock	Cam Rampası
+factory.paper	Paper Mill	Kâğıt Fabrikası
+product.paper_logs	Logs	Tomruk
+product.paper_pulp	Pulp	Kâğıt Hamuru
+product.paper_paper_roll	Paper Roll	Kâğıt Bobini
+product.paper_paper_ream	Paper Ream	Kâğıt Topu
+machine.paper_log_crane	Log Crane	Tomruk Vinci
+machine.paper_pulper	Pulper	Hamurlaştırıcı
+machine.paper_paper_machine	Paper Machine	Kâğıt Makinesi
+machine.paper_ream_wrapper	Ream Wrapper	Top Sarıcı
+machine.paper_warehouse	Paper Warehouse	Kâğıt Deposu
+machine.paper_dock	Paper Dock	Kâğıt Rampası
+factory.furniture	Furniture Factory	Mobilya Fabrikası
+product.furniture_timber	Timber	Kereste
+product.furniture_plank	Plank	Tahta
+product.furniture_furniture_part	Furniture Part	Mobilya Parçası
+product.furniture_flatpack	Flat-pack Furniture	Paketli Mobilya
+machine.furniture_timber_loader	Timber Loader	Kereste Yükleyici
+machine.furniture_sawmill	Sawmill	Hızar
+machine.furniture_cnc_router	CNC Router	CNC Freze
+machine.furniture_flatpack_packer	Flat-pack Packer	Paketleme Hattı
+machine.furniture_warehouse	Furniture Warehouse	Mobilya Deposu
+machine.furniture_dock	Furniture Dock	Mobilya Rampası
+factory.beverage	Beverage Plant	İçecek Fabrikası
+product.beverage_fruit	Fruit	Meyve
+product.beverage_juice	Juice	Meyve Suyu
+product.beverage_bottle	Bottled Juice	Şişe Meyve Suyu
+product.beverage_juice_case	Juice Case	Meyve Suyu Kolisi
+machine.beverage_fruit_intake	Fruit Intake	Meyve Kabulü
+machine.beverage_juicer	Industrial Juicer	Endüstriyel Sıkacak
+machine.beverage_bottler	Bottling Line	Dolum Hattı
+machine.beverage_case_packer	Case Packer	Koli Paketleyici
+machine.beverage_cold_store	Cold Store	Soğuk Depo
+machine.beverage_dock	Beverage Dock	İçecek Rampası
+factory.cement	Cement Works	Çimento Fabrikası
+product.cement_limestone	Limestone	Kireçtaşı
+product.cement_clinker	Clinker	Klinker
+product.cement_cement	Cement	Çimento
+product.cement_cement_bag	Cement Bag	Çimento Torbası
+machine.cement_quarry_loader	Quarry Loader	Ocak Yükleyici
+machine.cement_rotary_kiln	Rotary Kiln	Döner Fırın
+machine.cement_cement_mill	Cement Mill	Çimento Değirmeni
+machine.cement_bagger	Bagging Machine	Torbalama Makinesi
+machine.cement_silo_store	Bulk Silo	Dökme Silo
+machine.cement_dock	Cement Dock	Çimento Rampası
+factory.chemical	Chemical Plant	Kimya Fabrikası
+product.chemical_brine	Brine	Tuzlu Su
+product.chemical_solution	Chemical Solution	Kimyasal Çözelti
+product.chemical_detergent	Detergent	Deterjan
+product.chemical_detergent_pack	Detergent Pack	Deterjan Paketi
+machine.chemical_brine_pump	Brine Pump	Tuzlu Su Pompası
+machine.chemical_reactor	Reactor	Reaktör
+machine.chemical_mixer	Formulation Mixer	Formül Karıştırıcı
+machine.chemical_filler	Pack Filler	Paket Dolum
+machine.chemical_tank_farm	Tank Farm	Tank Sahası
+machine.chemical_dock	Chemical Dock	Kimya Rampası
+factory.pharma	Pharmaceutical Plant	İlaç Fabrikası
+product.pharma_compound	Raw Compound	Ham Bileşik
+product.pharma_active_ingredient	Active Ingredient	Etken Madde
+product.pharma_tablet	Tablet	Tablet
+product.pharma_medicine_box	Medicine Box	İlaç Kutusu
+machine.pharma_compound_loader	Compound Loader	Bileşik Yükleyici
+machine.pharma_synthesis	Synthesis Reactor	Sentez Reaktörü
+machine.pharma_tablet_press	Tablet Press	Tablet Presi
+machine.pharma_blister_packer	Blister Packer	Blister Paketleyici
+machine.pharma_clean_store	Clean Store	Temiz Depo
+machine.pharma_dock	Pharma Dock	İlaç Rampası
+factory.rubber	Tyre Factory	Lastik Fabrikası
+product.rubber_latex	Latex	Lateks
+product.rubber_compound_rubber	Rubber Compound	Kauçuk Karışımı
+product.rubber_tyre	Tyre	Lastik
+product.rubber_tyre_stack	Tyre Stack	Lastik Yığını
+machine.rubber_latex_tank	Latex Tank	Lateks Tankı
+machine.rubber_banbury	Banbury Mixer	Banbury Karıştırıcı
+machine.rubber_tyre_press	Curing Press	Vulkanizasyon Presi
+machine.rubber_stacker	Tyre Stacker	Lastik İstifleyici
+machine.rubber_warehouse	Tyre Warehouse	Lastik Deposu
+machine.rubber_dock	Tyre Dock	Lastik Rampası
+factory.appliance	Appliance Factory	Beyaz Eşya Fabrikası
+product.appliance_sheet_metal	Sheet Metal	Sac Levha
+product.appliance_casing	Casing	Gövde
+product.appliance_washer	Washing Machine	Çamaşır Makinesi
+product.appliance_boxed_appliance	Boxed Appliance	Kutulu Beyaz Eşya
+machine.appliance_coil_loader	Coil Loader	Rulo Yükleyici
+machine.appliance_stamping	Stamping Press	Pres Hattı
+machine.appliance_assembly_cell	Assembly Cell	Montaj Hücresi
+machine.appliance_boxer	Boxing Line	Kutulama Hattı
+machine.appliance_warehouse	Appliance Warehouse	Beyaz Eşya Deposu
+machine.appliance_dock	Appliance Dock	Beyaz Eşya Rampası
+factory.automotive	Car Factory	Otomobil Fabrikası
+product.automotive_steel_coil	Steel Coil	Çelik Rulo
+product.automotive_car_body	Car Body	Kaporta
+product.automotive_car	Car	Otomobil
+product.automotive_car_load	Car Carrier Load	Oto Taşıyıcı Yükü
+machine.automotive_coil_feeder	Coil Feeder	Rulo Besleyici
+machine.automotive_body_press	Body Press	Kaporta Presi
+machine.automotive_assembly_robots	Assembly Robots	Montaj Robotları
+machine.automotive_inspection	Final Inspection	Son Kontrol
+machine.automotive_car_park	Car Park	Araç Parkı
+machine.automotive_carrier_dock	Car Carrier Dock	Oto Taşıyıcı Rampası
+factory.solar	Solar Panel Factory	Güneş Paneli Fabrikası
+product.solar_quartz	Quartz	Kuvars
+product.solar_solar_cell	Solar Cell	Güneş Hücresi
+product.solar_solar_panel	Solar Panel	Güneş Paneli
+product.solar_panel_pallet	Panel Pallet	Panel Paleti
+machine.solar_quartz_crusher	Quartz Crusher	Kuvars Kırıcı
+machine.solar_ingot_furnace	Ingot Furnace	Külçe Fırını
+machine.solar_laminator	Panel Laminator	Panel Laminatörü
+machine.solar_palletizer	Palletizer	Paletleyici
+machine.solar_warehouse	Panel Warehouse	Panel Deposu
+machine.solar_dock	Solar Dock	Güneş Paneli Rampası
+factory.battery	Battery Factory	Batarya Fabrikası
+product.battery_lithium_ore	Lithium Ore	Lityum Cevheri
+product.battery_cathode	Cathode Material	Katot Malzemesi
+product.battery_cell	Battery Cell	Batarya Hücresi
+product.battery_battery_pack	Battery Pack	Batarya Paketi
+machine.battery_ore_loader	Ore Loader	Cevher Yükleyici
+machine.battery_calciner	Calciner	Kalsinasyon Fırını
+machine.battery_cell_line	Cell Line	Hücre Hattı
+machine.battery_pack_assembly	Pack Assembly	Paket Montajı
+machine.battery_dry_room	Dry Room Store	Kuru Oda Deposu
+machine.battery_dock	Battery Dock	Batarya Rampası
+factory.aerospace	Aerospace Plant	Havacılık Fabrikası
+product.aerospace_aluminium	Aluminium Ingot	Alüminyum Külçe
+product.aerospace_alloy	Aero Alloy	Havacılık Alaşımı
+product.aerospace_wing_part	Wing Part	Kanat Parçası
+product.aerospace_aero_crate	Aero Crate	Havacılık Sandığı
+machine.aerospace_ingot_loader	Ingot Loader	Külçe Yükleyici
+machine.aerospace_alloy_furnace	Alloy Furnace	Alaşım Fırını
+machine.aerospace_five_axis	5-Axis Machining	5 Eksen İşleme
+machine.aerospace_crate_builder	Crate Builder	Sandık Yapıcı
+machine.aerospace_hangar	Hangar Store	Hangar Deposu
+machine.aerospace_dock	Aerospace Dock	Havacılık Rampası
+factory.robotics	Robotics Factory	Robotik Fabrikası
+product.robotics_microchip	Microchip	Mikroçip
+product.robotics_servo	Servo Motor	Servo Motor
+product.robotics_robot	Robot	Robot
+product.robotics_robot_crate	Robot Crate	Robot Sandığı
+machine.robotics_chip_loader	Chip Loader	Çip Yükleyici
+machine.robotics_servo_winder	Servo Winder	Servo Sarıcı
+machine.robotics_robot_assembly	Robot Assembly	Robot Montajı
+machine.robotics_crater	Robot Crater	Robot Sandıklayıcı
+machine.robotics_warehouse	Robot Warehouse	Robot Deposu
+machine.robotics_dock	Robotics Dock	Robotik Rampası
+factory.space	Space Technology	Uzay Teknolojisi
+product.space_titanium	Titanium	Titanyum
+product.space_component	Space Component	Uzay Bileşeni
+product.space_satellite	Satellite	Uydu
+product.space_launch_container	Launch Container	Fırlatma Konteyneri
+machine.space_titanium_loader	Titanium Loader	Titanyum Yükleyici
+machine.space_vacuum_furnace	Vacuum Furnace	Vakum Fırını
+machine.space_clean_assembly	Clean-Room Assembly	Temiz Oda Montajı
+machine.space_container_packer	Container Packer	Konteyner Paketleyici
+machine.space_integration_hall	Integration Hall	Entegrasyon Salonu
+machine.space_launch_dock	Launch Dock	Fırlatma Rampası
+# --- generated factories end ---
+screen.season	Season	Sezon
+screen.cosmetics	Decoration	Dekorasyon
+hud.season_left	Season {0} · {1} left	Sezon {0} · {1} kaldı
+hud.season_reward	{0} season reward(s)	{0} sezon ödülü
+season.title	Season {0}	Sezon {0}
+season.time_left	Ends in {0}	Bitişe: {0}
+season.factories	Factories this season: {0}/{1}	Bu sezon fabrikalar: {0}/{1}
+season.legacy	Legacy stars: {0} (+{1}% sale price forever)	Miras yıldızı: {0} (kalıcı +%{1} satış fiyatı)
+season.momentum	Season momentum: +{0}% sale price (grows every day)	Sezon ivmesi: satış fiyatı +%{0} (her gün artar)
+season.rules	Every season lasts 30 days. When it ends your factories, cash, research and crowns start over; diamonds, decorations, achievements, managers, legacy stars and purchases are kept forever.	Her sezon 30 gün sürer. Bittiğinde fabrikalar, para, araştırma ve taçlar sıfırlanır; elmaslar, dekorasyonlar, başarımlar, yöneticiler, miras yıldızları ve satın alımlar kalıcıdır.
+season.premium_active	Season Pass active: double diamonds and premium rewards!	Sezon Bileti aktif: çift elmas ve özel ödüller!
+season.rewards	Season rewards	Sezon ödülleri
+season.tier	Own {0} factories	{0} fabrikaya sahip ol
+season.stars	{0} legacy star	{0} miras yıldızı
+season.premium	Pass	Bilet
+season.complete	Season completed!	Sezon tamamlandı!
+season.start_new	Start the next season now	Yeni sezonu şimdi başlat
+season.start_new_confirm	You own every factory. Start the next season now? All rewards are paid first; the run starts over.	Tüm fabrikalara sahipsin. Yeni sezon şimdi başlasın mı? Önce tüm ödüller verilir, sonra tur sıfırlanır.
+season.history	Past seasons	Geçmiş sezonlar
+season.history_row	Season {0}: {1} factories	Sezon {0}: {1} fabrika
+season.ended	Season {0} is over!	Sezon {0} bitti!
+season.ended_reached	You built {0} factories this season. Your rewards have been added to your collection.	Bu sezon {0} fabrika kurdun. Ödüllerin koleksiyonuna eklendi.
+season.kept	Kept forever: diamonds, decorations, achievements, managers (back to level 1), legacy stars and purchases.	Kalıcı olanlar: elmaslar, dekorasyonlar, başarımlar, yöneticiler (seviye 1'e döner), miras yıldızları ve satın alımlar.
+season.begin	Start Season {0}	Sezon {0}'i başlat
+cosmetics.intro	Customise your factory. Decorations are permanent and stay with you every season.	Fabrikanı kişiselleştir. Dekorasyonlar kalıcıdır, her sezonda seninle kalır.
+cosmetics.slot.Floor	Factory floor	Fabrika zemini
+cosmetics.slot.Wall	Walls	Duvarlar
+cosmetics.slot.Ground	Outdoor ground	Dış alan zemini
+cosmetics.slot.Sky	Sky	Gökyüzü
+cosmetics.equip	Use	Kullan
+cosmetics.equipped	In use	Kullanılıyor
+cosmetics.buy	Buy ◆ {0}	Satın al ◆ {0}
+cosmetics.src.default	Standard	Standart
+cosmetics.src.diamonds	Shop: ◆ {0}	Mağaza: ◆ {0}
+cosmetics.src.season	Season reward	Sezon ödülü
+cosmetics.src.season_premium	Season Pass reward	Sezon Bileti ödülü
+cosmetics.src.achievement	Achievement: {0}	Başarım: {0}
+cosmetics.src.purchase	Decoration pack	Dekorasyon paketi
+cosmetic.floor_default	Standard floor	Standart zemin
+cosmetic.floor_graphite	Graphite	Grafit
+cosmetic.floor_blue_tiles	Blue tiles	Mavi fayans
+cosmetic.floor_checker	Checkerboard	Dama
+cosmetic.floor_marble	Marble	Mermer
+cosmetic.floor_gold	Golden tiles	Altın fayans
+cosmetic.floor_neon	Neon grid	Neon ızgara
+cosmetic.wall_default	Standard walls	Standart duvar
+cosmetic.wall_brick	Red brick	Kırmızı tuğla
+cosmetic.wall_navy	Navy	Lacivert
+cosmetic.wall_teal_stripes	Teal stripes	Turkuaz çizgi
+cosmetic.wall_glass	Glass facade	Cam cephe
+cosmetic.wall_gold	Golden walls	Altın duvar
+cosmetic.wall_neon	Neon stripes	Neon çizgi
+cosmetic.ground_default	Green grass	Yeşil çim
+cosmetic.ground_desert	Desert sand	Çöl kumu
+cosmetic.ground_snow	Snowfield	Kar örtüsü
+cosmetic.ground_autumn	Autumn leaves	Sonbahar yaprakları
+cosmetic.ground_city	City pavement	Şehir kaldırımı
+cosmetic.ground_sakura	Cherry blossom	Kiraz çiçeği
+cosmetic.sky_default	Natural sky	Doğal gökyüzü
+cosmetic.sky_sunset	Endless sunset	Sonsuz gün batımı
+cosmetic.sky_deep_blue	Deep blue	Derin mavi
+cosmetic.sky_aurora	Aurora	Kuzey ışıkları
+cosmetic.sky_galaxy	Galaxy	Galaksi
+cosmetic.sky_gold	Golden hour	Altın saat
+cosmetic.sky_neon	Neon night	Neon gece
+achievement.ach_ten_factories	Tycoon	Sanayi Devi
+achievement.ach_ten_factories.desc	Own 10 factories in one season.	Bir sezonda 10 fabrikaya sahip ol.
+achievement.ach_twenty_factories	Factory King	Fabrika Kralı
+achievement.ach_twenty_factories.desc	Own all 20 factories in one season.	Bir sezonda 20 fabrikanın hepsine sahip ol.
+achievement.ach_first_season	Season Veteran	Sezon Gazisi
+achievement.ach_first_season.desc	Complete your first season.	İlk sezonunu tamamla.
+shop.season_pass	Season Pass	Sezon Bileti
+shop.season_pass.desc	For the current season: 150 diamonds now, double diamonds from season rewards and events, and exclusive premium decorations.	Bu sezon için: hemen 150 elmas, sezon ödülleri ve etkinliklerden çift elmas ve özel dekorasyonlar.
+shop.cosmetic_neon	Neon Look	Neon Görünüm
+shop.cosmetic_neon.desc	Neon floor, walls and sky for your factory. Cosmetic only, kept forever.	Fabrikan için neon zemin, duvar ve gökyüzü. Yalnızca görünüm, kalıcı.

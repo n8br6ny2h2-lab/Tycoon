@@ -47,15 +47,23 @@ namespace FactoryKing.Core.Economy
 
         /// <summary>Run earnings needed before prestige is offered.</summary>
         public double PrestigeMinRunEarnings = 1e9;
-        /// <summary>Crowns = floor((runEarnings / PrestigeCrownDivisor) ^ PrestigeExponent).</summary>
+        /// <summary>Crowns = floor(PrestigeLogFactor * log10(runEarnings / PrestigeCrownDivisor)).</summary>
         public double PrestigeCrownDivisor = 1e8;
         /// <summary>
-        /// Fourth root: each extra crown needs much more income, so prestige multiplies progress without the
-        /// runaway loop a square root causes (verified by the 24 h progression probe).
+        /// Logarithmic crowns: with 20 factories earnings span ~30 orders of magnitude, so any power curve (square or
+        /// fourth root) explodes; a log keeps prestige a steady multiplier (verified by the season pacing test).
         /// </summary>
-        public double PrestigeExponent = 0.25;
+        public double PrestigeLogFactor = 2;
         /// <summary>Permanent sell-price bonus per crown (0.1 = +10%).</summary>
         public double PrestigeBonusPerCrown = 0.10;
+
+        /// <summary>Length of a season; the run resets when it ends (permanent rewards are kept).</summary>
+        public double SeasonDays = 30;
+        /// <summary>
+        /// Season momentum: +X sale price per elapsed season day. Catch-up so late factories stay reachable for
+        /// players with less time, and the pace stays smooth instead of hitting a wall.
+        /// </summary>
+        public double SeasonMomentumPerDay = 0.15;
 
         public static EconomyTuning CreateDefault() => new EconomyTuning();
     }

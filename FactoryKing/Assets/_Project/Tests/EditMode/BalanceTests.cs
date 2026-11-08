@@ -1,6 +1,8 @@
 using System;
+using System.Linq;
 using FactoryKing.Core.Content;
 using FactoryKing.Core.Meta;
+using FactoryKing.Core.Numerics;
 using FactoryKing.Core.Simulation;
 using FactoryKing.Core.TimeKeeping;
 using NUnit.Framework;
@@ -8,71 +10,110 @@ using NUnit.Framework;
 namespace FactoryKing.Tests
 {
     /// <summary>
-    /// Progression guard rails using an "ideal player" bot that spends greedily and claims every reward every 5 s.
-    /// Real players are slower, so these bounds are the fastest acceptable pace; they catch runaway economies.
+    /// Season pacing guard rail. An "average player" bot plays 4 sessions of 15 minutes a day (offline earnings in
+    /// between, doubled half the time), spends greedily, uses manager skills and prestiges sensibly. Income during a
+    /// session is credited analytically (the live simulation is verified separately to match the analyzer), which
+    /// lets a whole 30-day season run in seconds.
+    /// Design target: the 20th factory near the end of the season — never early, never unreachable.
     /// </summary>
     public class BalanceTests
     {
-        private sealed class Milestones
+        public static double[] PlaySeason(int sessionsPerDay = 4, int sessionMinutes = 15, int stepMinutes = 3, int days = 32)
         {
-            public double Food = -1, Plastic = -1, AllFive = -1, FirstPrestige = -1;
+            var clock = new ManualClock { UtcNow = new DateTime(2027, 1, 1, 7, 0, 0, DateTimeKind.Utc) };
+            var s = new GameSession(DefaultContent.Create(), clock: clock);
+            var reached = new double[DefaultContent.FactoryCount + 1];
+            var origin = new DateTime(2027, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            long day0 = clock.UtcNow.Ticks;
+            double[] hours = Enumerable.Range(0, sessionsPerDay).Select(i => 8.0 + i * (14.0 / Math.Max(1, sessionsPerDay - 1))).ToArray();
+
+            for (int day = 0; day < days && reached[DefaultContent.FactoryCount] == 0; day++)
+            foreach (var h in hours)
+            {
+                var start = origin.AddDays(day).AddHours(h);
+                if (start <= clock.UtcNow) continue;
+                double gap = (start - clock.UtcNow).TotalSeconds;
+                clock.UtcNow = start;
+                s.Wallet.Grant(s.Offline.Calculate(gap).Earnings * 1.5);
+                s.MetaTick();
+                if (s.Seasons.Number > 1) return reached; // season ended
+                for (int m = 0; m < sessionMinutes; m += stepMinutes)
+                {
+                    s.Wallet.Grant(BigDouble.FromDouble(Math.Max(0, s.PotentialNetPerSecond) * 60 * stepMinutes));
+                    clock.Advance(TimeSpan.FromMinutes(stepMinutes));
+                    s.MetaTick();
+                    Spend(s);
+                    int owned = s.State.Factories.Count(f => f.Unlocked);
+                    for (int k = 1; k <= owned; k++)
+                        if (reached[k] == 0) reached[k] = (clock.UtcNow.Ticks - day0) / (double)TimeSpan.TicksPerDay;
+                }
+            }
+            return reached;
         }
 
-        private static Milestones RunBot(double hours)
+        private static void Spend(GameSession s)
         {
-            var clock = new ManualClock();
-            var s = new GameSession(DefaultContent.Create(), clock: clock);
-            var ms = new Milestones();
-            double t = 0;
-            while (t < hours * 3600)
+            for (int pass = 0; pass < 40; pass++)
             {
-                for (int i = 0; i < 10; i++) { s.Tick(0.5); t += 0.5; }
-                clock.Advance(TimeSpan.FromSeconds(5));
-                foreach (var m in s.State.Missions.Daily) s.Missions.TryClaim(m);
-                foreach (var m in s.State.Missions.Weekly) s.Missions.TryClaim(m);
-                foreach (var a in AchievementService.Defs) s.Achievements.TryClaim(a.Id);
-                s.DailyRewards.TryClaim();
-                foreach (var o in s.State.Orders.ToArray()) s.Orders.TryClaim(o);
-                foreach (var d in ManagerService.Defs) s.Managers.TryHire(d.Id);
-                var owned = s.State.Factories.FindAll(f => f.Unlocked);
-                for (int i = 0; i < s.State.Managers.Count && i < owned.Count; i++)
-                    if (s.State.Managers[i].AssignedFactoryId == null) s.Managers.Assign(s.State.Managers[i].Id, owned[owned.Count - 1 - i].FactoryId);
-                var pv = s.Prestige.Preview();
-                if (pv.Available && pv.CrownsGained >= 3 && s.Prestige.TryPrestige() && ms.FirstPrestige < 0) ms.FirstPrestige = t / 60;
-                bool bought = true;
-                while (bought)
+                bool bought = false;
+                foreach (var f in s.Content.Factories) bought |= s.Factories.TryUnlockFactory(f.Id);
+                foreach (var fs in s.State.Factories)
                 {
-                    bought = false;
-                    foreach (var f in s.Content.Factories) bought |= s.Factories.TryUnlockFactory(f.Id);
-                    foreach (var fs in s.State.Factories)
+                    if (!fs.Unlocked) continue;
+                    if (s.Power.Throttle(fs.FactoryId) < 0.999) bought |= s.Power.TryUpgrade(fs.FactoryId);
+                    for (int l = 0; l < fs.Lines.Count; l++)
                     {
-                        if (!fs.Unlocked) continue;
-                        for (int l = 0; l < fs.Lines.Count; l++)
-                        {
-                            if (!fs.Lines[l].Unlocked) { bought |= s.Factories.TryUnlockLine(fs.FactoryId, l); continue; }
-                            bought |= s.Upgrades.TryUpgrade(new MachineRef(fs.FactoryId, l, s.AnalyzeLine(fs.FactoryId, l).BottleneckIndex));
-                        }
+                        if (!fs.Lines[l].Unlocked) { bought |= s.Factories.TryUnlockLine(fs.FactoryId, l); continue; }
+                        bought |= s.Upgrades.TryUpgrade(new MachineRef(fs.FactoryId, l, s.AnalyzeLine(fs.FactoryId, l).BottleneckIndex), 5);
                     }
-                    foreach (var r in ResearchService.Defs) bought |= s.Research.TryBuy(r.Id);
-                    foreach (var fs in s.State.Factories)
-                        if (fs.Unlocked && s.Power.Throttle(fs.FactoryId) < 0.999) bought |= s.Power.TryUpgrade(fs.FactoryId);
                 }
-                if (ms.Food < 0 && s.State.GetFactory("food").Unlocked) ms.Food = t / 60;
-                if (ms.Plastic < 0 && s.State.GetFactory("plastic").Unlocked) ms.Plastic = t / 60;
-                if (ms.AllFive < 0 && s.State.Factories.TrueForAll(f => f.Unlocked)) ms.AllFive = t / 60;
+                foreach (var r in ResearchService.Defs) bought |= s.Research.TryBuy(r.Id);
+                if (!bought) break;
             }
-            return ms;
+            foreach (var d in ManagerService.Defs) s.Managers.TryHire(d.Id);
+            var owned = s.State.Factories.FindAll(f => f.Unlocked);
+            for (int i = 0; i < s.State.Managers.Count && i < owned.Count; i++)
+                s.Managers.Assign(s.State.Managers[i].Id, owned[owned.Count - 1 - i].FactoryId);
+            foreach (var m in s.State.Managers) s.Managers.TryUseAbility(m.Id);
+            for (int i = 0; i < SeasonService.Tiers.Length; i++) s.Seasons.TryClaim(i);
+            foreach (var a in AchievementService.Defs) s.Achievements.TryClaim(a.Id);
+            s.DailyRewards.TryClaim();
+            var pv = s.Prestige.Preview();
+            if (pv.Available && pv.CrownsGained >= Math.Max(3, s.State.Prestige.Crowns * 0.5)) s.Prestige.TryPrestige();
         }
 
         [Test]
-        public void Ideal_Player_Pace_Stays_Within_Design_Bounds()
+        public void Average_Player_Finishes_The_Season_In_About_A_Month()
         {
-            var m = RunBot(4);
-            TestContext.WriteLine($"food {m.Food:0} min, plastic {m.Plastic:0} min, prestige {m.FirstPrestige:0} min, all five {m.AllFive:0} min");
-            Assert.That(m.Food, Is.InRange(8, 60), "second factory");
-            Assert.That(m.Plastic, Is.InRange(30, 240), "third factory");
-            Assert.That(m.FirstPrestige, Is.GreaterThan(90).Or.EqualTo(-1), "first prestige should not come too early");
-            Assert.That(m.AllFive < 0 || m.AllFive > 180, Is.True, "all five factories must take more than 3 hours");
+            var r = PlaySeason();
+            TestContext.WriteLine($"5 @ {r[5]:0.0} d, 10 @ {r[10]:0.0} d, 15 @ {r[15]:0.0} d, 20 @ {r[20]:0.0} d");
+            Assert.That(r[2], Is.InRange(0.01, 1.0), "second factory on the first day");
+            Assert.That(r[5], Is.InRange(1.0, 7.0));
+            Assert.That(r[10], Is.InRange(3.0, 14.0));
+            Assert.That(r[15], Is.InRange(8.0, 24.0));
+            Assert.That(r[20], Is.InRange(18.0, 30.0), "20th factory near the end of the 30-day season");
+        }
+    }
+}
+
+namespace FactoryKing.Tests
+{
+    public class BalanceExtremesTests
+    {
+        [Test]
+        public void Light_Player_Still_Gets_Far()
+        {
+            var r = BalanceTests.PlaySeason(sessionsPerDay: 2, sessionMinutes: 9);
+            TestContext.WriteLine($"light: 10 @ {r[10]:0.0} d, 15 @ {r[15]:0.0} d, 20 @ {r[20]:0.0} d");
+            Assert.That(r[12], Is.GreaterThan(0), "a player with ~20 minutes a day reaches at least 12 factories");
+        }
+
+        [Test]
+        public void Hardcore_Player_Cannot_Rush_The_Season()
+        {
+            var r = BalanceTests.PlaySeason(sessionsPerDay: 12, sessionMinutes: 45);
+            TestContext.WriteLine($"hardcore: 10 @ {r[10]:0.0} d, 15 @ {r[15]:0.0} d, 20 @ {r[20]:0.0} d");
+            Assert.That(r[20] == 0 || r[20] > 14, Is.True, "even 9 hours a day takes more than two weeks");
         }
     }
 }

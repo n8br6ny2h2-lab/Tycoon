@@ -27,7 +27,7 @@ namespace FactoryKing.Tests
         {
             var t = Table();
             string scripts = Path.GetDirectoryName(TestPaths.ProjectFile("Assets/_Project/Scripts/Runtime/FactoryKing.Runtime.asmdef"));
-            var keyPattern = new Regex("\"((?:ui|screen|nav|hud|market|power|ability|tutorial|map|managers|missions|orders|warehouse|research|daily|achievements|collection|events|prestige|shop|ads|settings|menu|consent|offline|notif|gc|save|debug|achievement)\\.[a-z0-9_.]*[a-z0-9_])\"(?!\\s*\\+)");
+            var keyPattern = new Regex("\"((?:ui|screen|nav|hud|market|power|ability|season|cosmetics|tutorial|map|managers|missions|orders|warehouse|research|daily|achievements|collection|events|prestige|shop|ads|settings|menu|consent|offline|notif|gc|save|debug|achievement)\\.[a-z0-9_.]*[a-z0-9_])\"(?!\\s*\\+)");
             int found = 0;
             foreach (var file in Directory.GetFiles(scripts, "*.cs", SearchOption.AllDirectories))
             foreach (Match m in keyPattern.Matches(File.ReadAllText(file)))
@@ -54,6 +54,8 @@ namespace FactoryKing.Tests
             foreach (var k in new[] { "prestige.bonus.multiplier", "prestige.bonus.cash", "prestige.bonus.line2", "prestige.bonus.food" }) AssertKey(t, k);
             foreach (var d in new[] { "decor_monument", "badge_prestige", "decor_weekly_flag", "decor_golden_gear", "decor_gold_trucks", "decor_gold_trim", "decor_gold_statue" })
                 AssertKey(t, "decor." + d);
+            foreach (var c in CosmeticService.Defs) AssertKey(t, c.NameKey);
+            foreach (var slot in Enum.GetNames(typeof(CosmeticSlot))) AssertKey(t, "cosmetics.slot." + slot);
             AssertKey(t, "event.weekend_rush");
             AssertKey(t, "event.weekend_rush.desc");
         }
