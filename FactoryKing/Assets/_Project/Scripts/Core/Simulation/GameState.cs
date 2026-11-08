@@ -48,6 +48,8 @@ namespace FactoryKing.Core.Simulation
         public bool Unlocked;
         /// <summary>Power plant level (1..MaxPowerLevel).</summary>
         public int PowerLevel = 1;
+        /// <summary>Truck fleet tier at the dock (1..5): bigger loads per trip.</summary>
+        public int FleetLevel = 1;
         public List<LineState> Lines = new List<LineState>();
     }
 
@@ -115,6 +117,7 @@ namespace FactoryKing.Core.Simulation
         public int TutorialStep;
         /// <summary>Player-chosen company name (local profile; no account needed).</summary>
         public string CompanyName;
+        public LiveOpsState Live = new LiveOpsState();
 
         public static GameState CreateNew(GameContent content, EconomyTuning tuning)
         {
@@ -141,7 +144,7 @@ namespace FactoryKing.Core.Simulation
             foreach (var fs in Factories)
                 if (fs?.FactoryId != null && !byId.ContainsKey(fs.FactoryId)) byId[fs.FactoryId] = fs;
 
-            var ordered = new List<FactoryDef>(content.Factories);
+            var ordered = new List<FactoryDef>(content.AllFactories);
             ordered.Sort((a, b) => a.Order.CompareTo(b.Order));
 
             var rebuilt = new List<FactoryState>();
@@ -150,6 +153,7 @@ namespace FactoryKing.Core.Simulation
                 if (!byId.TryGetValue(def.Id, out var fs)) fs = new FactoryState { FactoryId = def.Id };
                 fs.Lines ??= new List<LineState>();
                 if (fs.PowerLevel < 1) fs.PowerLevel = 1;
+                if (fs.FleetLevel < 1) fs.FleetLevel = 1;
                 while (fs.Lines.Count < def.LineCount) fs.Lines.Add(new LineState());
                 if (fs.Lines.Count > def.LineCount) fs.Lines.RemoveRange(def.LineCount, fs.Lines.Count - def.LineCount);
                 foreach (var line in fs.Lines)
@@ -185,7 +189,7 @@ namespace FactoryKing.Core.Simulation
             Missions.Daily ??= new List<MissionState>();
             Missions.Weekly ??= new List<MissionState>();
             Orders ??= new List<OrderState>();
-            Orders.RemoveAll(o => o == null || o.FactoryId == null || content.Factories.TrueForAll(f => f.Id != o.FactoryId));
+            Orders.RemoveAll(o => o == null || o.FactoryId == null || !content.TryGetFactory(o.FactoryId, out _));
             AchievementsUnlocked ??= new HashSet<string>(StringComparer.Ordinal);
             AchievementsClaimed ??= new HashSet<string>(StringComparer.Ordinal);
             Daily ??= new DailyRewardState();
@@ -200,6 +204,15 @@ namespace FactoryKing.Core.Simulation
             if (Season.Number < 1) Season.Number = 1;
             if (Season.LegacyStars < 0) Season.LegacyStars = 0;
             EquippedCosmetics ??= new Dictionary<string, string>(StringComparer.Ordinal);
+            Live ??= new LiveOpsState();
+            Live.Expeditions ??= new List<ExpeditionState>();
+            Live.ManagerCards ??= new Dictionary<string, int>(StringComparer.Ordinal);
+            Live.Crates ??= new Dictionary<string, int>(StringComparer.Ordinal);
+            Live.Engineering ??= new Dictionary<string, int>(StringComparer.Ordinal);
+            Live.RoadClaimedFree ??= new HashSet<int>();
+            Live.RoadClaimedPremium ??= new HashSet<int>();
+            Live.EventBadges ??= new List<string>();
+            if (Live.EventFactory != null) Live.EventFactory.ClaimedTiers ??= new HashSet<int>();
             Ads ??= new AdState();
             Ads.ShownToday ??= new Dictionary<string, int>(StringComparer.Ordinal);
             Ads.LastShownUtcTicks ??= new Dictionary<string, long>(StringComparer.Ordinal);

@@ -153,7 +153,7 @@ namespace FactoryKing.Tests
             state.Factories[0].Lines[0].Machines[1].Progress = double.NaN;
             state.ActiveFactoryId = "deleted_factory";
             state.EnsureConsistent(content);
-            Assert.That(state.Factories.Count, Is.EqualTo(DefaultContent.FactoryCount));
+            Assert.That(state.Factories.Count, Is.EqualTo(DefaultContent.FactoryCount + 3));
             Assert.That(state.Factories[0].Lines[0].Machines.Count, Is.EqualTo(6));
             Assert.That(state.Factories[0].Lines[0].Machines[0].Level, Is.EqualTo(1));
             Assert.That(state.Factories[0].Lines[0].Machines[1].Progress, Is.EqualTo(0));

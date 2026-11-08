@@ -120,6 +120,8 @@ namespace FactoryKing.Tests
             var cost1 = _s.AnalyzeLine("steel", 0).CostsPerSecond;
             Assert.That(cost1, Is.LessThan(baseCost));
             _s.State.Cash = 1e9;
+            Assert.That(_s.Managers.TryLevelUp("mgr_kemal"), Is.False, "needs a card");
+            _s.Managers.AddCards("mgr_kemal", 1);
             Assert.That(_s.Managers.TryLevelUp("mgr_kemal"), Is.True);
             Assert.That(_s.AnalyzeLine("steel", 0).CostsPerSecond, Is.LessThan(cost1));
             Assert.That(_s.State.Stats.ManagerLevelUps, Is.EqualTo(1));
@@ -140,8 +142,8 @@ namespace FactoryKing.Tests
         [Test]
         public void Five_Managers_With_All_Rarities_And_Distinct_Perks()
         {
-            Assert.That(ManagerService.Defs.Count, Is.EqualTo(5));
-            Assert.That(ManagerService.Defs.Select(d => d.Stat).Distinct().Count(), Is.EqualTo(5));
+            Assert.That(ManagerService.Defs.Count, Is.EqualTo(20));
+            Assert.That(ManagerService.Defs.Take(5).Select(d => d.Stat).Distinct().Count(), Is.EqualTo(5));
             Assert.That(ManagerService.Defs.Select(d => d.Rarity).Distinct().Count(), Is.EqualTo(4));
             foreach (var d in ManagerService.Defs)
                 Assert.That(ManagerService.Bonus(d, d.MaxLevel), Is.GreaterThan(ManagerService.Bonus(d, 1)));

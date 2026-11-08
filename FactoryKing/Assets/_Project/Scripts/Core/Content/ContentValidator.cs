@@ -34,7 +34,7 @@ namespace FactoryKing.Core.Content
 
             var factoryIds = new HashSet<string>(StringComparer.Ordinal);
             var usedMachines = new HashSet<string>(StringComparer.Ordinal);
-            foreach (var f in content.Factories)
+            foreach (var f in content.AllFactories)
             {
                 if (!factoryIds.Add(f.Id)) errors.Add($"Duplicate factory id '{f.Id}'.");
                 if (f.LineCount < 1) errors.Add($"Factory '{f.Id}' has no lines.");

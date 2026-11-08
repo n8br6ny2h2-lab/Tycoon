@@ -121,6 +121,8 @@ namespace FactoryKing.Core.Meta
             if (m == null || m.Claimed || !IsComplete(m)) return false;
             m.Claimed = true;
             _s.Wallet.AddDiamonds(m.RewardDiamonds);
+            _s.Piggy.Feed(m.RewardDiamonds);
+            _s.Road.AddXp(m.Id != null && m.Id.StartsWith("w") ? SeasonXp.WeeklyMission : SeasonXp.DailyMission);
             _s.Wallet.Grant(m.RewardCash > 0 ? BigDouble.FromDouble(m.RewardCash) : _s.IncomeReward(m.RewardCashSeconds));
             _s.Analytics.Track(AnalyticsEvents.MissionClaimed, "type", m.Type);
             Changed?.Invoke();
@@ -203,6 +205,8 @@ namespace FactoryKing.Core.Meta
             o.Claimed = true;
             _s.Wallet.Grant(Reward(o));
             _s.Wallet.AddDiamonds(2);
+            _s.Piggy.Feed(2);
+            _s.Road.AddXp(SeasonXp.Order);
             _s.State.Stats.OrdersCompleted++;
             Refresh();
             Changed?.Invoke();
@@ -232,9 +236,9 @@ namespace FactoryKing.Core.Meta
             A("ach_ten_machines", 15, s => s.OwnedMachineCount, 10),
             A("ach_first_million", 25, s => s.State.LifetimeEarnings.ToDouble(), 1e6),
             A("ach_first_prestige", 50, s => s.State.Prestige.Count, 1),
-            A("ach_five_factories", 100, s => s.State.Factories.FindAll(f => f.Unlocked).Count, 5, "floor_marble"),
-            A("ach_ten_factories", 150, s => s.State.Factories.FindAll(f => f.Unlocked).Count, 10, "wall_glass"),
-            A("ach_twenty_factories", 300, s => s.State.Factories.FindAll(f => f.Unlocked).Count, 20),
+            A("ach_five_factories", 100, s => s.OwnedRegularFactories, 5, "floor_marble"),
+            A("ach_ten_factories", 150, s => s.OwnedRegularFactories, 10, "wall_glass"),
+            A("ach_twenty_factories", 300, s => s.OwnedRegularFactories, 20),
             A("ach_first_season", 100, s => s.State.Stats.SeasonsCompleted, 1, "ground_city"),
             A("ach_first_billion", 60, s => s.State.LifetimeEarnings.ToDouble(), 1e9),
             A("ach_level_100", 40, s => s.State.Stats.HighestMachineLevel, 100),
@@ -277,6 +281,8 @@ namespace FactoryKing.Core.Meta
             var d = Defs.Find(x => x.Id == id);
             if (d == null || !_s.State.AchievementsUnlocked.Contains(id) || !_s.State.AchievementsClaimed.Add(id)) return false;
             _s.Wallet.AddDiamonds(d.RewardDiamonds);
+            _s.Piggy.Feed(d.RewardDiamonds);
+            _s.Road.AddXp(SeasonXp.Achievement);
             if (d.RewardCosmetic != null) _s.Cosmetics.Grant(d.RewardCosmetic);
             return true;
         }
@@ -316,7 +322,8 @@ namespace FactoryKing.Core.Meta
         {
             if (!CanClaim) return false;
             var r = Cycle[NextIndex];
-            if (r.Diamonds > 0) _s.Wallet.AddDiamonds(r.Diamonds);
+            if (r.Diamonds > 0) { _s.Wallet.AddDiamonds(r.Diamonds); _s.Piggy.Feed(r.Diamonds); }
+            _s.Road.AddXp(SeasonXp.DailyReward);
             if (r.CashSeconds > 0) _s.Wallet.Grant(_s.IncomeReward(r.CashSeconds));
             if (r.BoostMinutes > 0) _s.Boosts.Activate(r.BoostMinutes);
             if (r.DecorId != null) _s.State.Collection.Add(r.DecorId);

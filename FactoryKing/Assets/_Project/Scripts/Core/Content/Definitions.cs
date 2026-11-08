@@ -114,6 +114,11 @@ namespace FactoryKing.Core.Content
         public double PowerUpgradeBaseCost = 150;
         public double PowerUpgradeGrowth = 1.55;
 
+        /// <summary>Limited-time event factory (not bought, not counted for season milestones).</summary>
+        public bool IsEvent;
+        /// <summary>Factory whose product this one uses: when owned, costs -20% and prices +10% (supply chain).</summary>
+        public string SupplierId;
+
         public int LineCount => LineUnlockCosts.Length;
     }
 
@@ -122,7 +127,19 @@ namespace FactoryKing.Core.Content
     {
         public readonly List<ProductDef> Products = new List<ProductDef>();
         public readonly List<MachineDef> Machines = new List<MachineDef>();
+        /// <summary>The 20 regular factories, in unlock order.</summary>
         public readonly List<FactoryDef> Factories = new List<FactoryDef>();
+        /// <summary>Limited-time event factories (rotating).</summary>
+        public readonly List<FactoryDef> EventFactories = new List<FactoryDef>();
+
+        public IEnumerable<FactoryDef> AllFactories
+        {
+            get
+            {
+                foreach (var f in Factories) yield return f;
+                foreach (var f in EventFactories) yield return f;
+            }
+        }
 
         private Dictionary<string, ProductDef> _products;
         private Dictionary<string, MachineDef> _machines;
@@ -130,7 +147,7 @@ namespace FactoryKing.Core.Content
 
         public ProductDef GetProduct(string id) => Lookup(ref _products, Products, p => p.Id, id, "product");
         public MachineDef GetMachine(string id) => Lookup(ref _machines, Machines, m => m.Id, id, "machine");
-        public FactoryDef GetFactory(string id) => Lookup(ref _factories, Factories, f => f.Id, id, "factory");
+        public FactoryDef GetFactory(string id) => Lookup(ref _factories, new List<FactoryDef>(AllFactories), f => f.Id, id, "factory");
 
         public bool TryGetFactory(string id, out FactoryDef def)
         {
@@ -139,7 +156,7 @@ namespace FactoryKing.Core.Content
             if (_factories == null)
             {
                 _factories = new Dictionary<string, FactoryDef>(StringComparer.Ordinal);
-                foreach (var f in Factories) _factories[f.Id] = f;
+                foreach (var f in AllFactories) _factories[f.Id] = f;
             }
             return _factories.TryGetValue(id, out def);
         }

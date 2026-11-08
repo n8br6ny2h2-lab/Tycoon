@@ -19,6 +19,10 @@ namespace FactoryKing.Core.Simulation
         public long DailyRewardsClaimed;
         public int HighestMachineLevel = 1;
         public long SeasonsCompleted;
+        public long DronesCaught;
+        public long ExpeditionsDone;
+        public long CratesOpened;
+        public long EventTokensBest;
         public double SessionCount;
         public Dictionary<string, long> SoldByProduct = new Dictionary<string, long>(StringComparer.Ordinal);
     }
@@ -38,6 +42,11 @@ namespace FactoryKing.Core.Simulation
         public bool BatterySaver;
         public bool OnboardingDone;
         public bool ReviewRequested;
+        public bool AutoUpgrade;
+        /// <summary>0 = normal, 1 = large, 2 = extra large text.</summary>
+        public int TextScale;
+        public bool Colorblind;
+        public bool ReduceMotion;
     }
 
     /// <summary>Wall-clock bookkeeping used by offline earnings and the anti clock-tampering guard.</summary>
@@ -135,6 +144,52 @@ namespace FactoryKing.Core.Simulation
         public HashSet<int> ClaimedTiers = new HashSet<int>();
         /// <summary>"seasonNumber:factoriesReached" entries.</summary>
         public List<string> History = new List<string>();
+    }
+
+    [Serializable]
+    public sealed class ExpeditionState
+    {
+        public int Slot;
+        public int Kind;            // 0 short, 1 medium, 2 long
+        public long StartUtcTicks;
+        public long EndUtcTicks;
+        public double RewardCash;   // fixed at departure
+        public int RewardCards;
+        public long RewardDiamonds;
+        public bool RewardCrate;
+    }
+
+    [Serializable]
+    public sealed class EventFactoryState
+    {
+        public string FactoryId;
+        public long StartUtcTicks;
+        public long EndUtcTicks;
+        public long BaselineSold;
+        public double Scale = 1;
+        public HashSet<int> ClaimedTiers = new HashSet<int>();
+    }
+
+    [Serializable]
+    public sealed class LiveOpsState
+    {
+        public long DroneNextUtcTicks;
+        public long DroneVisibleUntilUtcTicks;
+        public int DroneSeed;
+        public EventFactoryState EventFactory;
+        public List<ExpeditionState> Expeditions = new List<ExpeditionState>();
+        public Dictionary<string, int> ManagerCards = new Dictionary<string, int>(StringComparer.Ordinal);
+        public Dictionary<string, int> Crates = new Dictionary<string, int>(StringComparer.Ordinal);
+        public Dictionary<string, int> Engineering = new Dictionary<string, int>(StringComparer.Ordinal);
+        public int SeasonXp;
+        public HashSet<int> RoadClaimedFree = new HashSet<int>();
+        public HashSet<int> RoadClaimedPremium = new HashSet<int>();
+        public List<string> EventBadges = new List<string>();
+        public long PiggyDiamonds;
+        public long StarterOfferStartUtcTicks;
+        public long SubscriptionExpiresUtcTicks;
+        public long SubscriptionLastDailyDay = -1;
+        public double AutoUpgradeTimer;
     }
 
     [Serializable]

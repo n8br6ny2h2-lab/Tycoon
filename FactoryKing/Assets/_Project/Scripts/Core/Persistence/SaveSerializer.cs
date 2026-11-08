@@ -31,7 +31,7 @@ namespace FactoryKing.Core.Persistence
             var factories = JsonValue.NewArray();
             foreach (var f in s.Factories)
             {
-                var fo = JsonValue.NewObject().Set("id", f.FactoryId).Set("unlocked", f.Unlocked).Set("power", f.PowerLevel);
+                var fo = JsonValue.NewObject().Set("id", f.FactoryId).Set("unlocked", f.Unlocked).Set("power", f.PowerLevel).Set("fleet", f.FleetLevel);
                 var lines = JsonValue.NewArray();
                 foreach (var l in f.Lines)
                 {
@@ -55,14 +55,16 @@ namespace FactoryKing.Core.Persistence
                 .Set("produced", st.UnitsProduced).Set("sold", st.UnitsSold).Set("upgrades", st.Upgrades)
                 .Set("orders", st.OrdersCompleted).Set("mgrUps", st.ManagerLevelUps).Set("ads", st.AdsWatched)
                 .Set("factories", st.FactoriesBought).Set("lines", st.LinesBought).Set("research", st.ResearchBought)
-                .Set("daily", st.DailyRewardsClaimed).Set("highest", st.HighestMachineLevel).Set("seasons", st.SeasonsCompleted).Set("sessions", st.SessionCount)
+                .Set("daily", st.DailyRewardsClaimed).Set("highest", st.HighestMachineLevel).Set("seasons", st.SeasonsCompleted).Set("drones", st.DronesCaught).Set("exped", st.ExpeditionsDone)
+                .Set("crates", st.CratesOpened).Set("evBest", st.EventTokensBest).Set("sessions", st.SessionCount)
                 .Set("soldBy", LongMap(st.SoldByProduct)));
 
             var se = s.Settings;
             o.Set("settings", JsonValue.NewObject()
                 .Set("music", se.MusicVolume).Set("sfx", se.SfxVolume).Set("notif", se.Notifications)
                 .Set("analytics", se.AnalyticsConsent).Set("asked", se.ConsentAsked).Set("lang", se.Language).Set("hq", se.HighQuality)
-                .Set("haptics", se.Haptics).Set("saver", se.BatterySaver).Set("onboard", se.OnboardingDone).Set("review", se.ReviewRequested));
+                .Set("haptics", se.Haptics).Set("saver", se.BatterySaver).Set("onboard", se.OnboardingDone).Set("review", se.ReviewRequested)
+                .Set("auto", se.AutoUpgrade).Set("text", se.TextScale).Set("cb", se.Colorblind).Set("motion", se.ReduceMotion));
 
             // Ticks exceed double precision: store as strings.
             o.Set("time", JsonValue.NewObject()
@@ -113,6 +115,7 @@ namespace FactoryKing.Core.Persistence
             var equipped = JsonValue.NewObject();
             foreach (var kv in s.EquippedCosmetics) equipped.Set(kv.Key, kv.Value);
             o.Set("equipped", equipped);
+            o.Set("live", LiveToJson(s.Live));
 
             var shown = JsonValue.NewObject();
             foreach (var kv in s.Ads.ShownToday) shown.Set(kv.Key, kv.Value);
@@ -145,7 +148,7 @@ namespace FactoryKing.Core.Persistence
             foreach (var fo in o.Arr("factories").Items)
             {
                 if (fo.Type != JsonType.Object) continue;
-                var f = new FactoryState { FactoryId = fo.Str("id"), Unlocked = fo.Bool("unlocked"), PowerLevel = fo.Int("power", 1) };
+                var f = new FactoryState { FactoryId = fo.Str("id"), Unlocked = fo.Bool("unlocked"), PowerLevel = fo.Int("power", 1), FleetLevel = fo.Int("fleet", 1) };
                 foreach (var lo in fo.Arr("lines").Items)
                 {
                     var l = new LineState { Unlocked = lo.Bool("unlocked") };
@@ -176,6 +179,10 @@ namespace FactoryKing.Core.Persistence
             s.Stats.DailyRewardsClaimed = st.Lng("daily");
             s.Stats.HighestMachineLevel = st.Int("highest", 1);
             s.Stats.SeasonsCompleted = st.Lng("seasons");
+            s.Stats.DronesCaught = st.Lng("drones");
+            s.Stats.ExpeditionsDone = st.Lng("exped");
+            s.Stats.CratesOpened = st.Lng("crates");
+            s.Stats.EventTokensBest = st.Lng("evBest");
             s.Stats.SessionCount = st.Dbl("sessions");
             ReadLongMap(st.Obj("soldBy"), s.Stats.SoldByProduct);
 
@@ -191,6 +198,10 @@ namespace FactoryKing.Core.Persistence
             s.Settings.BatterySaver = se.Bool("saver");
             s.Settings.OnboardingDone = se.Bool("onboard", o.Has("cash")); // existing saves skip onboarding
             s.Settings.ReviewRequested = se.Bool("review");
+            s.Settings.AutoUpgrade = se.Bool("auto");
+            s.Settings.TextScale = Math.Max(0, Math.Min(2, se.Int("text")));
+            s.Settings.Colorblind = se.Bool("cb");
+            s.Settings.ReduceMotion = se.Bool("motion");
 
             var t = o.Obj("time");
             s.Time.LastSavedUtcTicks = Ticks(t.Str("saved"));
@@ -254,6 +265,8 @@ namespace FactoryKing.Core.Persistence
             var eq = o.Obj("equipped");
             foreach (var k in eq.Keys) if (eq.Str(k) != null) s.EquippedCosmetics[k] = eq.Str(k);
 
+            LiveFromJson(o.Obj("live"), s.Live);
+
             var ads = o.Obj("ads");
             s.Ads.Day = ads.Lng("day", -1);
             var shown = ads.Obj("shown");
@@ -261,6 +274,82 @@ namespace FactoryKing.Core.Persistence
             var last = ads.Obj("last");
             foreach (var k in last.Keys) s.Ads.LastShownUtcTicks[k] = Ticks(last.Str(k));
             return s;
+        }
+
+        private static JsonValue IntMap(Dictionary<string, int> map)
+        {
+            var o = JsonValue.NewObject();
+            foreach (var kv in map) o.Set(kv.Key, kv.Value);
+            return o;
+        }
+
+        private static JsonValue IntSet(IEnumerable<int> set)
+        {
+            var a = JsonValue.NewArray();
+            foreach (var i in set) a.Add(JsonValue.From((double)i));
+            return a;
+        }
+
+        private static JsonValue LiveToJson(LiveOpsState l)
+        {
+            var exps = JsonValue.NewArray();
+            foreach (var e in l.Expeditions)
+                exps.Add(JsonValue.NewObject().Set("slot", e.Slot).Set("kind", e.Kind).Set("start", e.StartUtcTicks.ToString())
+                    .Set("end", e.EndUtcTicks.ToString()).Set("cash", e.RewardCash).Set("cards", e.RewardCards)
+                    .Set("dia", e.RewardDiamonds).Set("crate", e.RewardCrate));
+            var o = JsonValue.NewObject()
+                .Set("droneNext", l.DroneNextUtcTicks.ToString()).Set("droneUntil", l.DroneVisibleUntilUtcTicks.ToString()).Set("droneSeed", l.DroneSeed)
+                .Set("exps", exps).Set("cards", IntMap(l.ManagerCards)).Set("crates", IntMap(l.Crates)).Set("eng", IntMap(l.Engineering))
+                .Set("xp", l.SeasonXp).Set("roadFree", IntSet(l.RoadClaimedFree)).Set("roadPrem", IntSet(l.RoadClaimedPremium))
+                .Set("badges", StrArray(l.EventBadges)).Set("piggy", l.PiggyDiamonds).Set("starter", l.StarterOfferStartUtcTicks.ToString())
+                .Set("subExp", l.SubscriptionExpiresUtcTicks.ToString()).Set("subDay", l.SubscriptionLastDailyDay);
+            if (l.EventFactory != null)
+            {
+                var e = l.EventFactory;
+                o.Set("event", JsonValue.NewObject().Set("f", e.FactoryId).Set("start", e.StartUtcTicks.ToString()).Set("end", e.EndUtcTicks.ToString())
+                    .Set("base", e.BaselineSold).Set("scale", e.Scale).Set("claimed", IntSet(e.ClaimedTiers)));
+            }
+            return o;
+        }
+
+        private static void LiveFromJson(JsonValue o, LiveOpsState l)
+        {
+            l.DroneNextUtcTicks = Ticks(o.Str("droneNext"));
+            l.DroneVisibleUntilUtcTicks = Ticks(o.Str("droneUntil"));
+            l.DroneSeed = o.Int("droneSeed");
+            foreach (var e in o.Arr("exps").Items)
+                l.Expeditions.Add(new ExpeditionState
+                {
+                    Slot = e.Int("slot"), Kind = Math.Max(0, Math.Min(2, e.Int("kind"))), StartUtcTicks = Ticks(e.Str("start")),
+                    EndUtcTicks = Ticks(e.Str("end")), RewardCash = Math.Max(0, e.Dbl("cash")), RewardCards = Math.Max(0, e.Int("cards")),
+                    RewardDiamonds = Math.Max(0, e.Lng("dia")), RewardCrate = e.Bool("crate"),
+                });
+            ReadIntMap(o.Obj("cards"), l.ManagerCards);
+            ReadIntMap(o.Obj("crates"), l.Crates);
+            ReadIntMap(o.Obj("eng"), l.Engineering);
+            l.SeasonXp = Math.Max(0, o.Int("xp"));
+            foreach (var v in o.Arr("roadFree").Items) l.RoadClaimedFree.Add(v.AsInt());
+            foreach (var v in o.Arr("roadPrem").Items) l.RoadClaimedPremium.Add(v.AsInt());
+            foreach (var v in o.Arr("badges").Items) if (v.AsString() != null) l.EventBadges.Add(v.AsString());
+            l.PiggyDiamonds = Math.Max(0, o.Lng("piggy"));
+            l.StarterOfferStartUtcTicks = Ticks(o.Str("starter"));
+            l.SubscriptionExpiresUtcTicks = Ticks(o.Str("subExp"));
+            l.SubscriptionLastDailyDay = o.Lng("subDay", -1);
+            var ev = o.Get("event");
+            if (ev != null && ev.Type == JsonType.Object && ev.Str("f") != null)
+            {
+                l.EventFactory = new EventFactoryState
+                {
+                    FactoryId = ev.Str("f"), StartUtcTicks = Ticks(ev.Str("start")), EndUtcTicks = Ticks(ev.Str("end")),
+                    BaselineSold = ev.Lng("base"), Scale = Math.Max(1, ev.Dbl("scale", 1)),
+                };
+                foreach (var v in ev.Arr("claimed").Items) l.EventFactory.ClaimedTiers.Add(v.AsInt());
+            }
+        }
+
+        private static void ReadIntMap(JsonValue o, Dictionary<string, int> into)
+        {
+            foreach (var k in o.Keys) into[k] = Math.Max(0, o.Int(k));
         }
 
         /// <summary>Upgrades older save layouts in place before reading.</summary>

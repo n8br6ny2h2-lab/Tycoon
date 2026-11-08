@@ -51,9 +51,66 @@ namespace FactoryKing.Core.Meta
                 AbilityKey = "ability.flash_sale", AbilityStat = ModifierStat.SellPrice, AbilityMultiplier = 2, AbilitySeconds = 150, AbilityCooldownSeconds = 2700 },
         };
 
+        // 15 more managers, collected with cards (from crates, expeditions, events and the season road).
+        static ManagerService()
+        {
+            (string id, Rarity r, ModifierStat stat)[] extra =
+            {
+                ("mgr_mert", Rarity.Common, ModifierStat.ProductionSpeed), ("mgr_elif", Rarity.Common, ModifierStat.SellPrice),
+                ("mgr_can", Rarity.Common, ModifierStat.OperatingCost), ("mgr_zeynep", Rarity.Common, ModifierStat.OfflineEarnings),
+                ("mgr_emre", Rarity.Rare, ModifierStat.StorageCapacity), ("mgr_derya", Rarity.Rare, ModifierStat.SellPrice),
+                ("mgr_burak", Rarity.Rare, ModifierStat.OperatingCost), ("mgr_ece", Rarity.Rare, ModifierStat.ProductionSpeed),
+                ("mgr_oguz", Rarity.Epic, ModifierStat.ProductionSpeed), ("mgr_seda", Rarity.Epic, ModifierStat.SellPrice),
+                ("mgr_tolga", Rarity.Epic, ModifierStat.StorageCapacity), ("mgr_nil", Rarity.Epic, ModifierStat.OperatingCost),
+                ("mgr_kaan", Rarity.Legendary, ModifierStat.ProductionSpeed), ("mgr_ipek", Rarity.Legendary, ModifierStat.OfflineEarnings),
+                ("mgr_arda", Rarity.Legendary, ModifierStat.OperatingCost),
+            };
+            string[] colors = { "#6C8EAD", "#E07A5F", "#81B29A", "#F2CC8F", "#3D405B" };
+            int i = 0;
+            foreach (var (id, r, stat) in extra)
+            {
+                var template = Defs.Find(d => d.Stat == stat);
+                Defs.Add(new ManagerDef
+                {
+                    Id = id, NameKey = "manager." + id, TitleKey = template.TitleKey, Rarity = r, Stat = stat,
+                    HireDiamonds = 0, ColorHex = colors[i++ % colors.Length],
+                    AbilityKey = template.AbilityKey, AbilityStat = template.AbilityStat,
+                    AbilityMultiplier = template.AbilityMultiplier, AbilityInstantIncomeSeconds = template.AbilityInstantIncomeSeconds,
+                    AbilitySeconds = template.AbilitySeconds * (1 + 0.15 * (int)r),
+                    AbilityCooldownSeconds = template.AbilityCooldownSeconds * (1 - 0.08 * (int)r),
+                });
+            }
+        }
+
+        /// <summary>Cards needed to recruit a manager of this rarity without diamonds.</summary>
+        public static int CardsToUnlock(Rarity r) => 10 * (1 << (int)r);   // 10 / 20 / 40 / 80
+        /// <summary>Cards consumed to go from <paramref name="level"/> to level + 1.</summary>
+        public static int CardsForLevel(int level) => level;
+
         private readonly GameSession _s;
 
         public ManagerService(GameSession session) => _s = session;
+
+        public int Cards(string id) => _s.State.Live.ManagerCards.TryGetValue(id, out int n) ? n : 0;
+
+        public void AddCards(string id, int count)
+        {
+            if (GetDef(id) == null || count <= 0) return;
+            _s.State.Live.ManagerCards[id] = Cards(id) + count;
+            Changed?.Invoke();
+        }
+
+        /// <summary>Recruit with collected cards (managers without a diamond price can only be recruited this way).</summary>
+        public bool TryRecruitWithCards(string id)
+        {
+            var def = GetDef(id);
+            if (def == null || IsOwned(id)) return false;
+            int need = CardsToUnlock(def.Rarity);
+            if (Cards(id) < need) return false;
+            _s.State.Live.ManagerCards[id] = Cards(id) - need;
+            Grant(id);
+            return true;
+        }
 
         public event Action Changed;
 
@@ -78,7 +135,7 @@ namespace FactoryKing.Core.Meta
         public bool TryHire(string id)
         {
             var def = GetDef(id);
-            if (def == null || IsOwned(id)) return false;
+            if (def == null || IsOwned(id) || def.HireDiamonds <= 0) return false;
             if (!_s.Wallet.TrySpendDiamonds(def.HireDiamonds)) return false;
             Grant(id);
             return true;
@@ -98,7 +155,10 @@ namespace FactoryKing.Core.Meta
             var def = GetDef(id);
             var m = GetOwned(id);
             if (def == null || m == null || m.Level >= def.MaxLevel) return false;
+            int cards = CardsForLevel(m.Level);
+            if (Cards(id) < cards) return false;
             if (!_s.Wallet.TrySpend(LevelUpCost(def, m.Level))) return false;
+            _s.State.Live.ManagerCards[id] = Cards(id) - cards;
             m.Level++;
             _s.State.Stats.ManagerLevelUps++;
             Apply();
@@ -137,7 +197,8 @@ namespace FactoryKing.Core.Meta
             var def = GetDef(id);
             var m = GetOwned(id);
             long now = _s.Time.TrustedNow.Ticks;
-            m.AbilityReadyUtcTicks = now + (long)(def.AbilityCooldownSeconds * TimeSpan.TicksPerSecond);
+            double cooldown = def.AbilityCooldownSeconds * (1 - 0.08 * _s.Engineering.Level(EngineeringService.Cooldown));
+            m.AbilityReadyUtcTicks = now + (long)(cooldown * TimeSpan.TicksPerSecond);
             if (def.AbilityInstantIncomeSeconds > 0)
             {
                 double factoryNet = 0;

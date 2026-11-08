@@ -39,7 +39,7 @@ namespace FactoryKing.Core.Meta
         {
             get
             {
-                double hours = _s.Tuning.OfflineCapHours + _s.Research.OfflineCapBonusHours;
+                double hours = _s.Tuning.OfflineCapHours + _s.Research.OfflineCapBonusHours + _s.Engineering.Level(EngineeringService.Offline);
                 if (_s.State.Entitlements.Contains(StoreCatalog.EntitlementVip)) hours += StoreCatalog.VipOfflineHours;
                 return hours * 3600d;
             }

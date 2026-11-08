@@ -69,6 +69,8 @@ namespace FactoryKing.Core.Meta
             C("sky_galaxy", CosmeticSlot.Sky, "#5B2A86", null, CosmeticPattern.Solid, CosmeticSource.SeasonPremium),
             C("sky_gold", CosmeticSlot.Sky, "#FFD166", null, CosmeticPattern.Solid, CosmeticSource.Purchase, 0, "cosmetic_gold"),
             C("sky_neon", CosmeticSlot.Sky, "#7209B7", null, CosmeticPattern.Solid, CosmeticSource.Purchase, 0, "cosmetic_neon"),
+            C("floor_carbon", CosmeticSlot.Floor, "#2B2D31", "#3D4047", CosmeticPattern.Checker, CosmeticSource.SeasonPremium),
+            C("wall_aurora", CosmeticSlot.Wall, "#2EC4B6", "#7B2CBF", CosmeticPattern.Stripes, CosmeticSource.SeasonPremium),
         };
 
         private static CosmeticDef C(string id, CosmeticSlot slot, string color, string secondary, CosmeticPattern pattern,
@@ -191,11 +193,11 @@ namespace FactoryKing.Core.Meta
 
         public double SecondsLeft => Math.Max(0, (End - _s.Time.TrustedNow).TotalSeconds);
 
-        public int OwnedFactories => _s.State.Factories.FindAll(f => f.Unlocked).Count;
+        public int OwnedFactories => _s.OwnedRegularFactories;
 
         public bool IsReached(int tier) => OwnedFactories >= Tiers[tier].Factories || St.ReachedTiers.Contains(tier);
         public bool IsClaimed(int tier) => St.ClaimedTiers.Contains(tier);
-        public bool CanEndEarly => OwnedFactories >= _s.Content.Factories.Count;
+        public bool CanEndEarly => OwnedFactories >= _s.Content.Factories.Count; // regular factories only
 
         public int ClaimableCount
         {
@@ -253,6 +255,7 @@ namespace FactoryKing.Core.Meta
         public void EndSeason()
         {
             for (int i = 0; i < Tiers.Length; i++) if (IsReached(i)) TryClaim(i);
+            _s.Road.OnSeasonEnd();
             int old = St.Number, reached = St.BestFactories;
             St.History.Add(old + ":" + reached);
             if (St.History.Count > 24) St.History.RemoveAt(0);
@@ -263,7 +266,7 @@ namespace FactoryKing.Core.Meta
             st.Factories[0].Unlocked = true;
             st.Factories[0].Lines[0].Unlocked = true;
             st.ActiveFactoryId = st.Factories[0].FactoryId;
-            st.Cash = BigDouble.FromDouble(_s.Tuning.StartingCash * (1 + St.LegacyStars));
+            st.Cash = BigDouble.FromDouble(_s.Tuning.StartingCash * (1 + St.LegacyStars) * (1 + _s.Engineering.Level(EngineeringService.StartCash)));
             st.Debt = BigDouble.Zero;
             st.RunEarnings = BigDouble.Zero;
             st.TotalInvested = BigDouble.Zero;

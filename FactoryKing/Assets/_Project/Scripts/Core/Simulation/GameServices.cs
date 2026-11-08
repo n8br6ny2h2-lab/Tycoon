@@ -118,7 +118,7 @@ namespace FactoryKing.Core.Simulation
         {
             var def = _content.GetFactory(factoryId);
             cost = def.UnlockCost;
-            if (IsUnlocked(factoryId)) return false;
+            if (def.IsEvent || IsUnlocked(factoryId)) return false; // event factories open by themselves
             int index = _state.Factories.FindIndex(f => f.FactoryId == factoryId);
             if (index > 0 && !_state.Factories[index - 1].Unlocked) return false;
             return _wallet.CanAfford(cost);

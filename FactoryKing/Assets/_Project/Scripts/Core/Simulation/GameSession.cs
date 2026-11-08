@@ -41,6 +41,19 @@ namespace FactoryKing.Core.Simulation
         public MarketService Market { get; }
         public CosmeticService Cosmetics { get; }
         public SeasonService Seasons { get; }
+        public DroneService Drone { get; }
+        public CrateService Crates { get; }
+        public ExpeditionService Expeditions { get; }
+        public EventFactoryService EventFactory { get; }
+        public SupplyChainService Supply { get; }
+        public FleetService Fleet { get; }
+        public BadgeService Badges { get; }
+        public EngineeringService Engineering { get; }
+        public SeasonRoadService Road { get; }
+        public ConvenienceService Convenience { get; }
+        public PiggyBankService Piggy { get; }
+        public OfferService Offers { get; }
+        private int _metaCount;
 
         private double _metaTimer;
 
@@ -77,7 +90,20 @@ namespace FactoryKing.Core.Simulation
             Market = new MarketService(this);
             Cosmetics = new CosmeticService(this);
             Seasons = new SeasonService(this);
+            Drone = new DroneService(this);
+            Crates = new CrateService(this);
+            Expeditions = new ExpeditionService(this);
+            EventFactory = new EventFactoryService(this);
+            Supply = new SupplyChainService(this);
+            Fleet = new FleetService(this);
+            Badges = new BadgeService(this);
+            Engineering = new EngineeringService(this);
+            Road = new SeasonRoadService(this);
+            Convenience = new ConvenienceService(this);
+            Piggy = new PiggyBankService(this);
+            Offers = new OfferService(this);
             Seasons.EnsureStarted();
+            Offers.EnsureStarted();
 
             ApplyAllModifiers();
 
@@ -88,7 +114,13 @@ namespace FactoryKing.Core.Simulation
             {
                 if (State.Stats.Upgrades == to - from) Analytics.Track(AnalyticsEvents.FirstUpgrade, "machine", r.ToString());
             };
-            Factories.FactoryUnlocked += id => Analytics.Track(AnalyticsEvents.FactoryUnlocked, "factory", id);
+            Factories.FactoryUnlocked += id =>
+            {
+                Analytics.Track(AnalyticsEvents.FactoryUnlocked, "factory", id);
+                Road.AddXp(SeasonXp.Factory);
+                Supply.Apply();
+                Power.Apply();
+            };
         }
 
         /// <summary>Re-derives every modifier from persistent state (after load, prestige, purchases...).</summary>
@@ -102,6 +134,10 @@ namespace FactoryKing.Core.Simulation
             Managers.ApplyAbilities();
             Market.Apply();
             Seasons.Apply();
+            Supply.Apply();
+            Fleet.Apply();
+            Badges.Apply();
+            EventFactory.Tick();
             Power.Apply(); // last: demand depends on the other modifiers only through utilisation ratios
         }
 
@@ -151,6 +187,11 @@ namespace FactoryKing.Core.Simulation
             Orders.Refresh();
             Achievements.Evaluate();
             Seasons.Tick();
+            Drone.Tick();
+            EventFactory.Tick();
+            Supply.Apply();
+            Fleet.Apply();
+            if (++_metaCount % 2 == 0) Convenience.AutoUpgradeStep();
         }
 
         public LineReport AnalyzeLine(string factoryId, int line) =>
@@ -162,6 +203,18 @@ namespace FactoryKing.Core.Simulation
         /// <summary>Cash reward worth <paramref name="seconds"/> of current income (never less than a small floor).</summary>
         public BigDouble IncomeReward(double seconds) =>
             BigDouble.FromDouble(Math.Max(Tuning.StartingCash, Math.Max(0, PotentialNetPerSecond) * seconds));
+
+        /// <summary>Owned regular factories (event factories excluded).</summary>
+        public int OwnedRegularFactories
+        {
+            get
+            {
+                int n = 0;
+                foreach (var f in State.Factories)
+                    if (f.Unlocked && Content.TryGetFactory(f.FactoryId, out var d) && !d.IsEvent) n++;
+                return n;
+            }
+        }
 
         public int OwnedMachineCount
         {

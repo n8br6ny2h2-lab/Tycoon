@@ -22,6 +22,9 @@ namespace FactoryKing.Runtime.Visuals
                 case "aerospace": theme = new Theme("#ADB5BD", "#0077B6", "#CFD6DD", "#EDF1F5"); return true;
                 case "robotics": theme = new Theme("#6A4C93", "#8AC926", "#D1CCDC", "#EEEAF5"); return true;
                 case "space": theme = new Theme("#14213D", "#FCA311", "#BCC4D0", "#E5E9F0"); return true;
+                case "evt_chocolate": theme = new Theme("#6F4E37", "#F2C14E", "#D7C4B5", "#F4EBE3"); return true;
+                case "evt_toys": theme = new Theme("#FF6B6B", "#4ECDC4", "#E9DCD0", "#FFF4E6"); return true;
+                case "evt_fireworks": theme = new Theme("#22223B", "#F4A261", "#CFC8D8", "#EDE7F6"); return true;
                 default: theme = default; return false;
             }
         }

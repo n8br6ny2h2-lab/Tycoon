@@ -17,6 +17,8 @@ namespace FactoryKing.Core.Economy
         OfflineEarnings,
         /// <summary>Multiplies upgrade prices. Below 1 = cheaper.</summary>
         UpgradeCost,
+        /// <summary>Multiplies the truck load per shipping trip.</summary>
+        ShippingCapacity,
     }
 
     /// <summary>

@@ -529,6 +529,39 @@ machine.space_clean_assembly	Clean-Room Assembly	Temiz Oda Montajı
 machine.space_container_packer	Container Packer	Konteyner Paketleyici
 machine.space_integration_hall	Integration Hall	Entegrasyon Salonu
 machine.space_launch_dock	Launch Dock	Fırlatma Rampası
+factory.evt_chocolate	Chocolate Factory	Çikolata Fabrikası
+product.evt_chocolate_cocoa	Cocoa Beans	Kakao Çekirdeği
+product.evt_chocolate_cocoa_mass	Cocoa Mass	Kakao Kütlesi
+product.evt_chocolate_chocolate_bar	Chocolate Bar	Çikolata
+product.evt_chocolate_chocolate_box	Chocolate Box	Çikolata Kutusu
+machine.evt_chocolate_bean_hopper	Bean Hopper	Çekirdek Bunkeri
+machine.evt_chocolate_roaster	Roaster	Kavurma Fırını
+machine.evt_chocolate_conche	Conche Mixer	Konç Karıştırıcı
+machine.evt_chocolate_wrapper	Bar Wrapper	Tablet Paketleyici
+machine.evt_chocolate_cool_store	Cool Store	Serin Depo
+machine.evt_chocolate_dock	Sweet Dock	Tatlı Rampası
+factory.evt_toys	Toy Factory	Oyuncak Fabrikası
+product.evt_toys_toy_pellet	Toy Pellets	Oyuncak Granülü
+product.evt_toys_toy_part	Toy Parts	Oyuncak Parçası
+product.evt_toys_toy	Toy Robot	Oyuncak Robot
+product.evt_toys_toy_box	Toy Box	Oyuncak Kutusu
+machine.evt_toys_pellet_loader	Pellet Loader	Granül Yükleyici
+machine.evt_toys_molder	Toy Molder	Oyuncak Kalıbı
+machine.evt_toys_toy_assembly	Toy Assembly	Oyuncak Montajı
+machine.evt_toys_gift_wrapper	Gift Wrapper	Hediye Paketleyici
+machine.evt_toys_toy_store	Toy Store	Oyuncak Deposu
+machine.evt_toys_dock	Toy Dock	Oyuncak Rampası
+factory.evt_fireworks	Fireworks Workshop	Havai Fişek Atölyesi
+product.evt_fireworks_powder	Colour Powder	Renk Tozu
+product.evt_fireworks_charge	Star Charge	Yıldız Dolgusu
+product.evt_fireworks_rocket	Firework Rocket	Havai Fişek
+product.evt_fireworks_show_crate	Show Crate	Gösteri Sandığı
+machine.evt_fireworks_powder_silo	Powder Silo	Toz Silosu
+machine.evt_fireworks_star_press	Star Press	Yıldız Presi
+machine.evt_fireworks_rocket_line	Rocket Line	Fişek Hattı
+machine.evt_fireworks_crate_packer	Show Packer	Gösteri Paketleyici
+machine.evt_fireworks_bunker	Safety Bunker	Güvenlik Sığınağı
+machine.evt_fireworks_dock	Show Dock	Gösteri Rampası
 # --- generated factories end ---
 screen.season	Season	Sezon
 screen.cosmetics	Decoration	Dekorasyon

@@ -43,7 +43,7 @@ namespace FactoryKing.Tests
                     clock.Advance(TimeSpan.FromMinutes(stepMinutes));
                     s.MetaTick();
                     Spend(s);
-                    int owned = s.State.Factories.Count(f => f.Unlocked);
+                    int owned = s.OwnedRegularFactories;
                     for (int k = 1; k <= owned; k++)
                         if (reached[k] == 0) reached[k] = (clock.UtcNow.Ticks - day0) / (double)TimeSpan.TicksPerDay;
                 }

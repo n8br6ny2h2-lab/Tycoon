@@ -5,7 +5,7 @@ using FactoryKing.Core.Simulation;
 
 namespace FactoryKing.Core.Meta
 {
-    public enum ProductKind { Consumable, NonConsumable }
+    public enum ProductKind { Consumable, NonConsumable, Subscription }
 
     public sealed class StoreProductDef
     {
@@ -25,6 +25,10 @@ namespace FactoryKing.Core.Meta
         public string[] CosmeticIds = Array.Empty<string>();
         /// <summary>Activates the premium track of the current season (re-purchasable each season).</summary>
         public bool SeasonPass;
+        /// <summary>Opens the piggy bank (consumable, only when it holds enough diamonds).</summary>
+        public bool PiggyBank;
+        /// <summary>Auto-renewable subscription period in days (0 = not a subscription).</summary>
+        public int SubscriptionDays;
         /// <summary>Suggested App Store price tier in USD (display fallback only; real prices come from StoreKit).</summary>
         public string FallbackPrice;
     }
@@ -75,6 +79,9 @@ namespace FactoryKing.Core.Meta
             });
             // Bought once per season (consumable in App Store Connect; the save remembers it for the season).
             Add("season_pass", ProductKind.Consumable, "$4.99", p => { p.SeasonPass = true; p.Diamonds = 150; });
+            Add("piggy_bank", ProductKind.Consumable, "$2.99", p => p.PiggyBank = true);
+            // Weekly VIP: auto-renewable subscription — 30 diamonds every day + no ad videos needed while active.
+            Add("vip_weekly", ProductKind.Subscription, "$2.99", p => p.SubscriptionDays = 7);
             return c;
         }
 
@@ -108,9 +115,11 @@ namespace FactoryKing.Core.Meta
         /// <summary>False for non-consumables already owned (the shop hides/disables them).</summary>
         public bool CanPurchase(StoreProductDef p) =>
             p != null && !(p.Kind == ProductKind.NonConsumable && p.Entitlement != null && Owns(p.Entitlement))
-                      && !(p.SeasonPass && _s.Seasons.HasPremium);
+                      && !(p.SeasonPass && _s.Seasons.HasPremium)
+                      && !(p.PiggyBank && !_s.Piggy.CanBreak)
+                      && !(p.SubscriptionDays > 0 && _s.Offers.VipActive);
 
-        public PurchaseResult Process(string storeId, string transactionId, bool receiptValid, bool isRestore)
+        public PurchaseResult Process(string storeId, string transactionId, bool receiptValid, bool isRestore, long expiresUtcTicks = 0)
         {
             var p = Catalog.ByStoreId(storeId);
             if (p == null) return PurchaseResult.UnknownProduct;
@@ -118,6 +127,17 @@ namespace FactoryKing.Core.Meta
             string tx = string.IsNullOrEmpty(transactionId) ? null : transactionId;
             if (tx != null && _s.State.ProcessedTransactions.Contains(tx)) return PurchaseResult.AlreadyProcessed;
 
+            if (p.Kind == ProductKind.Subscription)
+            {
+                // Each renewal is a new transaction; the expiry comes from the (validated) receipt.
+                if (tx != null) _s.State.ProcessedTransactions.Add(tx);
+                long expires = expiresUtcTicks > 0 ? expiresUtcTicks : _s.Time.TrustedNow.AddDays(p.SubscriptionDays).Ticks;
+                if (expires <= _s.Time.TrustedNow.Ticks) return PurchaseResult.AlreadyProcessed; // expired (restore of an old period)
+                _s.State.Live.SubscriptionExpiresUtcTicks = Math.Max(_s.State.Live.SubscriptionExpiresUtcTicks, expires);
+                _s.Analytics.Track(AnalyticsEvents.Purchase, "product", p.Id);
+                Granted?.Invoke(p);
+                return PurchaseResult.Granted;
+            }
             if (p.Kind == ProductKind.Consumable && isRestore)
             {
                 if (tx != null) _s.State.ProcessedTransactions.Add(tx);
@@ -142,6 +162,7 @@ namespace FactoryKing.Core.Meta
             }
             foreach (var c in p.CosmeticIds) _s.Cosmetics.Grant(c); // restored too: cosmetics are permanent
             if (p.SeasonPass) _s.Seasons.ActivatePremium();
+            if (p.PiggyBank) _s.Piggy.Break();
             ApplyEntitlements();
             _s.Analytics.Track(AnalyticsEvents.Purchase, "product", p.Id);
             Granted?.Invoke(p);
@@ -195,7 +216,7 @@ namespace FactoryKing.Core.Meta
 
         public IAdsProvider Provider { get; set; } = new NoAdsProvider();
 
-        private bool AdFree => _s.State.Entitlements.Contains(StoreCatalog.EntitlementNoAds);
+        private bool AdFree => _s.State.Entitlements.Contains(StoreCatalog.EntitlementNoAds) || _s.Offers.VipActive;
 
         private void RollDay()
         {

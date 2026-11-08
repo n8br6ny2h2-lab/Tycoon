@@ -49,6 +49,7 @@ namespace FactoryKing.Core.Economy
             double speedMod = modifiers?.Get(ModifierStat.ProductionSpeed, factory.Id) ?? 1d;
             double costMod = modifiers?.Get(ModifierStat.OperatingCost, factory.Id) ?? 1d;
             double priceMod = modifiers?.Get(ModifierStat.SellPrice, factory.Id) ?? 1d;
+            double shipMod = modifiers?.Get(ModifierStat.ShippingCapacity, factory.Id) ?? 1d;
 
             var defs = new MachineDef[n];
             for (int i = 0; i < n; i++) defs[i] = content.GetMachine(factory.MachineChain[i]);
@@ -74,7 +75,7 @@ namespace FactoryKing.Core.Economy
             {
                 double cycle = UpgradeMath.CycleSeconds(defs[i], levels[i], tuning, speedMod);
                 double outputsPerCycle = defs[i].Stage == StageType.Shipping
-                    ? UpgradeMath.ShippingBatch(defs[i], levels[i], tuning)
+                    ? UpgradeMath.ShippingBatch(defs[i], levels[i], tuning, shipMod)
                     : defs[i].OutputPerCycle;
                 double cap = outputsPerCycle / cycle * finalPerOutput[i];
                 report.MachineCapacityPerSecond[i] = cap;

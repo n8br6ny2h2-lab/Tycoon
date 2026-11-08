@@ -104,6 +104,9 @@ namespace FactoryKing.Core.Meta
 
             Apply();
             _s.Managers.Apply();
+            _s.Badges.Apply();
+            _s.Supply.Apply();
+            _s.Fleet.Apply();
             _s.Ledger.Reset();
             _s.Analytics.Track(AnalyticsEvents.Prestige, "count", st.Prestige.Count.ToString());
             Prestiged?.Invoke();

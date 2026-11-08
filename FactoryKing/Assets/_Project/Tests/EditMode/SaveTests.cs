@@ -146,7 +146,7 @@ namespace FactoryKing.Tests
             Assert.That(s, Is.Not.Null);
             Assert.That(s.Cash.ToDouble(), Is.EqualTo(5000));
             Assert.That(s.RunEarnings.ToDouble(), Is.EqualTo(20000), "v1 lifetime becomes the current run");
-            Assert.That(s.Factories.Count, Is.EqualTo(DefaultContent.FactoryCount));
+            Assert.That(s.Factories.Count, Is.EqualTo(DefaultContent.FactoryCount + 3), "20 regular + 3 event factories");
             Assert.That(s.Factories[0].Unlocked, Is.True);
         }
 

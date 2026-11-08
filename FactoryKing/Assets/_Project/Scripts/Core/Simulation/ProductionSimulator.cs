@@ -175,7 +175,7 @@ namespace FactoryKing.Core.Simulation
                 if (def.Stage == StageType.Shipping)
                 {
                     if (upstream.OutputBuffer < 1) { ms.Status = MachineStatus.Starved; return false; }
-                    int load = Math.Min(UpgradeMath.ShippingBatch(def, ms.Level, _tuning), upstream.OutputBuffer);
+                    int load = Math.Min(UpgradeMath.ShippingBatch(def, ms.Level, _tuning, _modifiers.Get(ModifierStat.ShippingCapacity, factory.Id)), upstream.OutputBuffer);
                     upstream.OutputBuffer -= load;
                     ms.InProcess = load;
                 }

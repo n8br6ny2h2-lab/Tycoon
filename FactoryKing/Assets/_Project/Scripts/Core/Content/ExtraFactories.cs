@@ -52,5 +52,18 @@ namespace FactoryKing.Core.Content
                 new[] { ("space_titanium", "#B0B7C3"), ("space_component", "#E5E5E5"), ("space_satellite", "#FCA311"), ("space_launch_container", "#14213D") },
                 new[] { ("space_titanium_loader", MachineCategory.Transport, MachineVisual.Unloader), ("space_vacuum_furnace", MachineCategory.Smelting, MachineVisual.Oven), ("space_clean_assembly", MachineCategory.Assembly, MachineVisual.RobotArm), ("space_container_packer", MachineCategory.Packaging, MachineVisual.Packer), ("space_integration_hall", MachineCategory.Storage, MachineVisual.Warehouse), ("space_launch_dock", MachineCategory.Shipping, MachineVisual.Dock) }),
         };
+        /// <summary>Limited-time event factories (see LiveEvents).</summary>
+        internal static readonly ExtraFactorySpec[] EventFactories =
+        {
+            new ExtraFactorySpec("evt_chocolate", new[] { "#6F4E37", "#F2C14E", "#D7C4B5", "#F4EBE3" },
+                new[] { ("evt_chocolate_cocoa", "#5C4033"), ("evt_chocolate_cocoa_mass", "#7B4B2A"), ("evt_chocolate_chocolate_bar", "#4E2A1E"), ("evt_chocolate_chocolate_box", "#C0392B") },
+                new[] { ("evt_chocolate_bean_hopper", MachineCategory.RawProcessing, MachineVisual.Silo), ("evt_chocolate_roaster", MachineCategory.Smelting, MachineVisual.Oven), ("evt_chocolate_conche", MachineCategory.Assembly, MachineVisual.Mill), ("evt_chocolate_wrapper", MachineCategory.Packaging, MachineVisual.Packer), ("evt_chocolate_cool_store", MachineCategory.Storage, MachineVisual.Warehouse), ("evt_chocolate_dock", MachineCategory.Shipping, MachineVisual.Dock) }),
+            new ExtraFactorySpec("evt_toys", new[] { "#FF6B6B", "#4ECDC4", "#E9DCD0", "#FFF4E6" },
+                new[] { ("evt_toys_toy_pellet", "#FFD166"), ("evt_toys_toy_part", "#06D6A0"), ("evt_toys_toy", "#EF476F"), ("evt_toys_toy_box", "#118AB2") },
+                new[] { ("evt_toys_pellet_loader", MachineCategory.Transport, MachineVisual.Unloader), ("evt_toys_molder", MachineCategory.Smelting, MachineVisual.Extruder), ("evt_toys_toy_assembly", MachineCategory.Assembly, MachineVisual.RobotArm), ("evt_toys_gift_wrapper", MachineCategory.Packaging, MachineVisual.Packer), ("evt_toys_toy_store", MachineCategory.Storage, MachineVisual.Warehouse), ("evt_toys_dock", MachineCategory.Shipping, MachineVisual.Dock) }),
+            new ExtraFactorySpec("evt_fireworks", new[] { "#22223B", "#F4A261", "#CFC8D8", "#EDE7F6" },
+                new[] { ("evt_fireworks_powder", "#E76F51"), ("evt_fireworks_charge", "#F4A261"), ("evt_fireworks_rocket", "#E63946"), ("evt_fireworks_show_crate", "#264653") },
+                new[] { ("evt_fireworks_powder_silo", MachineCategory.RawProcessing, MachineVisual.Silo), ("evt_fireworks_star_press", MachineCategory.Assembly, MachineVisual.Press), ("evt_fireworks_rocket_line", MachineCategory.Assembly, MachineVisual.Cutter), ("evt_fireworks_crate_packer", MachineCategory.Packaging, MachineVisual.Packer), ("evt_fireworks_bunker", MachineCategory.Storage, MachineVisual.Warehouse), ("evt_fireworks_dock", MachineCategory.Shipping, MachineVisual.Dock) }),
+        };
     }
 }

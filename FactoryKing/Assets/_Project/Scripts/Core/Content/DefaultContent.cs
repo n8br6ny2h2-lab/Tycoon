@@ -158,6 +158,48 @@ namespace FactoryKing.Core.Content
                 c.Factories[c.Factories.Count - 1].ThemeId = spec.Id;
             }
 
+            // ---------------- supply chains: consumer <- supplier ----------------
+            void Supply(string consumer, string supplier) => c.Factories.Find(f => f.Id == consumer).SupplierId = supplier;
+            Supply("electronics", "plastic");
+            Supply("beverage", "glass");
+            Supply("furniture", "textile");
+            Supply("pharma", "chemical");
+            Supply("rubber", "chemical");
+            Supply("appliance", "steel");
+            Supply("automotive", "steel");
+            Supply("solar", "glass");
+            Supply("battery", "chemical");
+            Supply("aerospace", "battery");
+            Supply("robotics", "electronics");
+            Supply("space", "robotics");
+
+            // ---------------- limited-time event factories ----------------
+            for (int i = 0; i < EventFactories.Length; i++)
+            {
+                var spec = EventFactories[i];
+                string[] p = { spec.Products[0].id, spec.Products[1].id, spec.Products[2].id, spec.Products[3].id };
+                AddFactory(c, spec.Id, 100 + i, scale: 1, unlockCost: 0, rawCost: 1, growth: 1.15,
+                    products: new[]
+                    {
+                        P(p[0], spec.Products[0].color, 0), P(p[1], spec.Products[1].color, 0),
+                        P(p[2], spec.Products[2].color, 0), P(p[3], spec.Products[3].color, 12),
+                    },
+                    machines: new[]
+                    {
+                        M(spec.Machines[0].id, spec.Machines[0].cat, StageType.RawInput, spec.Machines[0].visual, null, 1, p[0], 1, 0.7, 14, 8, 1.2, 0.005),
+                        M(spec.Machines[1].id, spec.Machines[1].cat, StageType.Processing, spec.Machines[1].visual, p[0], 2, p[1], 1, 1.6, 10, 14, 4, 0.015),
+                        M(spec.Machines[2].id, spec.Machines[2].cat, StageType.Production, spec.Machines[2].visual, p[1], 1, p[2], 1, 2.0, 10, 18, 4, 0.015),
+                        M(spec.Machines[3].id, spec.Machines[3].cat, StageType.Packaging, spec.Machines[3].visual, p[2], 1, p[3], 1, 1.4, 10, 11, 1, 0.01),
+                        M(spec.Machines[4].id, spec.Machines[4].cat, StageType.Storage, spec.Machines[4].visual, p[3], 1, p[3], 1, 0.5, 36, 9, 0.5, 0.005),
+                        M(spec.Machines[5].id, spec.Machines[5].cat, StageType.Shipping, spec.Machines[5].visual, p[3], 5, p[3], 5, 6.5, 0, 22, 0.5, 0.01),
+                    });
+                var ev = c.Factories[c.Factories.Count - 1];
+                c.Factories.RemoveAt(c.Factories.Count - 1);
+                ev.IsEvent = true;
+                ev.ThemeId = spec.Id;
+                c.EventFactories.Add(ev);
+            }
+
             c.InvalidateLookups();
             return c;
         }
