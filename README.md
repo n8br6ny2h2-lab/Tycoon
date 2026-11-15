@@ -9,7 +9,7 @@ iOS (iPhone ve iPad) için 3D idle fabrika tycoon oyunu. Unity 6 LTS, URP ve C# 
 
 ## Yeni oyun: DEMİR BARONU — Çelik Ticareti
 
-Boru, profil ve sac ticareti üzerine gün tabanlı bir ticaret oyunu. Oyuncu 5.000 ₺ ve bir telefonla, depo ve kamyon olmadan başlar. Aracılıkla sermaye biriktirir, depo kiralar, stok alır, vadeli satışın ve kredinin riskini yönetir. Hedef 12.000 ton satış ve 40 milyon ₺ net değerle **Demir Baronu** olmaktır.
+Boru, profil, sac ve inşaat demiri ticareti üzerine gün tabanlı bir ticaret oyunu: 48 ürün, 15 şehir, depo ve dükkanlar. Oyuncu 5.000 ₺ ve bir telefonla, depo ve kamyon olmadan başlar. Aracılıkla sermaye biriktirir, depo kiralar, stok alır, vadeli satışın ve kredinin riskini yönetir. Hedef 12.000 ton satış ve 40 milyon ₺ net değerle **Demir Baronu** olmaktır.
 
 - Tasarım belgesi: [DemirBaronu/GDD.md](DemirBaronu/GDD.md)
 - Telefonda oynanabilir prototip (tek dosya): [DemirBaronu/web/play.html](DemirBaronu/web/play.html)
