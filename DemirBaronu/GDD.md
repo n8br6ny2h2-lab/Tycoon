@@ -208,11 +208,76 @@ Perakende satışlar da tonaja sayılır.
 
 İlk iş, kendi yerin, ilk dükkan, 25 perakende satış, ilk araç, ilk makine, 100 t, 3 şehirde tesis, 10 sadık müşteri, sigorta, 1.000 t, 1 Mn ₺, ilk ithalat, fiber lazer, 10 Mn ₺, 10.000 t, 100 Mn ₺. Her başarım nakit ödül (1.000 ₺ – 2 Mn ₺) ve +2 itibar verir.
 
+## 9b. Rekabet: rakip şirketler
+
+Oyuncu sektörde yalnız değildir. 7 bot şirket kendi başına büyür, şube açar, ihaleye girer ve müşteri kapar.
+
+| Şirket | Merkez | Karakter | Başlangıç | Özellik |
+|---|---|---|---|---|
+| Özler Demir Çelik | İstanbul | Sektör devi | ~25 Mn ₺ | Yavaş ama sürekli büyür, yenmesi en zor rakip |
+| Kaya Metal | Ankara | Agresif | ~2 Mn ₺ | Hızlı büyür, ihalede düşük teklif verir, iflas riski en yüksek |
+| Ege Çelik Ticaret | İzmir | Temkinli | ~6 Mn ₺ | İhalede yüksek teklif verir, istikrarlı |
+| Marmara Profil | Kocaeli | Uzman (profil) | ~3 Mn ₺ | Profil işlerinde daha agresif |
+| Güneydoğu Boru | Gaziantep | Uzman (boru) | ~1,2 Mn ₺ | Boru işlerinde daha agresif |
+| Anadolu Yapı Demir | Konya | Perakendeci | ~400 bin ₺ | Dükkan odaklı, ihalede pahalı |
+| Karadeniz Sac | Samsun | Temkinli (sac) | ~800 bin ₺ | Sac uzmanı |
+
+İflas eden rakibin yerine 20–40 gün sonra yeni bir şirket girer (Yıldırım Metal, Atlas Demir, Toros Çelik…).
+
+**Rakiplerin oyuncuya etkisi:**
+- **Müşteri kapma:** Rakibin şubesi olan şehirden gelen tekliflerin bir kısmı "Rakip" etiketlidir ve yalnızca o gün açık kalır. Gün biterse işi rakip alır.
+- **Pazarlık:** Her teklifte bir kez %3 zam istenebilir. Başarı şansı %55'tir; itibarla ve sadık müşteride artar, rakipli işte azalır. Rakipli işte pazarlık tutmazsa iş rakibe gider.
+- **Dükkan müşterisi:** Aynı şehirdeki her rakip şube, dükkana gelen müşteriyi azaltır.
+- **Fiyat savaşı:** Bir rakip bir kategoride 6 gün fiyat kırar. O kategoride marjlar −%3 düşer ve rakip daha sık araya girer.
+- **Eleman ayartma:** Rakip, satış elemanına teklif yapar. 60.000 ₺ prim verilmezse eleman gider.
+- **Konkordato:** Rakip iflas ederse deposu (120 t, forklift dahil) normal fiyatın %40'ına satışa çıkar.
+
+**İhaleler (Esnaf'tan itibaren, 6–12 günde bir):** Büyük projeler: otoyol viyadüğü, şehir hastanesi, metro, TOKİ, doğalgaz hattı, tersane… Oyuncu kâr marjı seçer (%2/4/6/8/11) ve tutarın %3'ü kadar teminat yatırır. Rakipler karakterlerine göre gizli teklif verir, en düşük teklif kazanır. Kazanan 10 gün içinde teslim eder, ödeme 30 gün vadelidir. Kaybedenin teminatı iade edilir. Teslim edilmezse teminat yanar ve itibar −10 düşer. Sonuçlar tüm tekliflerle birlikte gösterilir.
+
+**Sıralama:** Net değere göre sektör sıralaması ve son 30 günün tonajına göre pazar payı her zaman görünür. Sıra üst barda da yazar.
+
+## 9c. Takvim, mevsimler ve etkinlikler
+
+- **Takvim:** 1. gün 1 Mart, 1. yıldır. Her ay 30 gündür.
+- **Mevsimler:**
+
+| Mevsim | Sipariş | Talep |
+|---|---|---|
+| İlkbahar | ×1,15 | İnşaat demiri ×1,3, profil ×1,2 |
+| Yaz | ×1,2 | İnşaat demiri ×1,5, profil ×1,3, boru ×0,8 |
+| Sonbahar | ×1,1 | Boru ×1,3 |
+| Kış | ×0,95 | İnşaat demiri ×0,5, profil ×0,8, boru ×1,4, sac ×1,1 |
+
+- **Etkinlikler:** Aynı anda bir etkinlik olur. Bitiminden 6–14 gün sonra yenisi gelir.
+  - **Fuar** (TÜYAP, Ankara, İzmir, Konya, Bursa, Gaziantep): Stand kiralamak net değerin %1'i kadardır (20 bin – 2 Mn ₺). 5 gün boyunca itibar +5, günde +2 teklif ve fuar şehrinden üç kat sipariş getirir.
+  - **Bayram** (3 gün): Sipariş gelmez, dükkanlar kapalı olur. Karar kartları çıkar: müşterilere hediye (itibar +4) ve personele ikramiye (verilmezse %40 istifa riski).
+  - **Meydan okuma** (7 gün): "X ton Y kategorisi sat." Tamamlanırsa nakit ödül ve itibar +3.
+  - **Üretici kampanyası** (5 gün): Bir kategoride tüm alımlar −%5.
+  - **Vergi denetimi:** Muhasebeci yoksa karar kartı çıkar: 25.000 ₺ mali müşavir tut ya da %50 ihtimalle net değerin %2'si kadar ceza riskine gir.
+  - **Durgunluk** (6 gün): Günde 1 teklif eksik gelir.
+- **Yılın Tüccarı (her 1 Mart):** Sıralamada ilk 5'e ödül verilir: 5 Mn / 2 Mn / 1 Mn / 500 bin / 250 bin ₺, ayrıca itibar +5.
+
+## 9d. Menü, zorluk ve kayıt
+
+- **Ana menü:** Devam et (şirket, tarih, unvan, net değer, sıra), Yeni oyun, Nasıl oynanır, Rekorlar, Ayarlar. Altında canlı fiyat bandı akar. Oyun içinde sol üstteki menü düğmesiyle duraklatma.
+- **Yeni oyun:** şirket adı, merkez şehir, zorluk.
+
+| Zorluk | Başlangıç | Rakip saldırganlığı | Kredi faizi | Vergi |
+|---|---|---|---|---|
+| Kolay | 15.000 ₺ | ×0,7 | %2,5 | %15 |
+| Normal | 5.000 ₺ | ×1 | %3,5 | %20 |
+| Zor | 2.000 ₺ | ×1,35 | %4,5 | %25 |
+
+- **Rekorlar:** Baron olunca, her yıl sonunda ve iflasta sonuç kaydedilir (en iyi 10).
+- **Ayarlar:** ay sonu raporu, gün sonu bildirimi, tüm verileri sil.
+- **İflastan önce kurtarma:** Ay sonunda kasa eksiye düşerse banka önce alacakları otomatik kırdırır, sonra kredi limitinden otomatik kredi açar. İflas ancak bunlar yetmezse olur.
+- **Eski kayıtlar:** Yeni alanlar otomatik doldurulur, ilerleme silinmez.
+
 ## 10. Prototipte olmayanlar (sonraki sürümler)
 
 1. **Şehirler arası fiyat farkı:** Her şehirde ayrı piyasa fiyatı. Ucuz şehirden alıp pahalı şehre satma (arbitraj).
-2. **Rakip tüccarlar (yapay zekâ):** Aynı teklife rakipler de girer. Fiyat kırma ve müşteri kapma devreye girer.
-3. **İhaleler:** Büyük projeler (köprü, stadyum, OSB). Kapalı zarfla teklif verilir, teminat mektubu gerekir.
+2. **Rakiplerle doğrudan ilişki:** Rakiple ortak ihale (konsorsiyum), rakip satın alma, rakipten stok alıp satma.
+3. **Çok oyunculu lig:** Gerçek oyuncularla aynı piyasada haftalık rekabet.
 4. **Kur riski:** İthalat dolar bazlı olur, ödeme gemi geldiğinde yapılır.
 5. **Bobin dilme / boyuna kesme hattı:** Bobin alıp sac ve şerit üretilir (dikey büyüme).
 6. **Fire ve hurda:** Kesimde %2–3 fire oluşur ve hurdacıya satılır.
@@ -237,12 +302,13 @@ Nakit satılmaz. Böylece oyun "kazanmak için öde" olmaz ve Apple'ın 3.1.1 ku
 
 ## 12. Ekranlar
 
-1. **Açılış:** şirket adı, merkez şehir seçimi, kısa hikâye ("Cebinde 5.000 ₺ ve bir telefon…")
+1. **Ana menü ve yeni oyun:** devam et, yeni oyun (ad, şehir, zorluk), nasıl oynanır, rekorlar, ayarlar. Karar kartları ve yıl sonu ödülü pencereleri
 2. **Siparişler:** aktif siparişler ve yeni teklifler. Her teklifte şehir, en yakın tesise mesafe, aracılık kârı, stoktan kâr ve hangi tesisten gideceği yazar
 3. **Piyasa:** 6 kategori filtresi, "stoktakiler" filtresi, ürün satırı (fiyat, günlük değişim, 30 günlük grafik, ağırlık, toplam stok). Al/sat paneli: tesis seçimi, miktar, 3 tedarik yolu
 4. **Tesisler:** her tesis için doluluk, yükleme kapasitesi, kira, ekipman, tezgâhtar, büyütme, ürün bazında stok ve kâr/zarar, transfer ve satış. Yoldaki sevkiyatlar. Yeni tesis açma (şehir + tür)
-5. **Şirket:** unvan, net değer grafiği, filo, atölye makineleri, personel, sigorta, banka, alacaklar, ay sonu tahmini (vergi dahil), sadık müşteriler, başarımlar, istatistik, haberler
-6. **Üst bar:** kasa, gün/ay, unvan, net değer, stok/kapasite, itibar, haber bandı. Altta büyük **Günü Bitir** düğmesi
+5. **Rekabet:** sektör sıralaması, pazar payı çubuğu, açık ihaleler ve teklif düğmeleri, son ihale sonuçları, etkinlik ve mevsim, rakip haberleri
+6. **Şirket:** unvan, net değer grafiği, filo, atölye makineleri, personel, sigorta, banka, alacaklar, ay sonu tahmini (vergi dahil), sadık müşteriler, başarımlar, istatistik, haberler
+7. **Üst bar:** menü düğmesi, tarih ve mevsim, kasa, unvan, net değer, stok/kapasite, itibar, sektör sırası, haber bandı. Altta büyük **Günü Bitir** düğmesi
 
 ## 13. Teknik plan
 
@@ -250,7 +316,7 @@ Nakit satılmaz. Böylece oyun "kazanmak için öde" olmaz ve Apple'ın 3.1.1 ku
 - **Üretim sürümü:** Factory King ile aynı altyapı. Kurallar Unity'den bağımsız C# çekirdeğinde (`DemirBaronu.Core`, netstandard2.1) ve NUnit testleriyle yazılır. Arayüz UI Toolkit ile kurulur. Mevcut GitHub Actions → TestFlight hattı (`.github/workflows/ios-testflight.yml`) yeniden kullanılır.
 - **Kayıt:** sürümlü JSON, sağlama toplamı, iCloud. Hesap sistemi yok.
 - **Rastgelelik:** tohumlu RNG. Haftalık lig ve tekrar oynatma için gerekli.
-- **Denge testi:** otomatik "akıllı tüccar" ve "rastgele tüccar" botları oynar. 2. sürümde (tesisler, perakende, vergi, sigorta dahil) ölçülen değerler, 8 deneme: haberleri kullanmayan sade akıllı bot **334–412. günde** baron oldu ve hiç iflas etmedi. Ortalama ilerleme: Esnaf ~10. gün, Toptancı ~40. gün, Bayi ~100. gün, Distribütör ~230. gün. Rastgele aracılık yapan bot 200 günde Toptancı'da kaldı. Haberleri okuyup stoklayan gerçek oyuncunun daha hızlı ilerlemesi beklenir.
+- **Denge testi:** otomatik "akıllı tüccar" ve "rastgele tüccar" botları oynar. 3. sürümde (rakipler, ihaleler, mevsimler, etkinlikler dahil, Normal zorluk) ölçülen değerler, 8 deneme: haberleri kullanmayan sade akıllı bot **417–536. günde** baron oldu, hiç iflas etmedi, 700. günde 8 denemenin 7'sinde sektör lideriydi. İhalelerde %4 teklifle kazanma oranı yaklaşık %45'ti. Rastgele aracılık yapan bot 200 günde Toptancı'da kaldı. Haberleri ve mevsimleri takip eden gerçek oyuncunun daha hızlı ilerlemesi beklenir.
 
 ## 14. Yol haritası
 
