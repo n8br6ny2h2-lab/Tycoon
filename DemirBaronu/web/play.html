@@ -69,7 +69,7 @@ h2 { font-family: var(--display); font-size: 15px; letter-spacing: .06em; text-t
 .prow { display: flex; flex-direction: column; gap: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
 .prow.open { border-color: var(--steel); }
 .prow.locked { opacity: .5; }
-.phead { display: grid; grid-template-columns: minmax(0,1fr) 64px auto; gap: 4px 10px; align-items: center; text-align: left; width: 100%; }
+.phead { display: grid; grid-template-columns: 34px minmax(0,1fr) 64px auto; gap: 4px 10px; align-items: center; text-align: left; width: 100%; }
 .pname { font-weight: 600; font-size: 14px; }
 .pspec { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pprice { text-align: right; }
@@ -209,6 +209,16 @@ svg.nw { width: 100%; height: 90px; display: block; }
 .toggle > div { min-width: 0; }
 .toggle button { min-width: 70px; padding: 7px 10px; border-radius: 20px; background: var(--panel2); font-weight: 600; font-size: 13px; flex: none; }
 .toggle button[aria-pressed="true"] { background: var(--good); color: var(--bg); }
+.pic { width: 34px; height: 34px; border-radius: 7px; background: var(--panel2); display: grid; place-items: center; flex: none; }
+.pic svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+svg.map { width: 100%; height: auto; display: block; }
+svg.map text { font-family: var(--body); }
+.steps { display: flex; gap: 3px; }
+.steps i { flex: 1; height: 4px; border-radius: 2px; background: var(--panel2); }
+.steps i.on { background: var(--good); }
+.task { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; padding: 3px 0; }
+.task.done { color: var(--good); }
+.task b { font-family: var(--num); font-weight: 600; white-space: nowrap; }
 @media (prefers-reduced-motion: reduce) { #toast div { animation: none; } .tape div { animation: none; } }
 </style>
 
@@ -363,11 +373,14 @@ const MACHINES = {
   rebar: { name: "Demir kesme-bükme", proc: "demir", cats: ["insaat"], price: 150000, desc: "Şantiyeye etriye ve filiz hazırlığı" },
   abkant: { name: "Abkant pres", proc: "bukum", cats: ["sac", "ozel"], price: 380000, desc: "Sac büküm (dere, kanal, kutu)" },
   laser: { name: "Fiber lazer", proc: "lazer", cats: ["sac", "ozel"], price: 1500000, desc: "Hassas lazer kesim, en yüksek prim" },
+  slitter: { name: "Bobin dilme hattı", proc: null, cats: [], price: 2500000, desc: "HRP bobini 3 mm siyah sac levhaya çevirir, günde en fazla 30 t", lvl: 3 },
 };
 const STAFF = {
   sales: { name: "Satış elemanı", salary: 35000, max: 8, desc: "+1 teklif/gün, daha iyi fiyat" },
   acc: { name: "Muhasebeci", salary: 40000, max: 1, desc: "Karşılıksız çek riski ve faktoring maliyeti yarıya" },
   guard: { name: "Gece bekçisi", salary: 22000, max: 1, desc: "Hırsızlık olasılığı üçte bire iner" },
+  lawyer: { name: "Hukuk müşaviri", salary: 45000, max: 1, desc: "İcra ve dava masrafı yarıya, kazanma şansı +%15" },
+  ohs: { name: "İş güvenliği uzmanı", salary: 30000, max: 1, desc: "İş kazası olasılığı dörtte bire iner" },
 };
 const SUPPLY = {
   spot: { name: "Piyasadan", disc: 0, min: 0, days: 0, lvl: 0 },
@@ -375,7 +388,7 @@ const SUPPLY = {
   imp: { name: "İthalat", disc: 0.09, min: 100, days: 20, lvl: 3, port: true },
 };
 const EVENTS = [
-  { cat: "all", drift: 0.006, days: 5, text: "Dolar/TL yükseldi: ithal hammadde pahalanıyor" },
+  { cat: "all", drift: 0.006, days: 5, text: "Dolar/TL yükseldi: ithal hammadde pahalanıyor", fx: 0.006 },
   { cat: "sac", drift: -0.008, days: 6, text: "Çin'den ucuz sac ithalatı arttı" },
   { cat: "profil", drift: 0.007, days: 8, text: "İnşaat sezonu açıldı, profil talebi canlı", also: { insaat: 0.006 } },
   { cat: "profil", drift: 0.01, days: 4, text: "Büyük haddehanede bakım duruşu: profil arzı daraldı" },
@@ -384,7 +397,7 @@ const EVENTS = [
   { cat: "all", drift: -0.006, days: 6, text: "Hurda fiyatları geriledi" },
   { cat: "insaat", drift: 0.009, days: 7, text: "Kentsel dönüşüm teşviki genişledi", also: { profil: 0.004 } },
   { cat: "sac", drift: -0.005, days: 6, text: "Otomotiv üretiminde yavaşlama" },
-  { cat: "all", drift: 0.004, days: 6, text: "Faiz indirimi beklentisi piyasayı ısıttı" },
+  { cat: "all", drift: 0.004, days: 6, text: "Faiz indirimi beklentisi piyasayı ısıttı", fx: -0.002 },
   { cat: "boru", drift: -0.006, days: 5, text: "Boru fabrikaları stok eritmek için iskonto yaptı" },
   { cat: "sac", drift: 0.008, days: 5, text: "Bobin ithalatına ek gümrük vergisi geldi" },
   { cat: "insaat", drift: -0.009, days: 5, text: "Konut kredisi faizleri arttı, şantiyeler yavaşladı" },
@@ -399,7 +412,36 @@ const FIRMS = ["Yıldız İnşaat", "Kaya Demir Doğrama", "Öztürk Makina", "E
   "Başak Silo", "Kılıç Kepenk", "Arslan Merdiven", "Toros Yapı", "Bozkurt Çelik Konstrüksiyon", "Gürsoy Kalıp", "Selvi Bahçe Çit", "Altun Karoser",
   "Ekinci Kuyu Sondaj", "Uslu Isı Sistemleri", "Mavi Tesisat", "Ateş Kaynak Atölyesi", "Başkent Asma Tavan", "Özdemir Otopark Sistemleri",
   "Keskin Endüstriyel Mutfak", "Aydın Market Rafları", "Tekin Prefabrik Konut", "Güler Tarım Aletleri", "Ilgaz Tır Kasası"];
-const RISK = { A: 0, B: 0.04, C: 0.12 };
+// What happens when a credit sale falls due, by customer risk class
+const PAYPROB = { A: { def: 0.01, late: 0.09, part: 0.02 }, B: { def: 0.06, late: 0.18, part: 0.08 }, C: { def: 0.15, late: 0.25, part: 0.15 } };
+const EXCUSES = ["Müşterimden para gelmedi, gelince öderim.", "Bu ay çok sıkışığız, biraz zaman ver.", "Muhasebeci izinde, dönünce hallederiz.",
+  "Çek yarın bankada, söz.", "Mal eksik geldi, önce onu konuşalım.", "Şantiye hakedişi gecikti.", "Bankadan kredi bekliyoruz, çıkınca ödüyoruz."];
+const OWNERS = { ozler: "Hikmet Özler", kaya: "Ferhat Kaya", ege: "Nur Aydemir", marmara: "Cengiz Tunç", gunes: "Mahmut Ekinci", anadolu: "Osman Kılıç",
+  karadeniz: "Rıza Yazıcı", yildirim: "Emre Yıldırım", atlas: "Serdar Atlı", toros: "Gül Toros", bozkurt: "Kenan Bozkurt", aksu: "Leyla Aksu", deniz: "Barış Deniz" };
+const QUOTES = {
+  agresif: ["Bu şehir ikimize dar.", "Fiyatı ben belirlerim.", "Müşteri ucuzu sever, ben de ucuzum."],
+  dev: ["Biz kırk yıldır bu işteyiz.", "Küçük balıklarla uğraşmayız ama yolumuza da çıkmasınlar.", "Piyasa bizden sorulur."],
+  temkinli: ["Acele eden tüccar zarar eder.", "Biz vadesiz çalışırız, uykumuz rahat.", "Az olsun, temiz olsun."],
+  uzman: ["Bu malı bizden iyi bilen yok.", "Kalite konuşur.", "Müşterimiz bizi tanır."],
+  perakende: ["Kapımız herkese açık.", "Esnafın derdini esnaf bilir.", "Bizim dükkanda çay hazır."],
+};
+const owner = r => OWNERS[r.id] || r.name;
+const quote = r => `${owner(r)} (${r.name}): "${pick(QUOTES[r.style])}"`;
+const SCENARIOS = {
+  free: { name: "Serbest", desc: "Sıfırdan baronluğa" },
+  fx: { name: "Kur Krizi", desc: "90 gün dayan, net değeri 3 Mn ₺ yap" },
+  quake: { name: "Deprem Bölgesi", desc: "120 günde 1.000 t inşaat demiri sat" },
+};
+const TUT = [
+  ["İlk aracılığını yap", "Siparişler'de bir teklife Aracılık'a bas: mal fabrikadan doğrudan müşteriye gider.", s => s.stats.brokered >= 1, 1000],
+  ["İlk deponu kirala", "15.000 ₺ biriktir, Tesisler sekmesinden depo aç.", s => s.locs.length >= 1, 2000],
+  ["Stok al", "Piyasa'da bir ürüne dokun, Piyasadan al'a bas.", s => stockTotal() > 0 || s.incoming.length > 0, 1000],
+  ["Stoktan teslim et", "Elindeki mala uyan bir siparişte Stoktan teslim'e bas.", s => s.stats.deals - s.stats.brokered >= 1, 2000],
+  ["Esnaf ol", "25 t sat ve 20.000 ₺ net değere ulaş.", s => (s.lastLevel || 0) >= 1, 3000],
+  ["Vadeli satış yap", "30 ya da 60 gün vadeli bir siparişi teslim et. Tahsilatı Şirket sekmesinden izle.", s => s.stats.credit >= 1, 3000],
+  ["Dükkan aç", "Tesisler'den bir dükkan aç; her gün kapıdan müşteri gelsin.", s => s.locs.some(l => l.type === "shop"), 5000],
+  ["İhaleye gir", "Rekabet sekmesinde bir ihaleye teklif ver.", s => s.stats.bids >= 1, 5000],
+];
 const MONTHS = ["Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık", "Ocak", "Şubat"];
 const SEASONS = [
   { name: "İlkbahar", demand: { insaat: 1.3, profil: 1.2 }, offers: 1.15, note: "İnşaat sezonu açılıyor: inşaat demiri ve profil talebi artıyor." },
@@ -483,13 +525,16 @@ function mkRival([id, name, home, style, cat, nw, cap, color]) {
 // Fill in fields added after a save was made, so older saves keep working.
 function migrate(s) {
   const d = { diff: "normal", tenders: [], tenderLog: [], event: null, nextEventDay: s.day + 5, nextTenderDay: s.day + 8, catTons: {}, myHist: [],
-    tonsDayStart: s.tons, cards: [], priceWar: null, newcomerDay: null, prizes: [] };
+    tonsDayStart: s.tons, cards: [], priceWar: null, newcomerDay: null, prizes: [], fx: 42, fxPrev: 42, black: {}, suits: [], daily: null, tut: 0,
+    slitUsed: 0, credIns: false, scen: null, legacy: 0, fxShock: 0 };
   for (const k in d) if (s[k] === undefined) s[k] = d[k];
   if (!s.rivals) s.rivals = RIVAL_DEFS.map(mkRival);
-  for (const k of ["tenders", "tendersWon", "rivalsTaken", "fairs"]) if (s.stats[k] === undefined) s.stats[k] = 0;
+  if (!s.cityOff) { s.cityOff = {}; for (const c of CITIES) { s.cityOff[c.id] = {}; for (const k in CATS) s.cityOff[c.id][k] = Math.round(rnd(-0.04, 0.04) * 1e4) / 1e4; } }
+  for (const k of ["tenders", "tendersWon", "rivalsTaken", "fairs", "bids", "credit", "recovered", "legalCost", "scrap", "acquired", "suitsWon"]) if (s.stats[k] === undefined) s.stats[k] = 0;
+  for (const r of s.recv) { if (!r.status) r.status = "normal"; if (r.delays === undefined) r.delays = 0; }
   return s;
 }
-function newGame(name, home, diffKey) {
+function newGame(name, home, diffKey, scen) {
   const dk = DIFFS[diffKey] ? diffKey : "normal";
   S = { v: 2, diff: dk, name: name || "Demir Ticaret", home: home || "ist", day: 1, cash: DIFFS[dk].cash, rep: 50, tons: 0, g: 0, market: {}, events: [], news: [],
     locs: [], incoming: [], vehicles: { van: 0, truck: 0, tir: 0 }, machines: {}, staff: { sales: 0, acc: 0, guard: 0 }, insured: false,
@@ -500,9 +545,15 @@ function newGame(name, home, diffKey) {
   for (const p of PRODUCTS) S.market[p.id] = { d: gauss() * 0.03, hist: [] };
   for (let i = 0; i < 45; i++) stepMarket(true);
   S.news.unshift({ day: 1, text: "Piyasa sakin. İlk siparişini aracılıkla kapat." });
+  const lp = LEG.points || 0;
+  if (lp) { S.legacy = lp; S.cash += lp * 10000; S.rep = Math.min(70, 50 + lp * 2); }
   genOffers(); genOffers();
+  if (scen && scen !== "free") { applyScenario(scen); S.tut = TUT.length; }
+  genDaily();
 }
 const price = id => r10(P[id].base * Math.exp(S.market[id].d + S.g));
+const cityOff = (city, cat) => (S.cityOff && S.cityOff[city] && S.cityOff[city][cat]) || 0;
+const priceAt = (id, city) => r10(price(id) * (1 + cityOff(city, P[id].cat)));
 const prevPrice = id => { const h = S.market[id].hist; return h.length > 1 ? h[h.length - 2] : price(id); };
 const level = () => S.lastLevel || 0;
 // calendar: day 1 = 1 Mart, Yıl 1; 12 months × 30 days
@@ -534,7 +585,10 @@ const capTotal = () => S.locs.reduce((a, l) => a + locCap(l), 0);
 const avgCost = id => { let q = 0, c = 0; for (const l of S.locs) if (l.stock[id]) { q += l.stock[id].q; c += l.stock[id].q * l.stock[id].cost; } return q ? c / q : 0; };
 const stockValue = () => S.locs.reduce((a, l) => a + Object.entries(l.stock).reduce((b, [id, s]) => b + s.q * price(id), 0), 0)
   + S.incoming.reduce((a, i) => a + i.q * price(i.pid), 0);
-const recvTotal = () => S.recv.reduce((a, r) => a + r.amount, 0);
+// Receivables in legal follow-up are already written off from profit; count only their expected recovery.
+const recvValue = r => r.status === "normal" ? r.amount : r.status === "sigorta" ? r.claim : r.amount * 0.2;
+const recvTotal = () => S.recv.reduce((a, r) => a + recvValue(r), 0);
+const recvNormal = () => S.recv.filter(r => r.status === "normal").reduce((a, r) => a + r.amount, 0);
 const assetValue = () => S.locs.reduce((a, l) => a + tierOf(l).price * 0.5 + l.fork * EQUIP.fork.price * 0.5 + l.crane * EQUIP.crane.price * 0.5, 0)
   + Object.entries(S.vehicles).reduce((a, [k, n]) => a + n * VEHICLES[k].price * 0.6, 0)
   + Object.keys(S.machines).reduce((a, k) => a + (S.machines[k] ? MACHINES[k].price * 0.5 : 0), 0);
@@ -555,6 +609,7 @@ function monthlyCosts() {
     ["Kredi faizi", S.loan * loanRate()],
   ];
   if (S.insured) items.push(["Sigorta primi", Math.max(1000, stockValue() * INS_RATE)]);
+  if (S.credIns) items.push(["Kredi sigortası primi", Math.max(2000, recvNormal() * 0.004)]);
   return items.filter(([, v]) => v > 0);
 }
 
@@ -571,7 +626,11 @@ function catDrift(cat) {
   return d;
 }
 function stepMarket(silent) {
-  S.g = S.g * 0.985 + catDrift("__global") + gauss() * 0.004;
+  const fxd = 0.0004 + gauss() * 0.004 + S.events.reduce((a, e) => a + (e.fx || 0), 0) + (S.fxShock > 0 ? 0.01 : 0);
+  if (S.fxShock > 0) S.fxShock--;
+  S.fxPrev = S.fx; S.fx = Math.round(S.fx * Math.exp(fxd) * 100) / 100;
+  S.g = S.g * 0.985 + catDrift("__global") + gauss() * 0.004 + fxd * 0.5;
+  for (const c in S.cityOff) for (const k in S.cityOff[c]) S.cityOff[c][k] = Math.round(Math.max(-0.07, Math.min(0.07, S.cityOff[c][k] * 0.97 + gauss() * 0.004)) * 1e4) / 1e4;
   for (const p of PRODUCTS) {
     const m = S.market[p.id];
     m.d = Math.max(-0.35, Math.min(0.35, m.d * 0.96 + catDrift(p.cat) + gauss() * CATS[p.cat].vol));
@@ -594,25 +653,27 @@ function genOffer() {
   const L = LEVELS[level()], lv = level();
   const prods = unlocked();
   const sea = season();
-  const prod = wpick(prods, prods.map(p => p.pop * (catDrift(p.cat) > 0 ? 2 : 1) * (sea.demand[p.cat] || 1)));
-  const city = wpick(CITIES, CITIES.map(c => c.size * (c.id === S.home ? 3 : S.locs.some(l => l.city === c.id) ? 2 : 1) * (fairOn() && S.event.city === c.id ? 3 : 1)));
+  const quake = S.scen && S.scen.id === "quake" && !S.scen.done;
+  const prod = wpick(prods, prods.map(p => p.pop * (catDrift(p.cat) > 0 ? 2 : 1) * (sea.demand[p.cat] || 1) * (quake && p.cat === "insaat" ? 3 : 1)));
+  const city = wpick(CITIES, CITIES.map(c => c.size * (c.id === S.home ? 3 : S.locs.some(l => l.city === c.id) ? 2 : 1) * (fairOn() && S.event.city === c.id ? 3 : 1) * (quake && ["gaz", "ada", "kay", "mer"].includes(c.id) ? 2 : 1)));
   let qty = Math.max(0.5, Math.round(rnd(L.qty[0], L.qty[1]) * (1 + 0.08 * S.staff.sales) * 2) / 2);
   if (prod.base > 100000) qty = Math.max(0.5, Math.round(qty / 4 * 2) / 2);
-  const firm = pick(FIRMS), loyal = (S.rel[firm] || 0) >= 3;
+  const firm = pick(FIRMS), loyal = (S.rel[firm] || 0) >= 3, black = !!S.black[firm];
   const pay = lv === 0 ? 0 : pick([0, 0, 0, 0, 0, 30, 30, 30, 60, 60]);
   let risk = lv === 0 ? pick(["A", "A", "B"]) : pick(["A", "A", "A", "A", "B", "B", "B", "C", "C"]);
   if (loyal && risk !== "A") risk = risk === "C" ? "B" : "A";
+  if (black) risk = "C";
   const proc = Math.random() < 0.28 ? pick(PROC_BY_CAT[prod.cat]) : null;
   const war = S.priceWar && S.priceWar.cat === prod.cat;
-  const margin = rnd(0.04, 0.115) + (S.rep - 50) / 1200 + 0.004 * S.staff.sales + (loyal ? 0.015 : 0) - (war ? 0.03 : 0);
+  const margin = rnd(0.04, 0.115) + (S.rep - 50) / 1200 + 0.004 * S.staff.sales + (loyal ? 0.015 : 0) - (war ? 0.03 : 0) + (S.legacy || 0) * 0.002;
   // competitors with a branch in that city chase the same customer
   const here = S.rivals.filter(r => r.alive && r.cities.includes(city.id));
   let rival = null;
   if (here.length && Math.random() < Math.min(0.85, (0.2 + 0.15 * here.length) * diff().aggr * (war ? 1.4 : 1) * (loyal ? 0.5 : 1)))
     rival = wpick(here, here.map(r => STYLES[r.style].contest * (r.cat === prod.cat ? 2 : 1))).id;
   const prem = (pay === 30 ? 0.03 : pay === 60 ? 0.06 : 0) + (proc ? PROCS[proc].prem : 0) + (risk === "C" ? 0.02 : 0);
-  return { id: S.nextId++, cust: firm, city: city.id, prod: prod.id, qty, pay, risk, proc, loyal, rival, neg: false,
-    price: r10(price(prod.id) * (1 + margin + prem)), deadline: S.day + rint(2, 6), expires: S.day + (rival ? 1 : 2) };
+  return { id: S.nextId++, cust: firm, city: city.id, prod: prod.id, qty, pay, risk, proc, loyal, rival, neg: false, black,
+    price: r10(priceAt(prod.id, city.id) * (1 + margin + prem)), deadline: S.day + rint(2, 6), expires: S.day + (rival ? 1 : 2) };
 }
 function genOffers() {
   if (evOn("bayram")) return 0;
@@ -632,7 +693,8 @@ function shipCost(from, to, q, capLeft) {
   const own = Math.min(q, capLeft), hired = q - own;
   return { own, hired, cost: own * shipRate(from, to, true) + hired * shipRate(from, to, false) };
 }
-function procCost(o) { return o.proc && !hasMachine(o.proc, P[o.prod].cat) ? o.qty * price(o.prod) * PROCS[o.proc].fason : 0; }
+// Own machine: only cutting scrap (net of scrap sale ≈ 1.2%). No machine: outsourced at the fason rate.
+function procCost(o) { if (!o.proc) return 0; const m = priceAt(o.prod, o.city); return hasMachine(o.proc, P[o.prod].cat) ? o.qty * m * 0.012 : o.qty * m * PROCS[o.proc].fason; }
 // Cheapest facility that has the goods and loading capacity today.
 function bestSource(o) {
   let best = null;
@@ -655,9 +717,9 @@ function finishDeal(o, profit, how) {
   if (o.tender) { S.cash += o.deposit; S.rep = Math.min(100, S.rep + 3); S.news.unshift({ day: S.day, text: `${o.cust} ihalesi teslim edildi. Teminat ${tl(o.deposit)} geri döndü.` }); }
   else S.rel[o.cust] = (S.rel[o.cust] || 0) + 1;
   S.rep = Math.min(100, S.rep + (o.qty >= 20 ? 2 : 1));
-  checkLevel();
+  checkLevel(); checkTasks();
 }
-function addRecv(o, amount) { S.recv.push({ id: o.id, cust: o.cust, amount, due: S.day + o.pay, risk: o.risk }); }
+function addRecv(o, amount) { S.recv.push({ id: o.id, cust: o.cust, amount, orig: amount, due: S.day + o.pay, risk: o.risk, status: "normal", delays: 0 }); S.stats.credit++; }
 function takeStock(l, id, q) { const s = l.stock[id]; const cost = s.cost; s.q = r2(s.q - q); if (s.q <= 0) delete l.stock[id]; return cost; }
 function addStock(l, id, q, unit) { const s = l.stock[id] || (l.stock[id] = { q: 0, cost: 0 }); s.cost = (s.cost * s.q + unit * q) / (s.q + q); s.q = r2(s.q + q); }
 function deliverStock(o) {
@@ -669,7 +731,10 @@ function deliverStock(o) {
   const profit = orderValue(o) - o.qty * unit - src.total;
   if (o.pay === 0) S.cash += orderValue(o) - src.total; else { S.cash -= src.total; addRecv(o, orderValue(o)); }
   removeOrder(o.id);
-  finishDeal(o, profit, "stock");
+  if (o.proc && hasMachine(o.proc, P[o.prod].cat)) S.stats.scrap += o.qty * 0.02;
+  if (Math.random() < 0.012 + (o.proc && !hasMachine(o.proc, P[o.prod].cat) ? 0.03 : 0))
+    S.suits.push({ id: S.nextId++, kind: "quality", cust: o.cust, claim: Math.round(orderValue(o) * rnd(0.1, 0.25)), start: S.day + rint(3, 10), stage: "pending" });
+  finishDeal(o, profit, "stock"); beep("cash");
   toast(`${o.cust}: ${ton(o.qty)} ${C[src.l.city].name} tesisinden ${C[o.city].name}'a gitti. Kâr ${tl(profit)}${o.pay ? " (" + o.pay + " gün vadede)" : ""}.`);
   save(); render();
 }
@@ -684,7 +749,7 @@ function deliverBroker(o) {
   } else S.cash += profit;
   S.brokerToday++;
   removeOrder(o.id);
-  finishDeal(o, profit, "broker");
+  finishDeal(o, profit, "broker"); beep("cash");
   toast(`Aracılık: ${o.cust} siparişi fabrikadan sevk edildi. ${profit >= 0 ? "Kâr" : "Zarar"} ${tl(profit)}.`, profit < 0);
   save(); render();
 }
@@ -714,8 +779,8 @@ function upgradeLoc(id) {
 }
 const discount = q => q >= 200 ? 0.03 : q >= 50 ? 0.02 : q >= 10 ? 0.01 : 0;
 const campaignDisc = id => (evOn("campaign") && S.event.cat === P[id].cat ? 0.05 : 0);
-const buyUnit = (id, q, mode) => price(id) * (1 - discount(q) - SUPPLY[mode].disc - campaignDisc(id));
-const buyCost = (id, q, mode = "spot") => q * buyUnit(id, q, mode);
+const buyUnit = (id, q, mode, city) => (city ? priceAt(id, city) : price(id)) * (1 - discount(q) - SUPPLY[mode].disc - campaignDisc(id));
+const buyCost = (id, q, mode = "spot", city) => q * buyUnit(id, q, mode, city);
 function supplyBlock(mode, q, l) {
   const s = SUPPLY[mode];
   if (level() < s.lvl) return LEVELS[s.lvl].name + " unvanında açılır";
@@ -729,19 +794,28 @@ function buy(id, q, mode = "spot", locId = UI.loc) {
   if (q <= 0) return;
   const block = supplyBlock(mode, q, l); if (block) return toast(block, true);
   if (locFree(l) + 1e-9 < q) return toast(`${locName(l)} dolu. Boş yer: ${ton(locFree(l))}.`, true);
-  const unit = buyUnit(id, q, mode), cost = q * unit;
+  const unit = buyUnit(id, q, mode, l.city), cost = q * unit;
+  if (mode === "imp") {
+    // Imports are priced in dollars: 30% advance now, the rest at the exchange rate on arrival (or locked with a forward for +1.5%).
+    const hedge = !!UI.hedge, total = cost * (hedge ? 1.015 : 1), adv = total * 0.3;
+    if (S.cash < adv) return toast("Peşinat için " + tl(adv) + " gerekiyor.", true);
+    S.cash -= adv; S.stats.imports++;
+    S.incoming.push({ pid: id, q, unit, loc: l.id, arrive: S.day + SUPPLY.imp.days, mode, usd: total / S.fx, adv, hedge, fx0: S.fx });
+    toast(`İthalat: ${ton(q)} ${P[id].name}, %30 peşinat ${tl(adv)}. Kalan ${hedge ? "sabit kurla" : "geliş günündeki kurla"} ödenecek.`);
+    checkAch(); save(); render(); return;
+  }
   if (S.cash < cost) return toast("Nakit yetersiz. Bankadan kredi çekebilirsin.", true);
   S.cash -= cost;
   if (mode === "spot") { addStock(l, id, q, unit); toast(`${ton(q)} ${P[id].name} ${C[l.city].name} tesisine girdi: ${tl(cost)}`); }
-  else { S.incoming.push({ pid: id, q, unit, loc: l.id, arrive: S.day + SUPPLY[mode].days, mode }); if (mode === "imp") S.stats.imports++;
+  else { S.incoming.push({ pid: id, q, unit, loc: l.id, arrive: S.day + SUPPLY[mode].days, mode });
     toast(`${SUPPLY[mode].name}: ${ton(q)} ${P[id].name} sipariş edildi, ${SUPPLY[mode].days} gün sonra gelir.`); }
   checkAch(); save(); render();
 }
 function sellBack(id, q, locId) {
   const l = locById(locId); if (!l || !l.stock[id] || q <= 0) return;
   q = Math.min(q, l.stock[id].q);
-  const rev = q * price(id) * SELLBACK, unit = takeStock(l, id, q), profit = rev - q * unit;
-  S.cash += rev; S.stats.profit += profit; S.mProfit += profit;
+  const rev = q * priceAt(id, l.city) * SELLBACK, unit = takeStock(l, id, q), profit = rev - q * unit;
+  S.cash += rev; S.stats.profit += profit; S.mProfit += profit; checkTasks();
   toast(`${ton(q)} ${P[id].name} piyasaya satıldı: ${tl(rev)} (${profit >= 0 ? "kâr" : "zarar"} ${tl(profit)})`, profit < 0);
   save(); render();
 }
@@ -776,6 +850,7 @@ function checkLevel() {
   if (l > S.lastLevel) {
     S.lastLevel = l;
     S.news.unshift({ day: S.day, text: `Yeni unvan: ${LEVELS[l].name}. Açılanlar: ${LEVELS[l].perk}.`, big: true });
+    beep("win");
     if (l === LEVELS.length - 1 && !S.seen.baron) { S.seen.baron = true; addRecord("Demir Baronu"); showModal("baron"); } else showModal("level");
   }
 }
@@ -801,6 +876,8 @@ const ACH = [
   ["tender", "İhale kazandın", "İlk ihaleyi kazan", s => s.stats.tendersWon >= 1, 100000],
   ["top3", "İlk üçte", "Sektör sıralamasında ilk 3'e gir", s => myRank() <= 3, 500000],
   ["top1", "Sektör lideri", "Sıralamada 1. ol", s => myRank() === 1, 5000000],
+  ["court", "Haklı çıktın", "Bir davayı kazan", s => s.stats.suitsWon >= 1, 50000],
+  ["acquire", "Büyük balık", "Bir rakibi satın al", s => s.stats.acquired >= 1, 1000000],
 ].map(([id, name, desc, test, reward]) => ({ id, name, desc, test, reward }));
 function checkAch() {
   for (const a of ACH) if (!S.ach[a.id] && a.test(S)) {
@@ -813,7 +890,7 @@ function checkAch() {
 // COMPETITORS
 // =====================================================================
 function board() {
-  const rows = S.rivals.map(r => ({ id: r.id, name: r.name, nw: r.nw, alive: r.alive, color: r.color, style: STYLES[r.style].name, cities: r.cities.length,
+  const rows = S.rivals.map(r => ({ id: r.id, name: r.name, nw: r.nw, alive: r.alive, color: r.color, owner: owner(r), acquired: r.acquired, style: STYLES[r.style].name, cities: r.cities.length,
     t30: r.hist.reduce((a, b) => a + b, 0), cat: r.cat }));
   rows.push({ me: true, name: S.name, nw: netWorth(), alive: true, color: "var(--hot)", style: LEVELS[level()].name, cities: new Set(S.locs.map(l => l.city)).size,
     t30: S.myHist.reduce((a, b) => a + b, 0) });
@@ -856,6 +933,7 @@ function stepRivals() {
   if (!S.priceWar && alive.length && Math.random() < 0.02 * diff().aggr) {
     const r = pick(alive), cat = r.cat || pick(Object.keys(CATS));
     S.priceWar = { rival: r.id, cat, days: 6 };
+    S.news.unshift({ day: S.day, text: quote(r), rival: true });
     S.news.unshift({ day: S.day, text: `${r.name} ${CATS[cat].name} fiyatlarını kırdı: 6 gün marjlar düşük, rekabet sert.`, bad: true, rival: true });
   }
   if (S.staff.sales > 0 && alive.length && Math.random() < 0.008 * diff().aggr) S.cards.push({ kind: "poach", rival: pick(alive).name });
@@ -883,12 +961,13 @@ function resolveTenders() {
     S.tenderLog.unshift({ proj: t.proj, qty: t.qty, prod: t.prod, day: S.day, bids: bids.map(b => ({ name: b.me ? S.name : b.r.name, m: b.m, me: !!b.me })) });
     S.tenderLog = S.tenderLog.slice(0, 4);
     if (t.bid !== null) S.stats.tenders++;
+    if (bids[0] && !bids[0].me && Math.random() < 0.4) S.news.unshift({ day: S.day, text: quote(bids[0].r), rival: true });
     if (w && w.me) {
       S.stats.tendersWon++;
       S.active.push({ id: t.id, cust: t.proj, city: t.city, prod: t.prod, qty: t.qty, pay: 30, risk: "A", proc: null, loyal: false, rival: null, neg: true,
         price: r10(t.base * (1 + t.bid)), deadline: S.day + t.deliver, expires: S.day + 99, tender: true, deposit: t.deposit });
       S.news.unshift({ day: S.day, text: `İhaleyi kazandın: ${t.proj}, ${ton(t.qty)} ${P[t.prod].name}. ${t.deliver} gün içinde teslim et.`, big: true });
-      toast(`İhale kazanıldı: ${t.proj}. Aktif siparişlerine eklendi.`);
+      toast(`İhale kazanıldı: ${t.proj}. Aktif siparişlerine eklendi.`); beep("win");
     } else if (w) {
       if (t.bid !== null) { S.cash += t.deposit; toast(`${t.proj} ihalesini ${w.r.name} %${nf1.format(w.m * 100)} ile kazandı. Teminatın iade edildi.`, true); }
       w.r.tons += t.qty; w.r.nw += tenderValue(t, w.m) * 0.04;
@@ -917,6 +996,119 @@ function startEvent() {
   S.event = e;
   S.news.unshift({ day: S.day, text: `Etkinlik: ${e.name}.`, big: true });
 }
+// ---------- receivables, collections and the courts ----------
+function processRecv(r, tally) {
+  if (r.status === "normal") {
+    if (r.due > S.day + 1) return true;
+    const pr = PAYPROB[r.risk], k = (S.staff.acc ? 0.5 : 1) * (1 + r.delays * 0.6), x = Math.random();
+    if (x < pr.def * k) return defaultRecv(r, tally);
+    if (x < (pr.def + pr.late) * k && r.delays < 3) { r.delays++; r.due = S.day + rint(7, 15); tally.late++;
+      S.news.unshift({ day: S.day + 1, text: `${r.cust} ödemeyi erteledi: "${pick(EXCUSES)}" Yeni söz: ${dateStr(r.due)}.`, bad: true }); return true; }
+    if (x < (pr.def + pr.late + pr.part) * k && r.delays < 3) { const part = Math.round(r.amount * rnd(0.3, 0.7)); S.cash += part; tally.col += part; r.amount -= part; r.delays++; r.due = S.day + rint(10, 20);
+      S.news.unshift({ day: S.day + 1, text: `${r.cust} borcun ${tl(part)} kısmını ödedi, kalan ${tl(r.amount)} için ${dateStr(r.due)} sözü verdi.` }); return true; }
+    S.cash += r.amount; tally.col += r.amount; return false;
+  }
+  if (["icra", "dava", "sigorta"].includes(r.status) && S.day + 1 >= r.legalEnd) return finishLegal(r);
+  return true;
+}
+function defaultRecv(r, tally) {
+  tally.lost += r.amount; S.stats.defaults++; S.black[r.cust] = true;
+  S.mProfit -= r.amount; S.stats.profit -= r.amount; // provision: written off now, recoveries come back as income
+  if (S.credIns) { r.status = "sigorta"; r.legalEnd = S.day + 30; r.claim = Math.round(r.amount * 0.8);
+    S.news.unshift({ day: S.day + 1, text: `${r.cust} ödemedi. Kredi sigortası devrede: 30 gün içinde ${tl(r.claim)} ödenecek.`, bad: true }); return true; }
+  r.status = "takip"; r.since = S.day;
+  S.news.unshift({ day: S.day + 1, text: `${r.cust} çeki karşılıksız çıktı: ${tl(r.amount)} takipte. Firma kara listeye alındı.`, bad: true });
+  return true;
+}
+function recover(amt, text) { S.cash += amt; S.mProfit += amt; S.stats.profit += amt; S.stats.recovered += amt; S.news.unshift({ day: S.day + 1, text, big: true }); }
+function finishLegal(r) {
+  const law = S.staff.lawyer ? 0.15 : 0;
+  if (r.status === "sigorta") { recover(r.claim, `Kredi sigortası ${r.cust} alacağı için ${tl(r.claim)} ödedi.`); return false; }
+  if (r.status === "icra") {
+    const x = Math.random();
+    if (x < 0.5 + law) { const amt = Math.round(r.amount * rnd(0.6, 1)); recover(amt, `İcra takibi sonuçlandı: ${r.cust} hesabına haciz kondu, ${tl(amt)} tahsil edildi.`); return false; }
+    r.status = "takip";
+    if (x < 0.78 + law / 2) { r.objected = true; S.news.unshift({ day: S.day + 1, text: `${r.cust} icraya itiraz etti. Alacak için dava açman gerekiyor.`, bad: true }); }
+    else { r.noAssets = true; S.news.unshift({ day: S.day + 1, text: `İcra memuru ${r.cust} adına haczedilecek mal bulamadı.`, bad: true }); }
+    return true;
+  }
+  if (r.status === "dava") {
+    if (r.konk) { const amt = Math.round(r.amount * 0.15); recover(amt, `${r.cust} konkordato ilan etti. Alacağının yalnızca ${tl(amt)} kısmı ödendi.`); return false; }
+    if (Math.random() < 0.68 + law) { const amt = Math.round(r.amount * rnd(0.5, 1) * 1.1); S.stats.suitsWon++; recover(amt, `Davayı kazandın: ${r.cust} faiziyle birlikte ${tl(amt)} ödedi.`); return false; }
+    S.news.unshift({ day: S.day + 1, text: `${r.cust} davasını kaybettin. Alacak tamamen zarar yazıldı.`, bad: true }); return false;
+  }
+  return false;
+}
+const legalCost = (r, kind) => Math.round((kind === "icra" ? Math.max(3000, r.amount * 0.04) : Math.max(8000, r.amount * 0.08)) * (S.staff.lawyer ? 0.5 : 1));
+function payLegal(c) { S.cash -= c; S.mProfit -= c; S.stats.legalCost += c; }
+// Customer claims against you and workplace accidents
+function accidents() {
+  for (const l of S.locs) {
+    const n = l.fork + l.crane; if (!n) continue;
+    if (Math.random() < 0.0012 * n * (S.staff.ohs ? 0.25 : 1)) S.cards.push({ kind: "accident", city: l.city, comp: rint(150, 400) * 1000 });
+  }
+}
+function stepSuits() {
+  for (const s of S.suits) {
+    if (s.stage === "pending" && S.day >= s.start) { s.stage = "card"; S.cards.push({ kind: "suit", id: s.id }); }
+    if (s.stage === "court" && S.day >= s.end) {
+      s.stage = "done";
+      if (Math.random() < 0.55 + (S.staff.lawyer ? 0.15 : 0)) { S.stats.suitsWon++; S.news.unshift({ day: S.day, text: `${s.cust} davasını kazandın, tazminat ödemeyeceksin.`, big: true }); }
+      else { const pay = s.claim * (s.kind === "accident" ? 2 : 1); S.cash -= pay; S.mProfit -= pay; S.rep = Math.max(0, S.rep - (s.kind === "accident" ? 5 : 3));
+        S.news.unshift({ day: S.day, text: `${s.cust} davasını kaybettin: ${tl(pay)} ödendi.`, bad: true }); }
+    }
+  }
+  S.suits = S.suits.filter(s => s.stage !== "done");
+}
+// ---------- tutorial and daily tasks ----------
+function checkTasks() {
+  if (!S.daily) return;
+  while (S.tut < TUT.length && TUT[S.tut][2](S)) { const t = TUT[S.tut]; S.cash += t[3]; S.tut++; toast(`Adım tamam: ${t[0]}. Ödül ${tl(t[3])}.`); beep("win"); }
+  for (const t of S.daily.tasks) if (!t.done && taskProg(t) >= t.n) { t.done = true; const rw = 2000 * (level() + 1); S.cash += rw; S.rep = Math.min(100, S.rep + 1); toast(`Günlük görev tamam: ${taskText(t)}. +${tl(rw)}`); beep("win"); }
+}
+const taskBase = t => t.k === "deals" ? S.stats.deals : t.k === "cat" ? (S.catTons[t.cat] || 0) : t.k === "profit" ? S.stats.profit : S.stats.retail;
+const taskProg = t => Math.max(0, taskBase(t) - t.base);
+const taskText = t => t.k === "deals" ? `${t.n} sipariş kapat` : t.k === "cat" ? `${nf1.format(t.n)} t ${CATS[t.cat].name} sat` : t.k === "profit" ? `${tl(t.n)} kâr et` : `Dükkanda ${t.n} perakende satış yap`;
+function genDaily() {
+  if (S.daily && S.daily.day === S.day) return;
+  const L = LEVELS[level()], avg = (L.qty[0] + L.qty[1]) / 2, cats = [...new Set(unlocked().map(p => p.cat))];
+  const pool = [{ k: "deals", n: Math.max(2, Math.round(1 + level() * 0.8)) }, { k: "cat", cat: pick(cats), n: Math.max(1, Math.round(avg * 1.5)) },
+    { k: "profit", n: Math.round(Math.max(3000, avg * 30000 * 0.12) / 1000) * 1000 }];
+  if (S.locs.some(l => l.type === "shop")) pool.push({ k: "retail", n: 3 + level() * 2 });
+  const tasks = pool.sort(() => Math.random() - 0.5).slice(0, 3);
+  tasks.forEach(t => { t.base = taskBase(t); t.done = false; });
+  S.daily = { day: S.day, tasks };
+}
+// ---------- scenarios ----------
+function applyScenario(id) {
+  if (id === "fx") {
+    Object.assign(S, { lastLevel: 2, tons: 150, cash: 300000, loan: 1500000, fxShock: 20 });
+    const l = { id: S.nextId++, city: S.home, type: "depot", tier: 2, stock: {}, fork: 1, crane: 0, clerks: 0, used: 0 }; S.locs.push(l);
+    for (const [pid, q] of [["hrp3", 30], ["kutu40", 20], ["sboru48", 15], ["ns12", 20]]) addStock(l, pid, q, priceAt(pid, l.city));
+    S.events.push({ cat: "all", drift: -0.003, days: 25, text: "Kur şoku: talep çöktü, bankalar kredi musluklarını kıstı" });
+    S.event = { kind: "recession", start: 1, end: 30, name: "Kur şoku: siparişler azaldı" };
+    S.scen = { id, end: 91, done: false };
+  }
+  if (id === "quake") {
+    Object.assign(S, { home: "gaz", lastLevel: 1, tons: 25, cash: 200000 });
+    S.locs.push({ id: S.nextId++, city: "gaz", type: "depot", tier: 1, stock: {}, fork: 0, crane: 0, clerks: 0, used: 0 });
+    S.events.push({ cat: "insaat", drift: 0.003, days: 30, text: "Deprem bölgesinde yeniden yapım: inşaat demiri talebi patladı" });
+    S.scen = { id, end: 121, done: false, base: 0 };
+  }
+  S.tonsDayStart = S.tons; S.offers = []; genOffers(); genOffers();
+}
+function scenProgress() {
+  const sc = S.scen; if (!sc) return null;
+  if (sc.id === "fx") return { text: `${S.day >= sc.end ? "Süre doldu" : `${sc.end - S.day} gün kaldı`} · net değer ${tl(netWorth())} / 3 Mn ₺`, pct: Math.min(1, Math.max(0, netWorth()) / 3e6), ok: S.day >= sc.end && netWorth() >= 3e6 };
+  if (sc.id === "quake") { const t = (S.catTons.insaat || 0) - sc.base; return { text: `${Math.max(0, sc.end - S.day)} gün kaldı · ${nf1.format(t)} / 1.000 t inşaat demiri`, pct: Math.min(1, t / 1000), ok: t >= 1000 }; }
+  return null;
+}
+function checkScenario() {
+  const sc = S.scen; if (!sc || sc.done) return;
+  const p = scenProgress();
+  if (p.ok) { sc.done = true; sc.won = true; addRecord(`${SCENARIOS[sc.id].name} senaryosu kazanıldı`); showModal("scen", { won: true }); beep("win"); }
+  else if (S.day >= sc.end) { sc.done = true; sc.won = false; addRecord(`${SCENARIOS[sc.id].name} senaryosu kaybedildi`); showModal("scen", { won: false }); }
+}
 function stepEvent() {
   const e = S.event;
   if (e) {
@@ -930,6 +1122,7 @@ function stepEvent() {
     }
   } else if (S.day >= S.nextEventDay) startEvent();
   if (S.day > 1 && (S.day - 1) % 360 === 0) yearEnd();
+  checkScenario();
 }
 function yearEnd() {
   const rank = myRank(), prize = YEAR_PRIZES[rank - 1] || 0, y = yearOf(S.day - 1);
@@ -952,6 +1145,12 @@ function cardView(c) {
   if (c.kind === "sale") { const price = 140000, ok = S.locs.length < maxLocs();
     return { t: "Satılık tesis", p: `${c.rival} konkordato ilan etti. ${C[c.city].name} · ${C[c.city].osb} deposu (Depo + açık saha, 120 t) normal fiyatın %40'ına satışta.`, price,
       o: [["Satın al", ok ? tl(price) : "Tesis sınırın dolu", ok && S.cash >= price], ["İlgilenmiyorum", "", true]] }; }
+  if (c.kind === "suit") { const s = S.suits.find(x => x.id === c.id); if (!s) return { t: "Dava", p: "Dava düştü.", o: [["Tamam", "", true]] };
+    const fee = Math.round(s.claim * 0.1 * (S.staff.lawyer ? 0.5 : 1));
+    return { t: "Müşteri seni dava etti", p: `${s.cust}, teslim ettiğin malın ölçü ve kalitesinin eksik olduğunu söyleyerek ${tl(s.claim)} tazminat istiyor. Mahkeme 1–2 ay sürer; kazanma şansın %${Math.round((0.55 + (S.staff.lawyer ? 0.15 : 0)) * 100)}.`, s, fee,
+      o: [["Uzlaş, yarısını öde", tl(s.claim / 2), S.cash >= s.claim / 2], ["Mahkemede savun", `avukat ${tl(fee)} · kaybedersen ${tl(s.claim)}`, S.cash >= fee]] }; }
+  if (c.kind === "accident") return { t: "İş kazası", p: `${C[c.city].name} tesisinde forklift kazası: bir işçi yaralandı. Ailesi ${tl(c.comp)} tazminat istiyor. Ödemezsen dava açılır; kaybedersen iki katını ve itibarını ödersin.`,
+    o: [["Tazminatı öde", tl(c.comp), S.cash >= c.comp], ["Mahkemeye bırak", "%50 kazanma · kaybedersen 2 katı", true]] };
   if (c.kind === "poach") return { t: "Transfer teklifi", p: `${c.rival}, satış elemanlarından birine daha yüksek maaş teklif etti. Kalması için prim verebilirsin.`, o: [["Prim ver, kalsın", tl(60000), S.cash >= 60000], ["Gitsin", "1 satış elemanı ayrılır", true]] };
   return { t: "?", p: "", o: [["Tamam", "", true]] };
 }
@@ -965,6 +1164,12 @@ function resolveCard(i) {
   if (c.kind === "audit") { if (i === 0) S.cash -= 25000; else if (Math.random() < 0.5) { S.cash -= v.fine; S.news.unshift({ day: S.day, text: `Vergi cezası: ${tl(v.fine)}.`, bad: true }); } else S.news.unshift({ day: S.day, text: "Denetim cezasız geçti." }); }
   if (c.kind === "sale" && i === 0) { S.cash -= v.price; const l = { id: S.nextId++, city: c.city, type: "depot", tier: 2, stock: {}, fork: 1, crane: 0, clerks: 0, used: 0 }; S.locs.push(l); S.stats.boughtRival = 1;
     toast(`${C[c.city].name} deposu senin. 120 t kapasite, 1 forklift.`); }
+  if (c.kind === "suit") { const s = S.suits.find(x => x.id === c.id);
+    if (s) { if (i === 0) { S.cash -= s.claim / 2; S.mProfit -= s.claim / 2; s.stage = "done"; S.news.unshift({ day: S.day, text: `${s.cust} ile uzlaşıldı: ${tl(s.claim / 2)} ödendi.` }); }
+      else { payLegal(v.fee); s.stage = "court"; s.end = S.day + rint(30, 60); S.news.unshift({ day: S.day, text: `${s.cust} davası mahkemede, karar ${dateStr(s.end)} civarı.` }); } }
+    S.suits = S.suits.filter(x => x.stage !== "done"); }
+  if (c.kind === "accident") { if (i === 0) { S.cash -= c.comp; S.mProfit -= c.comp; S.news.unshift({ day: S.day, text: `İş kazası tazminatı ödendi: ${tl(c.comp)}.` }); }
+    else S.suits.push({ id: S.nextId++, kind: "accident", cust: "İş kazası (işçi ailesi)", claim: c.comp, stage: "court", end: S.day + rint(40, 80) }); }
   if (c.kind === "poach") { if (i === 0) S.cash -= 60000; else if (S.staff.sales) { S.staff.sales--; S.news.unshift({ day: S.day, text: `Bir satış elemanın ${c.rival}'e geçti.`, bad: true }); } }
   checkAch(); save();
 }
@@ -984,7 +1189,7 @@ function walkIns() {
       const id = wpick(ids, ids.map(i => P[i].pop));
       const q = Math.min(l.stock[id].q, handleLeft(l), r2(rnd(0.02, 0.2) * (P[id].base > 100000 ? 0.3 : 1)));
       if (q <= 0) continue;
-      const p = price(id) * rnd(1.08, 1.16), unit = takeStock(l, id, q);
+      const p = priceAt(id, l.city) * rnd(1.08, 1.16), unit = takeStock(l, id, q);
       l.used += q; S.cash += q * p; rev += q * p; n++;
       const profit = q * (p - unit);
       S.stats.profit += profit; S.mProfit += profit; S.stats.retail++; S.stats.retailRev += q * p; S.tons += q;
@@ -1015,33 +1220,43 @@ function endDay() {
   const wi = walkIns();
   S.myHist.push(r2(S.tons - S.tonsDayStart)); if (S.myHist.length > 30) S.myHist.shift(); S.tonsDayStart = S.tons;
   let collected = 0, lost = 0, expired = 0, failed = 0, arrived = 0;
-  S.recv = S.recv.filter(r => {
-    if (r.due > S.day + 1) return true;
-    if (Math.random() < RISK[r.risk] * (S.staff.acc ? 0.5 : 1)) { lost += r.amount; S.stats.defaults++; S.mProfit -= r.amount; S.stats.profit -= r.amount;
-      S.news.unshift({ day: S.day + 1, text: `${r.cust} çeki karşılıksız çıktı: ${tl(r.amount)} kayıp.`, bad: true }); }
-    else { collected += r.amount; S.cash += r.amount; }
-    return false;
-  });
+  checkTasks();
+  const tally = { col: 0, lost: 0, late: 0 };
+  S.recv = S.recv.filter(r => processRecv(r, tally));
+  collected = tally.col; lost = tally.lost;
   S.day++;
-  S.usedCap = 0; S.brokerToday = 0; S.locs.forEach(l => l.used = 0);
+  S.usedCap = 0; S.brokerToday = 0; S.slitUsed = 0; S.locs.forEach(l => l.used = 0);
   S.incoming = S.incoming.filter(i => {
     if (i.arrive > S.day) return true;
-    const l = locById(i.loc); if (l) { addStock(l, i.pid, i.q, i.unit); arrived++; S.news.unshift({ day: S.day, text: `${ton(i.q)} ${P[i.pid].name} ${C[l.city].name} tesisine teslim edildi.` }); }
+    if (i.mode === "mill" && !i.delayed && Math.random() < 0.15) { i.delayed = 1; i.arrive += rint(2, 5);
+      S.news.unshift({ day: S.day, text: `Fabrika ${P[i.pid].name} sevkiyatını erteledi: yeni tarih ${dateStr(i.arrive)}.`, bad: true }); return true; }
+    const l = locById(i.loc); if (!l) return false;
+    let unit = i.unit, extra = "";
+    if (i.mode === "imp") { const rest = i.usd * (i.hedge ? i.fx0 : S.fx) - i.adv; S.cash -= rest; unit = (i.adv + rest) / i.q;
+      const diffPct = i.hedge ? 0 : S.fx / i.fx0 - 1; extra = i.hedge ? " Kur sabitlenmişti." : ` Kur farkı ${pct(diffPct)}, kalan ödeme ${tl(rest)}.`; }
+    addStock(l, i.pid, i.q, unit); arrived++;
+    S.news.unshift({ day: S.day, text: `${ton(i.q)} ${P[i.pid].name} ${C[l.city].name} tesisine teslim edildi.${extra}`, bad: extra.includes("+") });
     return false;
   });
   incidents();
+  accidents();
+  stepSuits();
   const taken = [];
   S.offers = S.offers.filter(o => {
     if (o.expires > S.day) return true;
     const r = o.rival && rivalById(o.rival);
-    if (r && r.alive) { r.tons += o.qty; r.nw += orderValue(o) * 0.04; taken.push(`${r.name}: ${ton(o.qty)} ${P[o.prod].name}`); S.stats.rivalsTaken++; }
+    if (r && r.alive) { r.tons += o.qty; r.nw += orderValue(o) * 0.04; taken.push(`${r.name}: ${ton(o.qty)} ${P[o.prod].name}`); S.stats.rivalsTaken++;
+      if ((S.rel[o.cust] || 0) >= 3) { S.rel[o.cust]--; S.news.unshift({ day: S.day, text: `Sadık müşterin ${o.cust} bu sefer ${r.name}'den aldı.`, rival: true, bad: true }); } }
     else expired++;
     return false;
   });
+  if (taken.length && Math.random() < 0.3) { const r = pick(S.rivals.filter(x => x.alive)); if (r) S.news.unshift({ day: S.day, text: quote(r), rival: true }); }
   if (taken.length) S.news.unshift({ day: S.day, text: `Rakipler ${taken.length} siparişi kaptı (${taken.slice(0, 2).join(", ")}${taken.length > 2 ? "…" : ""}).`, rival: true });
   S.active = S.active.filter(o => {
     if (o.deadline >= S.day) return true;
     failed++; S.stats.late++; S.rep = Math.max(0, S.rep - (o.tender ? 10 : 6));
+    if (!o.tender && (S.rel[o.cust] || 0) >= 3) { const rv = pick(S.rivals.filter(x => x.alive)); S.rel[o.cust] = 0;
+      if (rv) S.news.unshift({ day: S.day, text: `${o.cust} gecikmeye kızdı, artık ${rv.name} ile çalışıyor.`, bad: true, rival: true }); }
     S.news.unshift({ day: S.day, text: o.tender ? `${o.cust} ihalesini teslim edemedin. Teminat ${tl(o.deposit)} yandı, itibar −10.` : `${o.cust} siparişini zamanında teslim edemedin. İtibar −6.`, bad: true });
     return false;
   });
@@ -1066,7 +1281,7 @@ function endDay() {
     // Before declaring bankruptcy the bank discounts receivables, then opens credit up to the limit.
     if (S.cash < 0) {
       let fac = 0;
-      for (const r of S.recv.slice().sort((a, b) => a.due - b.due)) { if (S.cash >= 0) break; const got = r.amount * (1 - factorRate(r)); S.cash += got; fac += got; S.recv = S.recv.filter(x => x !== r); }
+      for (const r of S.recv.filter(x => x.status === "normal").sort((a, b) => a.due - b.due)) { if (S.cash >= 0) break; const got = r.amount * (1 - factorRate(r)); S.cash += got; fac += got; S.recv = S.recv.filter(x => x !== r); }
       if (fac) monthMsg.rescue.push(["Alacaklar otomatik kırdırıldı", fac]);
       const room = Math.max(0, loanLimit() - S.loan), need = Math.min(room, Math.ceil(-S.cash / 10000) * 10000);
       if (S.cash < 0 && need > 0) { S.loan += need; S.cash += need; monthMsg.rescue.push(["Otomatik kredi açıldı", need]); }
@@ -1084,7 +1299,7 @@ function endDay() {
   info(parts.join(" · "));
   if (lost) toast(`Karşılıksız çek: −${tl(lost)}`, true);
   if (failed) toast(`${failed} sipariş gecikti ve iptal oldu`, true);
-  checkLevel(); checkAch();
+  checkLevel(); checkAch(); genDaily(); beep(lost ? "bad" : "day");
   save(); render();
   if (monthMsg && SET.monthModal) showModal("month", monthMsg);
   if (S.cards.length) showModal("card");
@@ -1125,7 +1340,7 @@ const ACT = {
     S.cash += tierOf(l).price * 0.5; S.locs = S.locs.filter(x => x !== l); toast(`${locName(l)} kapatıldı, devir bedeli ${tl(tierOf(l).price * 0.5)}.`); save(); render(); },
   veh: k => { const v = VEHICLES[k]; if (S.cash < v.price) return toast("Nakit yetersiz: " + tl(v.price), true); S.cash -= v.price; S.vehicles[k]++; toast(`${v.name} filoya katıldı (+${v.cap} t/gün).`); checkAch(); save(); render(); },
   vehSell: k => { if (!S.vehicles[k]) return; const v = VEHICLES[k]; S.vehicles[k]--; S.cash += v.price * 0.6; toast(`${v.name} ikinci ele satıldı: ${tl(v.price * 0.6)}`); save(); render(); },
-  mach: k => { const m = MACHINES[k]; if (S.machines[k]) return; if (S.cash < m.price) return toast("Nakit yetersiz: " + tl(m.price), true); S.cash -= m.price; S.machines[k] = true; toast(`${m.name} kuruldu.`); checkAch(); save(); render(); },
+  mach: k => { const m = MACHINES[k]; if (S.machines[k] || (m.lvl && level() < m.lvl)) return; if (S.cash < m.price) return toast("Nakit yetersiz: " + tl(m.price), true); S.cash -= m.price; S.machines[k] = true; toast(`${m.name} kuruldu.`); checkAch(); save(); render(); },
   hire: k => { const s = STAFF[k]; if (S.staff[k] >= s.max) return; S.staff[k]++; toast(`${s.name} işe başladı. Maaş ay sonunda: ${tl(s.salary)}.`); save(); render(); },
   fire: k => { if (!S.staff[k]) return; S.staff[k]--; toast(`${STAFF[k].name} ile yollar ayrıldı.`); save(); render(); },
   insure: () => { S.insured = !S.insured; toast(S.insured ? "Stoklar sigortalandı. Prim ay sonunda kesilir." : "Sigorta iptal edildi.", !S.insured); checkAch(); save(); render(); },
@@ -1133,7 +1348,7 @@ const ACT = {
     if (amt <= 0) return toast(level() === 0 ? "Banka seni henüz tanımıyor. Esnaf unvanında kredi açılır." : "Kredi limitin dolu.", true);
     S.loan += amt; S.cash += amt; toast(`${tl(amt)} kredi çekildi. Aylık faiz %${nf1.format(loanRate() * 100)}.`); save(); render(); },
   repay: v => { const amt = Math.min(+v || S.loan, S.loan, Math.max(0, S.cash)); if (amt <= 0) return toast("Ödeyecek nakit yok.", true); S.loan -= amt; S.cash -= amt; toast(`${tl(amt)} kredi ödendi.`); save(); render(); },
-  factor: v => { const r = S.recv.find(x => x.id === +v); if (!r) return; const got = r.amount * (1 - factorRate(r)); S.cash += got; S.recv = S.recv.filter(x => x !== r); toast(`Alacak bankaya kırdırıldı: ${tl(got)} kasaya girdi.`); save(); render(); },
+  factor: v => { const r = S.recv.find(x => x.id === +v); if (!r || r.status !== "normal") return; const got = r.amount * (1 - factorRate(r)); S.cash += got; S.recv = S.recv.filter(x => x !== r); toast(`Alacak bankaya kırdırıldı: ${tl(got)} kasaya girdi.`); save(); render(); },
   reset: () => showModal("reset"),
   resetYes: () => { closeModal(); showMenu("new"); },
   close: () => closeModal(),
@@ -1149,13 +1364,49 @@ const ACT = {
     save(); render(); },
   bid: v => { const [id, m] = v.split(":"); const t = S.tenders.find(x => x.id === +id); if (!t || t.bid !== null) return;
     const dep = tenderValue(t, +m) * 0.03; if (S.cash < dep) return toast("Teminat için " + tl(dep) + " gerekiyor.", true);
-    S.cash -= dep; t.bid = +m; t.deposit = dep; toast(`${t.proj} ihalesine %${nf1.format(m * 100)} kârla teklif verdin. Teminat ${tl(dep)}.`); save(); render(); },
+    S.cash -= dep; t.bid = +m; t.deposit = dep; S.stats.bids++; checkTasks(); toast(`${t.proj} ihalesine %${nf1.format(m * 100)} kârla teklif verdin. Teminat ${tl(dep)}.`); save(); render(); },
   card: v => { resolveCard(+v); closeModal(); render(); },
   pause: () => showMenu("main"),
   menuGo: v => { UI.confirmWipe = false; if (v === "continue") { hideMenu(); render(); if (S.cards.length) showModal("card"); return; } showMenu(v); },
   setDiff: v => { UI.newDiff = v; showMenu("new"); },
+  setScen: v => { UI.newScen = v; showMenu("new"); },
+  hedge: () => { UI.hedge = !UI.hedge; render(); },
+  mapCity: v => { UI.newCity = v; render(); },
+  // pick the city nearest to where the map was tapped
+  mapTap: (v, e) => { const svg = e.target.closest("svg"); if (!svg || !svg.getScreenCTM) return;
+    const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const p = pt.matrixTransform(svg.getScreenCTM().inverse());
+    let best = null, bd = 1e9; for (const c of CITIES) { const d = (MX(c.lon) - p.x) ** 2 + (MY(c.lat) - p.y) ** 2; if (d < bd) { bd = d; best = c.id; } }
+    if (best && bd < 900) { UI.newCity = best; render(); } },
+  credIns: () => { S.credIns = !S.credIns; toast(S.credIns ? "Alacaklar kredi sigortasına alındı. Prim ay sonunda kesilir." : "Kredi sigortası iptal edildi.", !S.credIns); save(); render(); },
+  recvAct: v => {
+    const [id, a] = v.split(":"), r = S.recv.find(x => x.id === +id); if (!r || r.status !== "takip") return;
+    if (a === "call") {
+      if (r.called && S.day - r.called < 5) return toast("Bu firmayı yakın zamanda aradın, birkaç gün bekle.", true);
+      r.called = S.day;
+      if (Math.random() < 0.35) { const amt = Math.round(r.amount * rnd(0.2, 0.5)); r.amount -= amt; recover(amt, `${r.cust} ziyaretten sonra ${tl(amt)} ödedi.`); toast(`${r.cust} ${tl(amt)} ödedi. Kalan ${tl(r.amount)}.`); beep("cash"); }
+      else toast(`${r.cust}: "${pick(EXCUSES)}"`, true);
+    }
+    if (a === "settle") { const amt = Math.round(r.amount * { A: 0.75, B: 0.65, C: 0.55 }[r.risk]); recover(amt, `${r.cust} ile uzlaşıldı: ${tl(amt)} tahsil edildi, kalanından vazgeçildi.`); S.recv = S.recv.filter(x => x !== r); toast(`Uzlaşma: ${tl(amt)} kasaya girdi.`); beep("cash"); }
+    if (a === "icra" || a === "dava") {
+      const c = legalCost(r, a); if (S.cash < c) return toast("Masraf için " + tl(c) + " gerekiyor.", true);
+      payLegal(c); r.status = a; r.legalEnd = S.day + (a === "icra" ? rint(20, 35) : rint(60, 150)); if (a === "dava") r.konk = Math.random() < 0.12;
+      toast(a === "icra" ? `İcra takibi başlatıldı. Sonuç ${dateStr(r.legalEnd)} civarı.` : `Dava açıldı. Duruşmalar sürüyor, karar ${dateStr(r.legalEnd)} civarı.`);
+    }
+    if (a === "write") { S.recv = S.recv.filter(x => x !== r); toast(`${r.cust} alacağı zarar yazıldı.`); }
+    save(); render(); },
+  slit: v => { const l = locById(+v); if (!l || !S.machines.slitter) return; const q = Math.floor(Math.min(sq(l, "bobin"), 30 - S.slitUsed, handleLeft(l)) * 2) / 2; if (q < 0.5) return;
+    const c = q * 300; if (S.cash < c) return toast("İşçilik için " + tl(c) + " gerekiyor.", true);
+    const unit = takeStock(l, "bobin", q); S.cash -= c; S.slitUsed += q; l.used += q; addStock(l, "hrp3", r2(q * 0.99), (unit * q + c) / (q * 0.99));
+    toast(`${ton(q)} bobin dilindi: ${ton(q * 0.99)} siyah sac levha hazır.`); beep("cash"); save(); render(); },
+  acquire: v => { const r = rivalById(v); if (!r || !r.alive) return; const cost = r.nw * 1.3; if (S.cash < cost) return toast("Nakit yetersiz: " + tl(cost), true);
+    S.cash -= cost; r.alive = false; r.acquired = true; S.stats.acquired++; S.rep = Math.min(100, S.rep + 5); let got = 0;
+    for (const c of r.cities) if (S.locs.length < maxLocs() && !S.locs.some(l => l.city === c)) { S.locs.push({ id: S.nextId++, city: c, type: "depot", tier: 1, stock: {}, fork: 0, crane: 0, clerks: 0, used: 0 }); got++; }
+    if (!S.newcomerDay) S.newcomerDay = S.day + rint(30, 50);
+    S.news.unshift({ day: S.day, text: `${r.name} artık senin. ${got} şehirde yeni depo.`, big: true }); toast(`${r.name} satın alındı.`); beep("win"); checkAch(); save(); render(); },
+  sellCo: () => showModal("sellco"),
+  sellCoYes: () => { const pts = legacyGain(); addRecord(`Şirket satıldı (+${pts} miras)`); LEG.points += pts; saveLeg(); closeModal(); UI.newScen = "free"; showMenu("new"); },
   startNew: () => {
-    newGame((UI.newName || "").trim().slice(0, 28) || "Demir Ticaret", UI.newHome || "ist", UI.newDiff || "normal");
+    newGame((UI.newName || "").trim().slice(0, 28) || "Demir Ticaret", UI.newHome || "ist", UI.newDiff || "normal", UI.newScen || "free");
     S.seen.intro = true; UI.tab = "orders"; UI.newCity = S.home; UI.open = null; save(); hideMenu(); render();
     toast(`${S.name} kuruldu. İlk teklife Aracılık'la başla.`); },
   toggleSet: k => { SET[k] = !SET[k]; saveSet(); showMenu("settings"); },
@@ -1173,6 +1424,61 @@ const ICONS = {
   company: '<svg viewBox="0 0 24 24"><path d="M4 21V9l5 3V9l5 3V5h6v16z"/><path d="M8 17h2M13 17h2"/></svg>',
   rival: '<svg viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 20h8"/></svg>',
 };
+const SHAPES = {
+  sheet: '<rect x="3" y="8" width="17" height="10" rx="1"/><path d="M6 8V5h15v10h-1"/>',
+  coil: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="5.5"/><circle cx="12" cy="12" r="2.5"/>',
+  trap: '<path d="M2 16l3-7h4l3 7h4l3-7h3"/>',
+  perf: '<rect x="3" y="5" width="18" height="14" rx="1"/><path d="M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01" stroke-width="2.4"/>',
+  plate: '<rect x="3" y="7" width="18" height="10" rx="1"/><path d="M6 10l3 4M10 10l3 4M14 10l3 4"/>',
+  box: '<rect x="5" y="5" width="14" height="14" rx="1.5"/><rect x="8" y="8" width="8" height="8" rx=".5"/>',
+  rect: '<rect x="3" y="7" width="18" height="10" rx="1.5"/><rect x="6" y="10" width="12" height="4" rx=".5"/>',
+  angle: '<path d="M6 4v15h14"/><path d="M9 4v12h11"/>',
+  flat: '<rect x="3" y="10" width="18" height="4" rx=".5"/>',
+  chan: '<path d="M18 5H7v14h11"/><path d="M18 8h-8v8h8"/>',
+  ibeam: '<path d="M6 4h12M6 20h12M12 4v16"/>',
+  hbeam: '<path d="M6 4v16M18 4v16M6 12h12"/>',
+  tee: '<path d="M4 5h16M12 5v15"/>',
+  pipe: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="5.5"/>',
+  bigpipe: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="7.6"/>',
+  rebar: '<path d="M4 18L18 4M6 20L20 6"/><path d="M7 13l2 2M11 9l2 2M9 17l2 2M13 13l2 2"/>',
+  mesh: '<path d="M4 8h16M4 12h16M4 16h16M8 4v16M12 4v16M16 4v16"/>',
+  wire: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="4"/>',
+  rod: '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="3.5" fill="currentColor"/>',
+  sq: '<rect x="6" y="6" width="12" height="12"/><rect x="9" y="9" width="6" height="6" fill="currentColor"/>',
+};
+const SHAPE_OF = { hrp3: "sheet", dkp1: "sheet", dkp2: "sheet", hrp10: "plate", gsac: "sheet", bakl: "perf", s355: "plate", trapez: "trap", bobin: "coil", delikli: "perf",
+  hardox: "plate", kutu20: "box", kutu40: "box", dik6040: "rect", kose30: "angle", kose50: "angle", kutu80: "box", lama: "flat", npu100: "chan", dik10050: "rect",
+  tdemir: "tee", npi120: "ibeam", ipe200: "ibeam", hea200: "hbeam", heb300: "hbeam", sboru21: "pipe", sboru48: "pipe", dg25: "pipe", dg50: "pipe", gboru: "pipe",
+  kazan: "pipe", dikissiz: "pipe", sondaj: "bigpipe", spiral: "bigpipe", ns8: "rebar", ns12: "rebar", ns16: "rebar", hasir: "mesh", ns32: "rebar", filmasin: "wire",
+  yuv50: "rod", kare20: "sq", c45: "rod", pas304: "sheet", alu: "sheet", pas316: "sheet", pasboru: "pipe", aluprof: "box" };
+const CAT_COLOR = { sac: "#8fb6d8", profil: "#ffb02e", boru: "#4cd893", insaat: "#ff8a4c", dolu: "#c08cff", ozel: "#dfe7ee" };
+const icon = p => `<span class="pic" style="color:${CAT_COLOR[p.cat]}" aria-hidden="true"><svg viewBox="0 0 24 24">${SHAPES[SHAPE_OF[p.id]] || SHAPES.sheet}</svg></span>`;
+// Rough outline of Turkey (lon, lat) for a schematic map
+const TR_OUTLINE = [[26.0, 41.8], [28.0, 41.95], [29.1, 41.25], [31.3, 41.15], [33.3, 42.0], [35.1, 42.05], [36.9, 41.35], [38.4, 40.95], [40.1, 41.0], [41.5, 41.5],
+  [43.4, 41.15], [44.8, 39.75], [44.3, 38.9], [44.3, 37.2], [42.5, 37.1], [40.3, 37.1], [38.1, 36.8], [36.7, 36.9], [36.1, 35.85], [35.8, 36.35], [34.7, 36.8],
+  [33.3, 36.1], [32.0, 36.55], [30.6, 36.85], [29.7, 36.2], [28.2, 36.7], [27.3, 37.0], [26.4, 38.3], [26.7, 39.3], [26.1, 39.9], [26.6, 40.4], [26.0, 40.7]];
+const MX = lon => (lon - 25.6) * 18.4, MY = lat => (42.4 - lat) * 23.7;
+function mapSvg() {
+  const pts = TR_OUTLINE.map(([lo, la]) => `${MX(lo).toFixed(1)},${MY(la).toFixed(1)}`).join(" ");
+  const sel = UI.newCity || S.home;
+  let h = `<svg class="map" viewBox="0 0 362 166" data-act="mapTap" style="cursor:pointer" role="img" aria-label="Türkiye haritası: turuncu noktalar senin tesislerin, küçük renkli noktalar rakip şubeleri"><polygon points="${pts}" fill="var(--panel2)" stroke="var(--line)"/>`;
+  for (const c of CITIES) {
+    const x = MX(c.lon), y = MY(c.lat), mine = S.locs.some(l => l.city === c.id), rv = S.rivals.filter(r => r.alive && r.cities.includes(c.id));
+    h += `<g data-city="${c.id}">`;
+    rv.forEach((r, i) => { const a = i / rv.length * Math.PI * 2 - Math.PI / 2; h += `<circle cx="${(x + Math.cos(a) * 7.5).toFixed(1)}" cy="${(y + Math.sin(a) * 7.5).toFixed(1)}" r="2.1" fill="${r.color}"/>`; });
+    if (c.id === sel) h += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="9" fill="none" stroke="var(--fg)" stroke-dasharray="2 2"/>`;
+    h += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${mine ? 5 : 3.2}" fill="${mine ? "var(--hot)" : "var(--muted)"}" stroke="var(--bg)"/>`;
+    if (mine || c.id === sel || ["ist", "ank", "izm"].includes(c.id)) h += `<text x="${(x + 7).toFixed(1)}" y="${(y - 6).toFixed(1)}" font-size="9" fill="${mine || c.id === sel ? "var(--fg)" : "var(--muted)"}">${c.name}</text>`;
+    h += `</g>`;
+  }
+  return h + `</svg>`;
+}
+function cityInfo(id) {
+  const c = C[id], mine = S.locs.filter(l => l.city === id), rv = S.rivals.filter(r => r.alive && r.cities.includes(id));
+  return `<div class="line2"><span><b style="font-family:var(--body)">${c.name} · ${c.osb}</b>${c.port ? " · liman" : ""}</span><b>${km(S.home, id) ? nf0.format(km(S.home, id)) + " km" : "merkez"}</b></div>
+    <div class="muted">${mine.length ? `Tesislerin: ${mine.map(l => LOC_TYPES[l.type].name).join(", ")}` : "Burada tesisin yok"} · ${rv.length ? `Rakipler: ${rv.map(r => esc(r.name)).join(", ")}` : "Rakip yok"}</div>
+    <div class="chips">${Object.keys(CATS).map(k => { const o = cityOff(id, k); return `<span class="chip ${o < -0.01 ? "g" : o > 0.01 ? "b" : ""}">${CATS[k].name} ${pct(o)}</span>`; }).join("")}</div>`;
+}
 function spark(hist) {
   const h = hist.slice(-30), mn = Math.min(...h), mx = Math.max(...h), span = mx - mn || 1;
   const pts = h.map((v, i) => [(i / (h.length - 1) * 62 + 1).toFixed(1), (22 - (v - mn) / span * 20).toFixed(1)]);
@@ -1197,7 +1503,7 @@ function renderHud() {
 const payChip = o => o.pay ? `<span class="chip w">${o.pay} gün vade</span>` : `<span class="chip g">Peşin</span>`;
 const riskChip = o => `<span class="chip ${o.risk === "A" ? "st" : o.risk === "B" ? "w" : "b"}">Risk ${o.risk}</span>`;
 function orderCard(o, active) {
-  const p = P[o.prod], m = price(o.prod), over = o.price / m - 1;
+  const p = P[o.prod], m = priceAt(o.prod, o.city), over = o.price / m - 1;
   const bc = brokerCost(o), bp = orderValue(o) - bc, brokerBig = o.qty > BROKER_MAX_T;
   const brokerDisabled = brokerBig || (o.pay > 0 && S.cash < bc) || S.brokerToday >= brokerQuota();
   const src = bestSource(o), left = o.deadline - S.day, have = stockQty(o.prod);
@@ -1211,7 +1517,7 @@ function orderCard(o, active) {
     <div class="ohead"><div class="ocust">${esc(o.cust)}<small>${C[o.city].name}${nearest !== null ? ` · en yakın tesisine ${nearest ? nf0.format(nearest) + " km" : "aynı şehir"}` : ""}</small></div>
       <div class="oamt"><span class="num">${tl(orderValue(o))}</span><small class="num">${nf0.format(o.price)} ₺/t · piyasa ${pct(over)}</small></div></div>
     <div class="oprod"><b>${ton(o.qty)}</b> ${p.name} <span class="muted">· ${p.spec}</span></div>
-    <div class="chips">${o.tender ? `<span class="chip hot">İhale</span>` : ""}${o.rival ? `<span class="chip b">Rakip: ${esc((rivalById(o.rival) || {}).name || "")}</span>` : ""}${payChip(o)}${riskChip(o)}${o.loyal ? `<span class="chip g">Sadık müşteri</span>` : ""}
+    <div class="chips">${o.tender ? `<span class="chip hot">İhale</span>` : ""}${o.rival ? `<span class="chip b">Rakip: ${esc((rivalById(o.rival) || {}).name || "")}</span>` : ""}${o.black ? `<span class="chip b">Daha önce ödemedi</span>` : ""}${payChip(o)}${riskChip(o)}${o.loyal ? `<span class="chip g">Sadık müşteri</span>` : ""}
       ${o.proc ? `<span class="chip hot">${PROCS[o.proc].name}${hasMachine(o.proc, p.cat) ? "" : " (fason %" + PROCS[o.proc].fason * 100 + ")"}</span>` : ""}
       <span class="chip ${left <= 1 ? "b" : ""}">Son teslim: ${left <= 0 ? "bugün" : left + " gün"}</span>
       ${active ? "" : o.rival ? `<span class="chip b">Bugün almazsan rakip alır</span>` : `<span class="chip">Teklif ${o.expires - S.day <= 1 ? "yarın düşer" : (o.expires - S.day) + " gün geçerli"}</span>`}</div>
@@ -1224,7 +1530,13 @@ function orderCard(o, active) {
 }
 function renderOrders() {
   let h = "";
-  if (S.day <= 4 && S.tons < 3) h += `<div class="hint"><b>Sıfırdan başlıyorsun.</b> Depon ve kamyonun yok. Bir teklifte <b>Aracılık</b>'a bas. Mal fabrikadan doğrudan müşteriye gider, sen farkı alırsın. 15.000 ₺ biriktirince <b>Tesisler</b> sekmesinden depo kirala, ucuzken stok al, stoktan satarak daha çok kazan.</div>`;
+  const sp = scenProgress();
+  if (sp && !S.scen.done) h += `<div class="banner"><span class="t">Senaryo · ${SCENARIOS[S.scen.id].name}</span><p>${SCENARIOS[S.scen.id].desc}</p><p>${sp.text}</p><div class="bar"><i style="width:${sp.pct * 100}%"></i></div></div>`;
+  if (S.tut < TUT.length) { const t = TUT[S.tut];
+    h += `<div class="card"><div class="line2"><span><b style="font-family:var(--body);color:var(--hot)">İlk adımlar ${S.tut + 1}/${TUT.length}: ${t[0]}</b></span><b>+${tl(t[3])}</b></div>
+      <div class="muted">${t[1]}</div><div class="steps">${TUT.map((x, i) => `<i class="${i < S.tut ? "on" : ""}"></i>`).join("")}</div></div>`; }
+  if (S.daily) h += `<div class="card"><div class="line2"><span><b style="font-family:var(--body)">Günlük görevler</b></span><span>her biri ${tl(2000 * (level() + 1))} · itibar +1</span></div>
+    ${S.daily.tasks.map(t => `<div class="task ${t.done ? "done" : ""}"><span>${t.done ? "✓ " : ""}${taskText(t)}</span><b>${t.k === "profit" ? tlShort(Math.min(t.n, taskProg(t))) + " / " + tlShort(t.n) : nf1.format(Math.min(t.n, taskProg(t))) + " / " + nf1.format(t.n)}</b></div>`).join("")}</div>`;
   if (S.event) h += eventBanner();
   const openT = S.tenders.filter(t => t.bid === null);
   if (openT.length) h += `<div class="banner"><span class="t">Açık ihale</span><p>${openT.map(t => `<b>${esc(t.proj)}</b>: ${ton(t.qty)} ${P[t.prod].name}`).join(" · ")}</p><button class="btn st" data-act="tab" data-v="rival">Rakiplere karşı teklif ver</button></div>`;
@@ -1238,6 +1550,8 @@ function renderMarket() {
   const cats = [["all", "Tümü"], ...Object.entries(CATS).map(([k, c]) => [k, c.name])];
   let h = `<div class="filter">${cats.map(([k, n]) => `<button aria-pressed="${UI.cat === k}" data-act="cat" data-v="${k}">${n}</button>`).join("")}
     <button aria-pressed="${UI.onlyStock}" data-act="onlyStock">Stoktakiler</button></div>`;
+  const fxc = S.fx / (S.fxPrev || S.fx) - 1;
+  h += `<div class="line2"><span>Dolar/TL <b>${S.fx.toFixed(2).replace(".", ",")}</b> <span class="${fxc > 0 ? "bad" : "good"}">${pct(fxc)}</span></span><span>Fiyatlar Türkiye ortalaması · ₺/t</span></div>`;
   if (S.events.length) h += `<div class="chips">${S.events.map(e => `<span class="chip ${e.drift > 0 ? "g" : "b"}">${e.cat === "all" ? "Tüm piyasa" : CATS[e.cat].name} ${e.drift > 0 ? "▲" : "▼"} ${e.days} gün</span>`).join("")}</div>`;
   const list = PRODUCTS.filter(p => (UI.cat === "all" || p.cat === UI.cat) && (!UI.onlyStock || stockQty(p.id) > 0));
   if (!list.length) h += `<div class="hint">Bu filtrede stoğun yok.</div>`;
@@ -1247,6 +1561,7 @@ function renderMarket() {
     const lock = p.lvl > level(), m = price(p.id), ch = m / prevPrice(p.id) - 1, q = stockQty(p.id), open = UI.open === p.id && !lock;
     h += `<div class="prow ${open ? "open" : ""} ${lock ? "locked" : ""}">
       <button class="phead" data-act="${lock ? "" : "open"}" data-v="${p.id}" aria-expanded="${open}" ${lock ? "disabled" : ""}>
+        ${icon(p)}
         <div style="min-width:0"><div class="pname">${p.name}</div><div class="pspec">${lock ? LEVELS[p.lvl].name + " unvanında açılır" : p.spec + " · " + p.w}</div></div>
         ${spark(S.market[p.id].hist)}
         <div class="pprice"><span class="num">${nf0.format(m)}</span><small class="${ch >= 0 ? "good" : "bad"}">${pct(ch)}</small> <small class="muted">₺/t</small></div>
@@ -1260,16 +1575,21 @@ function renderMarket() {
 function tradePanel(p) {
   if (!S.locs.length) return `<div class="trade"><div class="hint">Stok tutmak için önce <b>Tesisler</b> sekmesinden bir depo ya da dükkan aç.</div></div>`;
   const l = locById(UI.loc) || S.locs[0]; UI.loc = l.id;
-  const m = price(p.id), q = UI.qty, have = sq(l, p.id);
+  const m = priceAt(p.id, l.city), q = UI.qty, have = sq(l, p.id);
   const hist = S.market[p.id].hist.slice(-30), lo = Math.min(...hist), hi = Math.max(...hist);
-  const sup = mode => { const b = supplyBlock(mode, q, l), s = SUPPLY[mode], c = buyCost(p.id, q, mode);
-    return `<button class="btn ${mode === "spot" ? "hot" : "st"}" data-act="buy" data-v="${p.id}:${mode}" ${b || q <= 0 ? "disabled" : ""}>${s.name}${s.disc ? " −%" + s.disc * 100 : ""}<small>${b || tl(c) + (s.days ? " · " + s.days + " gün" : " · hemen")}</small></button>`; };
+  const byCity = CITIES.map(c => [c, priceAt(p.id, c.id)]).sort((a, b) => a[1] - b[1]), cheap = byCity[0], dear = byCity[byCity.length - 1];
+  const sup = mode => { const b = supplyBlock(mode, q, l), s = SUPPLY[mode], c = buyCost(p.id, q, mode, l.city);
+    const sub = b || (mode === "imp" ? `peşinat ${tl(c * 0.3 * (UI.hedge ? 1.015 : 1))} · 20 gün` : tl(c) + (s.days ? " · " + s.days + " gün" : " · hemen"));
+    return `<button class="btn ${mode === "spot" ? "hot" : "st"}" data-act="buy" data-v="${p.id}:${mode}" ${b || q <= 0 ? "disabled" : ""}>${s.name}${s.disc ? " −%" + s.disc * 100 : ""}<small>${sub}</small></button>`; };
   return `<div class="trade">
     <div class="line2"><span>30 gün en düşük <b>${nf0.format(lo)}</b></span><span>en yüksek <b>${nf0.format(hi)}</b></span></div>
     ${S.locs.length > 1 ? `<div class="filter">${S.locs.map(x => `<button aria-pressed="${x.id === l.id}" data-act="pickLoc" data-v="${x.id}">${C[x.city].name} · ${LOC_TYPES[x.type].name} (${ton(sq(x, p.id))})</button>`).join("")}</div>` : ""}
     <div class="qty">${[0.5, 1, 5, 10, 20, 50, 100].map(v => `<button aria-pressed="${q === v}" data-act="qty" data-v="${v}">${nf1.format(v)}</button>`).join("")}
       <button data-act="qty" data-v="max">Maks</button><span class="q">${ton(q)}</span></div>
     <div class="line2"><span>${locName(l)} · boş yer</span><b>${ton(locFree(l))}</b></div>
+    <div class="line2"><span>${C[l.city].name} fiyatı</span><b>${nf0.format(m)} ₺/t</b></div>
+    <div class="line2"><span>En ucuz ${cheap[0].name} <b>${nf0.format(cheap[1])}</b></span><span>en pahalı ${dear[0].name} <b>${nf0.format(dear[1])}</b></span></div>
+    ${level() >= SUPPLY.imp.lvl ? `<div class="filter"><button aria-pressed="${!!UI.hedge}" data-act="hedge">İthalatta kuru sabitle (+%1,5)</button></div>` : ""}
     ${discount(q) ? `<div class="line2"><span>Toplu alım indirimi</span><b>−%${discount(q) * 100}</b></div>` : ""}
     <div class="btns">${sup("spot")}${sup("mill")}${sup("imp")}</div>
     <div class="btns"><button class="btn" data-act="sell" data-v="${p.id}" ${have <= 0 ? "disabled" : ""}>Bu tesisten piyasaya sat<small>${nf0.format(m * SELLBACK)} ₺/t · elde ${ton(have)}</small></button></div>
@@ -1293,10 +1613,13 @@ function locCard(l) {
   }
   if (n) h += `<div class="item"><div><b>Büyüt: ${n.name}</b><div class="muted">${n.cap} t · yükleme ${n.handle} t/gün · kira ${tl(n.rent)}${n.walk ? " · daha çok müşteri" : ""}${n.port && !C[l.city].port ? " · liman şehri gerekir" : ""}</div></div>
     <button class="btn hot sm" data-act="upLoc" data-v="${l.id}" ${S.cash < n.price || (n.port && !C[l.city].port) ? "disabled" : ""}>${tl(n.price)}</button></div>`;
+  if (S.machines.slitter && sq(l, "bobin") > 0) { const q = Math.min(sq(l, "bobin"), 30 - S.slitUsed, handleLeft(l));
+    h += `<div class="item"><div><b>Bobin dilme</b><div class="muted">Bobini 3 mm siyah sac levhaya çevir · 300 ₺/t · %1 fire · bugün ${ton(Math.max(0, 30 - S.slitUsed))} kaldı</div></div>
+      <button class="btn hot sm" data-act="slit" data-v="${l.id}" ${q < 0.5 ? "disabled" : ""}>${ton(Math.max(0, Math.floor(q * 2) / 2))} dil</button></div>`; }
   const ent = Object.entries(l.stock);
   if (!ent.length) h += `<div class="muted">Boş. Piyasa sekmesinden bu tesise mal al.</div>`;
   for (const [id, s] of ent) {
-    const m = price(id), pl = s.q * (m - s.cost), mv = UI.move === `${l.id}:${id}`;
+    const m = priceAt(id, l.city), pl = s.q * (m - s.cost), mv = UI.move === `${l.id}:${id}`;
     h += `<div class="srow"><div><b>${P[id].name}</b><div class="muted num">${ton(s.q)} · ort. ${nf0.format(s.cost)} ₺/t</div></div>
       <div class="num ${pl >= 0 ? "good" : "bad"}" style="text-align:right">${pl >= 0 ? "+" : ""}${tl(pl)}</div>
       <div class="acts">${S.locs.length > 1 ? `<button class="btn sm" data-act="move" data-v="${l.id}:${id}">Taşı</button>` : ""}
@@ -1308,7 +1631,9 @@ function locCard(l) {
   return h + `</div>`;
 }
 function renderStock() {
-  let h = `<section class="sec"><div class="sechead"><h2>Tesisler</h2><span class="muted">${S.locs.length}/${maxLocs()} · ${nf1.format(stockTotal())}/${nf0.format(capTotal())} t</span></div>`;
+  let h = `<section class="sec"><div class="sechead"><h2>Harita</h2><span class="muted">şehre dokun · fiyat farkları</span></div><div class="card">${mapSvg()}${cityInfo(UI.newCity || S.home)}
+    <div class="legend"><span><i style="background:var(--hot)"></i>Senin tesisin</span><span><i style="background:var(--muted)"></i>Şehir</span><span>Küçük renkli noktalar: rakip şubeleri</span></div></div></section>`;
+  h += `<section class="sec"><div class="sechead"><h2>Tesisler</h2><span class="muted">${S.locs.length}/${maxLocs()} · ${nf1.format(stockTotal())}/${nf0.format(capTotal())} t</span></div>`;
   if (!S.locs.length) h += `<div class="hint">Henüz tesisin yok. <b>Depo</b> ucuzdur ve stok tutar. <b>Dükkan</b> pahalıdır ama her gün kapıdan perakende müşteri gelir ve stoğunu %8–16 kârla satar.</div>`;
   h += S.locs.map(locCard).join("") + `</section>`;
   if (S.incoming.length) h += `<section class="sec"><h2>Yoldaki sevkiyatlar</h2><div class="card">${S.incoming.map(i => `<div class="line2"><span>${ton(i.q)} ${P[i.pid].name} → ${C[locById(i.loc).city].name} · ${SUPPLY[i.mode].name}</span><b>Gün ${i.arrive}</b></div>`).join("")}</div></section>`;
@@ -1339,11 +1664,14 @@ function lbRows(rows) {
   let rank = 0;
   return rows.map(r => { if (r.alive) rank++;
     return `<div class="lb ${r.me ? "me" : ""} ${r.alive ? "" : "dead"}"><span class="rk">${r.alive ? rank : "—"}</span><span class="dot" style="background:${r.color}"></span>
-      <div style="min-width:0">${esc(r.name)}<small>${r.alive ? `${r.style} · ${r.cities} şehir · 30 günde ${nf0.format(r.t30)} t` : "Konkordato"}</small></div><span class="v">${r.alive ? tl(r.nw) : "—"}</span></div>`; }).join("");
+      <div style="min-width:0">${esc(r.name)}<small>${r.alive ? `${r.owner ? esc(r.owner) + " · " : ""}${r.style} · ${r.cities} şehir · 30 günde ${nf0.format(r.t30)} t` : r.acquired ? "Senin tarafından satın alındı" : "Konkordato"}</small></div><span class="v">${r.alive ? tl(r.nw) : "—"}</span></div>`; }).join("");
 }
 function renderRival() {
   const rows = board(), alive = rows.filter(r => r.alive);
   let h = `<section class="sec"><div class="sechead"><h2>Sektör sıralaması</h2><span class="muted">Sen ${myRank()}. sıradasın · net değer</span></div><div class="card">${lbRows(rows)}</div></section>`;
+  const buyable = S.rivals.filter(r => r.alive && r.nw > 0 && r.nw < netWorth() * 0.35);
+  if (level() >= 3 && buyable.length) h += `<section class="sec"><h2>Satın alınabilir rakipler</h2><div class="card">${buyable.map(r => `<div class="item"><div><b>${esc(r.name)}</b><div class="muted">${esc(owner(r))} satmaya razı. ${r.cities.length} şehirdeki şubeleri sana küçük depo olarak geçer (tesis sınırın kadar).</div></div>
+    <button class="btn hot sm" data-act="acquire" data-v="${r.id}" ${S.cash < r.nw * 1.3 ? "disabled" : ""}>${tlShort(r.nw * 1.3)}</button></div>`).join("")}</div></section>`;
   const tot = alive.reduce((a, r) => a + r.t30, 0) || 1;
   h += `<section class="sec"><div class="sechead"><h2>Pazar payı</h2><span class="muted">son 30 gün · ton</span></div><div class="card">
     <div class="share">${alive.map(r => `<i style="width:${r.t30 / tot * 100}%;background:${r.color}"></i>`).join("")}</div>
@@ -1386,9 +1714,14 @@ function menuHtml(v) {
         style="width:100%;box-sizing:border-box;padding:11px 12px;border-radius:7px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font:inherit;font-size:16px">
       <label for="homeCity" class="muted">Merkez şehrin (siparişlerin çoğu buradan gelir)</label>
       <select id="homeCity">${CITIES.map(c => `<option value="${c.id}" ${c.id === (UI.newHome || "ist") ? "selected" : ""}>${c.name} · ${c.osb}${c.port ? " (liman)" : ""}</option>`).join("")}</select>
+      <span class="muted">Oyun türü</span>
+      <div class="seg">${Object.entries(SCENARIOS).map(([k, x]) => `<button aria-pressed="${(UI.newScen || "free") === k}" data-act="setScen" data-v="${k}">${x.name}<small>${x.desc}</small></button>`).join("")}</div>
       <span class="muted">Zorluk</span>
       <div class="seg">${Object.entries(DIFFS).map(([k, x]) => `<button aria-pressed="${d === k}" data-act="setDiff" data-v="${k}">${x.name}<small>${x.desc}</small></button>`).join("")}</div></div>
       <div class="card help"><p>Cebinde ${tl(DIFFS[d].cash)} ve bir telefon var. Deponu, kamyonun ve kredin yok. Hedefin <b>12.000 ton satış ve 40 milyon ₺ net değerle Demir Baronu</b> olmak, sonra rakiplerini geçip sektör lideri olmak.</p></div>
+      ${(UI.newScen || "free") === "fx" ? `<div class="hint"><b>Kur Krizi:</b> Toptancı olarak başlarsın; elinde 85 t stok, 300.000 ₺ nakit ve 1,5 Mn ₺ kredi borcu var. Dolar 20 gün her gün yükselir, talep çöker. 90. günde net değerin 3 Mn ₺ olmalı ve batmamalısın.</div>` : ""}
+      ${(UI.newScen || "free") === "quake" ? `<div class="hint"><b>Deprem Bölgesi:</b> Gaziantep'te Esnaf olarak başlarsın. Bölgede inşaat demiri talebi üç kat. 120 günde 1.000 t inşaat demiri sat.</div>` : ""}
+      ${LEG.points ? `<div class="hint"><b>Miras: ${LEG.points} puan</b> · +${tl(LEG.points * 10000)} başlangıç, +${Math.min(20, LEG.points * 2)} itibar, tekliflerde +%${nf1.format(LEG.points * 0.2)}</div>` : ""}
       ${hasGame() ? `<div class="hint">Mevcut şirketin (${esc(S.name)}) silinir.</div>` : ""}
       <button class="mbtn hot" data-act="startNew"><span>Ticarete başla</span><span class="arrow">›</span></button>`;
   }
@@ -1401,7 +1734,10 @@ function menuHtml(v) {
     <h3>Nakliye</h3><p>Mesafe para demek. Kendi aracın yakıt öder, nakliyeci kilometre başı ücret alır. Müşteriye yakın tesis aç.</p>
     <h3>Tedarik</h3><p>Piyasadan hemen al. Toptancı olunca fabrikadan %4 ucuza (en az 20 t, 3 gün), Bayi olunca gemiyle %9 ucuza (en az 100 t, 20 gün, liman şehrine) al.</p>
     <h3>İşleme</h3><p>Bazı siparişler kesim, büküm, lazer ya da kesme-bükme ister. Makinen yoksa iş fasona gider ve kârın azalır.</p>
-    <h3>Vade ve risk</h3><p>Vadeli satış daha pahalıya gider ama çek karşılıksız çıkabilir. Nakit sıkışırsa alacağı faktoringle bankaya kırdır. Hırsızlık ve yangına karşı sigorta yaptır.</p>
+    <h3>Vade, tahsilat ve mahkeme</h3><p>Vadeli satış daha pahalıya gider ama gerçek hayattaki gibi müşteri ödemeyi erteleyebilir, kısmen ödeyebilir ya da çeki karşılıksız çıkabilir. Ödemeyen firma kara listeye girer. Takipteki alacak için ara, indirimle uzlaş, icra takibi başlat ya da dava aç. İcraya itiraz edilebilir, dava aylar sürer, firma konkordato ilan edebilir. Hukuk müşaviri masrafı yarıya indirir ve kazanma şansını artırır. Kredi sigortası ödenmeyen alacağın %80'ini öder.</p>
+    <h3>Aleyhine davalar</h3><p>Teslim ettiğin malda sorun bulan müşteri tazminat davası açabilir (fason işlemede risk daha yüksek). Forklift ve vinç olan tesislerde iş kazası olabilir; iş güvenliği uzmanı riski azaltır.</p>
+    <h3>Şehir fiyatları ve kur</h3><p>Her şehirde fiyat biraz farklı. Ucuz şehirde alıp pahalı şehre sat. İthalatın %30'u peşin, kalanı mal gelince o günkü dolar kuruyla ödenir; istersen kuru %1,5 bedelle sabitlersin.</p>
+    <h3>Hırsızlık ve yangın</h3><p>Stok sigortası zararın %90'ını öder. Gece bekçisi hırsızlığı azaltır.</p>
     <h3>Rakipler</h3><p>Rakipler şube açtıkları şehirlerde müşterini kovalar. "Rakip" etiketli teklif yalnızca o gün açıktır. Pazarlıkla %3 fazla isteyebilirsin ama rakipli işte müşteri rakibe gidebilir. Rakipler fiyat savaşı açar, elemanını ayartır, bazen iflas eder ve tesisi ucuza satılır.</p>
     <h3>İhaleler</h3><p>Büyük projeler kapalı zarfla verilir. Kâr marjını seç, %3 teminat yatır. En düşük teklif kazanır. Kazanırsan 10 günde teslim etmelisin.</p>
     <h3>Etkinlikler ve mevsimler</h3><p>Fuar, bayram, meydan okuma, fabrika kampanyası, vergi denetimi ve durgunluk dönemleri gelir. Yazın inşaat demiri, kışın boru talebi artar. Yıl sonunda ilk 5'e girene ödül var.</p>
@@ -1412,6 +1748,8 @@ function menuHtml(v) {
   if (v === "settings") return `${back("Ayarlar")}<div class="card">
     <div class="toggle"><div><b>Ay sonu raporu</b><div class="muted">Her ay sonunda gider ve vergi özetini göster</div></div><button aria-pressed="${SET.monthModal}" data-act="toggleSet" data-v="monthModal">${SET.monthModal ? "Açık" : "Kapalı"}</button></div>
     <div class="toggle"><div><b>Gün sonu bildirimi</b><div class="muted">Her gün sonunda özet baloncuğu göster</div></div><button aria-pressed="${SET.toasts}" data-act="toggleSet" data-v="toasts">${SET.toasts ? "Açık" : "Kapalı"}</button></div>
+    <div class="toggle"><div><b>Ses</b><div class="muted">Satış, ihale ve uyarı sesleri</div></div><button aria-pressed="${SET.sound}" data-act="toggleSet" data-v="sound">${SET.sound ? "Açık" : "Kapalı"}</button></div>
+    <div class="toggle"><div><b>Titreşim</b><div class="muted">Destekleyen telefonlarda</div></div><button aria-pressed="${SET.vibe}" data-act="toggleSet" data-v="vibe">${SET.vibe ? "Açık" : "Kapalı"}</button></div>
     <div class="toggle"><div><b>Tüm verileri sil</b><div class="muted">Kayıtlı şirketi ve rekorları siler</div></div><button data-act="wipe" style="${UI.confirmWipe ? "background:var(--bad);color:#fff" : ""}">${UI.confirmWipe ? "Emin misin?" : "Sil"}</button></div></div>
     <div class="muted">Oyun bu cihazda, bu tarayıcıda kaydedilir.</div>`;
   // main
@@ -1426,6 +1764,27 @@ function menuHtml(v) {
     <button class="mbtn" data-act="menuGo" data-v="records"><span>Rekorlar<small>En iyi şirketlerin</small></span><span class="arrow">›</span></button>
     <button class="mbtn" data-act="menuGo" data-v="settings"><span>Ayarlar<small>Bildirimler, verileri sil</small></span><span class="arrow">›</span></button>
     <p class="muted" style="margin-top:auto;font-size:12px">Prototip · kayıt bu cihazda tutulur</p>`;
+}
+const STATUS_TXT = { normal: "", takip: "Takipte", icra: "İcrada", dava: "Davada", sigorta: "Sigortada" };
+function recvCard(r) {
+  const left = r.due - S.day, st = r.status;
+  let body = "", chips = "";
+  if (st === "normal") {
+    chips = `${r.delays ? `<span class="chip w">${r.delays} kez ertelendi</span>` : ""}${left < 0 ? `<span class="chip b">Gecikmede</span>` : ""}`;
+    body = `<button class="btn" data-act="factor" data-v="${r.id}">Faktoring: hemen ${tl(r.amount * (1 - factorRate(r)))} al</button>`;
+  } else if (st === "takip") {
+    const settle = Math.round(r.amount * { A: 0.75, B: 0.65, C: 0.55 }[r.risk]);
+    chips = `<span class="chip b">Karşılıksız · ${S.day - (r.since || S.day)} gündür takipte</span>${r.objected ? `<span class="chip w">İcraya itiraz etti</span>` : ""}${r.noAssets ? `<span class="chip w">Haczedilecek mal yok</span>` : ""}`;
+    body = `<div class="btns"><button class="btn sm" data-act="recvAct" data-v="${r.id}:call">Ara / ziyaret et</button>
+      <button class="btn sm" data-act="recvAct" data-v="${r.id}:settle">Uzlaş · ${tl(settle)} al</button>
+      ${!r.objected && !r.noAssets ? `<button class="btn st sm" data-act="recvAct" data-v="${r.id}:icra">İcra takibi · ${tl(legalCost(r, "icra"))}</button>` : ""}
+      <button class="btn st sm" data-act="recvAct" data-v="${r.id}:dava">Dava aç · ${tl(legalCost(r, "dava"))}</button>
+      <button class="btn ghost sm" data-act="recvAct" data-v="${r.id}:write">Zarar yaz</button></div>
+      <div class="muted">Uzlaşma hemen para getirir ama kalanından vazgeçersin. İcra 3–5 hafta sürer, itiraz edilebilir. Dava 2–5 ay sürer, kazanma şansı %${Math.round((0.68 + (S.staff.lawyer ? 0.15 : 0)) * 100)}; firma bu arada konkordato ilan edebilir.</div>`;
+  } else chips = `<span class="chip ${st === "sigorta" ? "g" : "w"}">${STATUS_TXT[st]} · sonuç ${dateStr(r.legalEnd)}</span>`;
+  return `<div class="card"><div class="item"><div><b>${esc(r.cust)}</b><div class="muted">${st === "normal" ? `Vade ${dateStr(r.due)} (${left >= 0 ? left + " gün" : "geçti"})` : `İlk tutar ${tl(r.orig || r.amount)}`} · Risk ${r.risk}</div></div>
+    <div class="oamt"><span class="num ${st === "normal" ? "" : "bad"}">${tl(r.amount)}</span>${st !== "normal" ? `<small>${STATUS_TXT[st]}</small>` : ""}</div></div>
+    ${chips ? `<div class="chips">${chips}</div>` : ""}${body}</div>`;
 }
 function nwChart() {
   const h = S.nwHist.slice(-90); if (h.length < 3) return `<div class="muted">Grafik birkaç gün sonra oluşur.</div>`;
@@ -1453,15 +1812,17 @@ function renderCompany() {
     <div class="btns">${S.vehicles[k] ? `<button class="btn ghost sm" data-act="vehSell" data-v="${k}">Sat</button>` : ""}<button class="btn st sm" data-act="veh" data-v="${k}" ${S.cash < v.price ? "disabled" : ""}>${tl(v.price)}</button></div></div>`;
   h += `<div class="muted">Kendi aracın yalnızca yakıt öder. Nakliyeci aynı şehirde 150 ₺/t, şehirler arası 250 ₺ + 1,1 ₺/km alır.</div></div></section>`;
   h += `<section class="sec"><h2>Atölye makineleri</h2><div class="card">`;
-  for (const [k, m] of Object.entries(MACHINES)) h += `<div class="item"><div><b>${m.name}</b><div class="muted">${m.desc}. ${PROCS[m.proc].name} siparişinde %${PROCS[m.proc].fason * 100} fason masrafı kalkar.</div></div>
-    ${S.machines[k] ? `<span class="chip g">Kurulu</span>` : `<button class="btn st sm" data-act="mach" data-v="${k}" ${S.cash < m.price ? "disabled" : ""}>${tl(m.price)}</button>`}</div>`;
+  for (const [k, m] of Object.entries(MACHINES)) h += `<div class="item"><div><b>${m.name}</b><div class="muted">${m.desc}.${m.proc ? ` ${PROCS[m.proc].name} siparişinde %${PROCS[m.proc].fason * 100} fason masrafı yerine yalnızca %1,2 fire.` : ""}${m.lvl && level() < m.lvl ? ` ${LEVELS[m.lvl].name} unvanında açılır.` : ""}</div></div>
+    ${S.machines[k] ? `<span class="chip g">Kurulu</span>` : `<button class="btn st sm" data-act="mach" data-v="${k}" ${S.cash < m.price || (m.lvl && level() < m.lvl) ? "disabled" : ""}>${tl(m.price)}</button>`}</div>`;
   h += `</div></section>`;
   h += `<section class="sec"><h2>Personel</h2><div class="card">`;
   for (const [k, s] of Object.entries(STAFF)) h += `<div class="item"><div><b>${s.name}</b> <span class="muted">× ${S.staff[k]}</span><div class="muted">${s.desc} · aylık ${tl(s.salary)}</div></div>
     <div class="btns">${S.staff[k] ? `<button class="btn ghost sm" data-act="fire" data-v="${k}">Çıkar</button>` : ""}<button class="btn st sm" data-act="hire" data-v="${k}" ${S.staff[k] >= s.max ? "disabled" : ""}>İşe al</button></div></div>`;
   h += `<div class="muted">Tezgâhtarlar dükkan kartından alınır.</div></div></section>`;
   h += `<section class="sec"><h2>Sigorta</h2><div class="card"><div class="item"><div><b>${S.insured ? "Stoklar sigortalı" : "Sigorta yok"}</b><div class="muted">Hırsızlık ve yangında zararın %90'ı ödenir. Prim aylık stok değerinin %${nf1.format(INS_RATE * 100)}'i (şu an ${tl(Math.max(1000, stockValue() * INS_RATE))}).</div></div>
-    <button class="btn ${S.insured ? "ghost" : "st"} sm" data-act="insure">${S.insured ? "İptal et" : "Sigortala"}</button></div></div></section>`;
+    <button class="btn ${S.insured ? "ghost" : "st"} sm" data-act="insure">${S.insured ? "İptal et" : "Sigortala"}</button></div>
+    <div class="item"><div><b>${S.credIns ? "Alacaklar kredi sigortalı" : "Kredi sigortası yok"}</b><div class="muted">Müşteri ödemezse 30 gün içinde alacağın %80'i ödenir. Prim aylık açık alacakların %0,4'ü (şu an ${tl(Math.max(2000, recvNormal() * 0.004))}).</div></div>
+    <button class="btn ${S.credIns ? "ghost" : "st"} sm" data-act="credIns">${S.credIns ? "İptal et" : "Sigortala"}</button></div></div></section>`;
   const lim = loanLimit(), step = Math.max(50000, Math.round(lim / 5 / 10000) * 10000);
   h += `<section class="sec"><h2>Banka</h2><div class="card"><div class="kv">
     <span>Kredi borcu</span><span>${tl(S.loan)}</span><span>Kredi limiti</span><span>${tl(lim)}</span>
@@ -1469,10 +1830,9 @@ function renderCompany() {
     <div class="btns"><button class="btn st" data-act="loan" data-v="${step}" ${lim - S.loan <= 0 ? "disabled" : ""}>Kredi çek<small>+${tl(Math.min(step, Math.max(0, lim - S.loan)))}</small></button>
     <button class="btn" data-act="repay" data-v="0" ${S.loan <= 0 || S.cash <= 0 ? "disabled" : ""}>Öde<small>${tl(Math.min(S.loan, Math.max(0, S.cash)))}</small></button></div></div></section>`;
   h += `<section class="sec"><div class="sechead"><h2>Alacaklar</h2><span class="muted">${tl(recvTotal())}</span></div>`;
-  h += S.recv.length ? S.recv.slice().sort((a, b) => a.due - b.due).map(r => `<div class="card"><div class="item"><div><b>${esc(r.cust)}</b><div class="muted">Vade: Gün ${r.due} (${r.due - S.day} gün) · Risk ${r.risk}</div></div>
-      <div class="oamt"><span class="num">${tl(r.amount)}</span></div></div>
-      <button class="btn" data-act="factor" data-v="${r.id}">Faktoring: hemen ${tl(r.amount * (1 - factorRate(r)))} al</button></div>`).join("")
-    : `<div class="hint">Vadeli sattığında alacakların burada görünür. Nakit sıkışırsa faktoringle bankaya kırdırabilirsin.</div>`;
+  h += S.recv.length ? S.recv.slice().sort((a, b) => (a.status === "normal") - (b.status === "normal") || a.due - b.due).map(recvCard).join("")
+    : `<div class="hint">Vadeli sattığında alacakların burada görünür. Müşteri bazen geç öder, bazen kısmen öder, bazen hiç ödemez. Ödemeyen için icra ya da dava açabilirsin.</div>`;
+  if (S.suits.length) h += `<div class="card"><b>Aleyhine davalar</b>${S.suits.map(x => `<div class="line2"><span>${esc(x.cust)} · ${x.kind === "accident" ? "iş kazası tazminatı" : "kalite tazminatı"} ${tl(x.claim)}</span><b>${x.stage === "court" ? "karar " + dateStr(x.end) : "bekliyor"}</b></div>`).join("")}</div>`;
   h += `</section>`;
   const mc = monthlyCosts(), mt = mc.reduce((a, [, v]) => a + v, 0);
   h += `<section class="sec"><h2>Ay sonu</h2><div class="card"><div class="kv">${mc.map(([k, v]) => `<span>${k}</span><span>${tl(v)}</span>`).join("")}
@@ -1489,6 +1849,9 @@ function renderCompany() {
     <span>Ödenen vergi</span><span>${tl(S.stats.taxes)}</span><span>Karşılıksız çek</span><span>${S.stats.defaults}</span>
     <span>Hırsızlık / yangın</span><span>${S.stats.incidents}</span><span>Geciken sipariş</span><span>${S.stats.late}</span></div></div></section>`;
   h += `<section class="sec"><h2>Haberler</h2><div class="card">${S.news.slice(0, 10).map(n => `<div class="line2"><span class="${n.bad ? "bad" : ""}" style="${n.bad ? "" : "color:var(--fg)"}">${esc(n.text)}</span><b>G${n.day}</b></div>`).join("")}</div></section>`;
+  if (level() === LEVELS.length - 1) { const pts = legacyGain();
+    h += `<section class="sec"><h2>Şirketi sat</h2><div class="card"><div class="muted">Şirketini satıp yeni bir şehirde sıfırdan başlayabilirsin. ${pts} miras puanı kazanırsın. Her puan yeni oyunlarda +10.000 ₺ başlangıç, +2 itibar ve teklif fiyatlarında +%0,2 verir. Şu anki miras: ${LEG.points} puan.</div>
+      <button class="btn hot" data-act="sellCo">Şirketi sat · +${pts} miras puanı</button></div></section>`; }
   h += `<button class="btn ghost" style="align-self:flex-start" data-act="reset">Yeni oyun başlat</button>`;
   return h;
 }
@@ -1503,7 +1866,24 @@ function render() {
 // =====================================================================
 // TOAST / MODAL
 // =====================================================================
+// Synthesized sounds (no audio files) and phone vibration; both can be turned off in Settings.
+let AC = null;
+function beep(kind) {
+  if (SET.sound) try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    const seq = { cash: [[1318, 0.06], [1760, 0.14]], win: [[523, 0.1], [659, 0.1], [784, 0.1], [1047, 0.28]], error: [[180, 0.18]], bad: [[392, 0.16], [262, 0.32]], day: [[660, 0.05]] }[kind] || [];
+    let t = AC.currentTime;
+    for (const [fq, d] of seq) {
+      const o = AC.createOscillator(), g = AC.createGain();
+      o.type = kind === "error" ? "sawtooth" : kind === "day" ? "sine" : "triangle"; o.frequency.value = fq;
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.1, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+      o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t + d + 0.02); t += d * 0.9;
+    }
+  } catch (e) {}
+  if (SET.vibe) try { if (navigator.vibrate) navigator.vibrate(kind === "error" || kind === "bad" ? [40, 40, 40] : kind === "win" ? [20, 30, 60] : 12); } catch (e) {}
+}
 function toast(msg, bad) {
+  if (bad) beep("error");
   const t = document.getElementById("toast"), d = document.createElement("div");
   d.textContent = msg; if (bad) d.className = "bad"; t.appendChild(d);
   while (t.children.length > 3) t.firstChild.remove();
@@ -1524,6 +1904,9 @@ function showModal(kind, data) {
     ${(data.rescue || []).map(([k, v]) => `<span class="warn">${k}</span><span class="warn">+${tl(v)}</span>`).join("")}<span>Kasa</span><span class="${S.cash < 0 ? "bad" : ""}">${tl(S.cash)}</span></div>
     ${S.cash < 0 ? `<p class="bad">Kasa eksiye düştü. Eksi bakiyeye aylık %5 faiz işler. −${tl(overdraftLimit())} altında iflas edersin.</p>` : ""}<button class="btn hot" data-act="close">Tamam</button>`;
   else if (kind === "bankrupt") h = `<h3>İflas</h3><p>Ay sonu giderleri ödenemedi. Kasa ${tl(S.cash)} ile eksi bakiye sınırını aştı.</p><p class="muted">${S.day} gün dayandın, ${ton(S.tons)} sattın, unvanın ${L.name}.</p><div class="btns"><button class="btn" data-act="toMenu">Ana menü</button><button class="btn hot" data-act="restart">Yeni şirket kur</button></div>`;
+  else if (kind === "scen") h = data.won ? `<h3>Senaryo kazanıldı</h3><p>${SCENARIOS[S.scen.id].name}: ${SCENARIOS[S.scen.id].desc}. Başardın.</p><p class="muted">İstersen bu şirketle serbest oyuna devam edebilirsin.</p><button class="btn hot" data-act="close">Devam et</button>`
+    : `<h3>Senaryo kaybedildi</h3><p>${SCENARIOS[S.scen.id].name}: hedefe süre içinde ulaşılamadı.</p><div class="btns"><button class="btn" data-act="close">Serbest devam et</button><button class="btn hot" data-act="restart">Yeniden dene</button></div>`;
+  else if (kind === "sellco") h = `<h3>Şirketi sat?</h3><p>${esc(S.name)} satılır ve ${legacyGain()} miras puanı kazanırsın. Sonra yeni şirketini kurarsın; miras bonusları kalıcıdır.</p><div class="btns"><button class="btn" data-act="close">Vazgeç</button><button class="btn hot" data-act="sellCoYes">Sat</button></div>`;
   else if (kind === "reset") h = `<h3>Yeni oyun?</h3><p>Bu şirketteki tüm ilerleme silinir.</p><div class="btns"><button class="btn" data-act="close">Vazgeç</button><button class="btn hot" data-act="resetYes">Yeni şirket kur</button></div>`;
   md.innerHTML = `<div class="box" role="dialog" aria-modal="true">${h}</div>`;
   md.hidden = false;
@@ -1539,7 +1922,11 @@ function info(msg) { if (SET.toasts) toast(msg); }
 // SAVE + BOOT
 // =====================================================================
 const KEY = "demir-baronu-v2", KEY_REC = "demir-baronu-records", KEY_SET = "demir-baronu-settings";
-let SET = { monthModal: true, toasts: true };
+let LEG = { points: 0 };
+try { Object.assign(LEG, JSON.parse(localStorage.getItem("demir-baronu-legacy") || "{}")); } catch (e) {}
+function saveLeg() { try { localStorage.setItem("demir-baronu-legacy", JSON.stringify(LEG)); } catch (e) {} }
+const legacyGain = () => Math.max(1, Math.min(20, Math.floor(netWorth() / 20e6)));
+let SET = { monthModal: true, toasts: true, sound: true, vibe: true };
 try { Object.assign(SET, JSON.parse(localStorage.getItem(KEY_SET) || "{}")); } catch (e) {}
 function saveSet() { try { localStorage.setItem(KEY_SET, JSON.stringify(SET)); } catch (e) {} }
 function getRecords() { try { return JSON.parse(localStorage.getItem(KEY_REC) || "[]"); } catch (e) { return []; } }
@@ -1552,7 +1939,7 @@ function load() { try { const s = JSON.parse(localStorage.getItem(KEY) || "null"
 
 document.addEventListener("click", e => {
   const b = e.target.closest("[data-act]"); if (!b || b.disabled) return;
-  const a = b.dataset.act; if (ACT[a]) ACT[a](b.dataset.v);
+  const a = b.dataset.act; if (ACT[a]) ACT[a](b.dataset.v, e);
 });
 document.addEventListener("change", e => {
   if (e.target.id === "newCity") { UI.newCity = e.target.value; render(); }
@@ -1564,7 +1951,7 @@ document.addEventListener("keydown", e => { if (e.key === "Enter" && e.target.id
 function start(data) {
   const hot = !!(data && data.S && data.S.v === 2);
   S = (hot && data.S) || load();
-  if (S) migrate(S);
+  if (S) { migrate(S); genDaily(); }
   if (data && data.UI && S) UI = Object.assign(UI, data.UI);
   if (!S) newGame();
   render();

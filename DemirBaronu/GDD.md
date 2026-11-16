@@ -168,17 +168,58 @@ Filo: Kamyonet 3 t/gün (180.000 ₺), Kamyon 12 t/gün (650.000 ₺), TIR 25 t/
 
 Toplu alım indirimi ayrıca uygulanır: 10 t −%1, 50 t −%2, 200 t −%3. Yoldaki mal, hedef tesisin kapasitesinden düşülür.
 
-## 8b. Nakit akışı, risk ve vergi
+## 8b. Nakit akışı, tahsilat ve mahkeme
 
-- **Alacaklar:** Vadeli satışlar alacak defterine yazılır. Vade günü tahsil edilir ya da karşılıksız çıkar.
-- **Faktoring:** Alacak bankaya kırdırılıp para hemen alınır. Kesinti aylık %3 (muhasebeciyle %1,5). Risk bankaya geçer.
-- **Banka kredisi:** Limit = unvan tabanı + net değerin %30'u. Aylık faiz %3,5.
-- **Net değer** = kasa + stok (piyasa fiyatıyla, yoldaki mal dahil) + alacaklar + tesis, ekipman, makine ve araçların ikinci el değeri − kredi.
-- **Hırsızlık:** Tesis başına günde %0,6 olasılık (gece bekçisiyle üçte biri). Bir ürünün %10–30'u çalınır.
-- **Yangın:** Tesis başına günde %0,15 olasılık. Tüm stoğun %40'ı yanar.
-- **Sigorta:** Zararın %90'ını öder. Prim aylık stok değerinin %0,2'si (en az 1.000 ₺).
-- **Ay sonu (her 30 gün):** kira, ekipman bakımı, tezgâhtar ve personel maaşı, araç gideri, kredi faizi, sigorta primi, eksi bakiye faizi (%5) ve **geçici vergi**. Vergi, ayın kârından sabit giderler düşüldükten sonra kalanın %20'sidir.
-- **İflas:** Ay sonunda kasa, kredi limitinin %25'i + 10.000 ₺'nin altına düşerse oyun biter.
+### Vadeli satışın akıbeti (vade günü)
+
+| Risk | Ödemeyi erteler | Kısmen öder | Çeki karşılıksız çıkar |
+|---|---|---|---|
+| A | %9 | %2 | %1 |
+| B | %18 | %8 | %6 |
+| C | %25 | %15 | %15 |
+
+- **Erteleme:** Müşteri bir bahane söyler ("Şantiye hakedişi gecikti", "Çek yarın bankada, söz") ve 7–15 gün yeni vade alır. Her erteleme bir sonraki seferde ödememe olasılığını artırır (×1,6). En fazla 3 kez ertelenir.
+- **Kısmi ödeme:** Borcun %30–70'i ödenir, kalanı için 10–20 gün sonrasına söz verilir.
+- Muhasebeci tüm olumsuz olasılıkları yarıya indirir.
+- **Karşılıksız:** Alacak **takibe** düşer, tutarı o ay kârdan karşılık olarak düşülür (vergiyi de azaltır) ve firma **kara listeye** girer. Sonraki tekliflerinde "Daha önce ödemedi" yazar ve riski C olur.
+
+### Takipteki alacak için seçenekler
+
+| Seçenek | Masraf | Süre | Sonuç |
+|---|---|---|---|
+| Ara / ziyaret et | — | 5 günde bir | %35 ihtimalle borcun %20–50'si ödenir |
+| Uzlaş | — | Hemen | A %75, B %65, C %55 tahsil edilir, kalanından vazgeçilir |
+| İcra takibi | Tutarın %4'ü (en az 3.000 ₺) | 20–35 gün | %50: %60–100 tahsil (haciz). %28: borçlu itiraz eder, dava gerekir. %22: haczedilecek mal yoktur |
+| Dava aç | Tutarın %8'i (en az 8.000 ₺) | 60–150 gün | %68 kazanma: %50–100 + faiz. %12 ihtimalle borçlu bu arada konkordato ilan eder: yalnızca %15 tahsil edilir |
+| Zarar yaz | — | Hemen | Alacak kapanır |
+
+- **Hukuk müşaviri** (45.000 ₺/ay): icra ve dava masrafını yarıya indirir, kazanma şansını +%15 artırır.
+- **Kredi sigortası:** Prim aylık açık alacakların %0,4'ü. Müşteri ödemezse 30 gün içinde alacağın %80'i ödenir.
+- **Net değerde** takip, icra ve davadaki alacaklar %20 değerle sayılır; sigortadaki alacak sigortanın ödeyeceği tutarla.
+
+### Aleyhine davalar
+
+- **Kalite tazminatı:** Her stok teslimatında %1,2 (fasona giden işlemede %4,2) ihtimalle müşteri 3–10 gün sonra "ölçü/kalite eksik" diyerek siparişin %10–25'i kadar tazminat ister. Seçenekler:
+  - **Uzlaş:** talebin yarısını öde.
+  - **Mahkemede savun:** avukat masrafı talebin %10'u; 30–60 gün sürer. Kazanma şansı %55 (müşavirle %70). Kaybedersen talebin tamamını ödersin ve itibar −3.
+- **İş kazası:** Forklift ve vinç başına günde %0,12 olasılık (iş güvenliği uzmanıyla dörtte biri). Tazminat 150–400 bin ₺. Ödenmezse dava açılır; %50 ihtimalle iki katı ve itibar −5.
+
+### Diğer
+
+- **Faktoring:** Normal alacak bankaya kırdırılıp para hemen alınır. Kesinti aylık %3 (muhasebeciyle %1,5).
+- **Banka kredisi:** Limit = unvan tabanı + net değerin %30'u. Aylık faiz zorluğa göre %2,5 / %3,5 / %4,5.
+- **Net değer** = kasa + stok + alacaklar + tesis, ekipman, makine ve araçların ikinci el değeri − kredi.
+- **Hırsızlık / yangın:** tesis başına günde %0,6 / %0,15. Stok sigortası zararın %90'ını öder; gece bekçisi hırsızlığı üçte bire indirir.
+- **Fabrika gecikmesi:** Fabrikadan alımların %15'i 2–5 gün gecikir.
+- **Ay sonu:** kira, bakım, maaşlar, araç gideri, faiz, sigorta primleri, eksi bakiye faizi ve geçici vergi. Kasa eksiye düşerse banka önce alacakları kırdırır, sonra otomatik kredi açar. Bunlar yetmezse iflas olur.
+
+## 8c. Şehir fiyatları, kur ve üretim
+
+- **Şehir fiyat farkı:** Her şehrin her kategori için kendi fiyat sapması vardır (±%7, her gün yavaşça değişir). Alım, satış, dükkan satışı ve müşteri teklifleri o şehrin fiyatıyla yapılır. Al-sat paneli en ucuz ve en pahalı şehri gösterir. Haritada şehre dokununca kategori farkları görünür. Ucuz şehirden alıp transferle pahalı şehirde satmak (arbitraj) mümkündür.
+- **Dolar/TL:** Günde ortalama +%0,04 değişir, oynaklığı %0,4'tür. Kur artışının yarısı çelik fiyatlarına yansır. "Dolar yükseldi" haberi kuru da iter.
+- **İthalatta kur riski:** Alımın %30'u peşin ödenir, kalan %70 mal geldiğinde o günkü kurla ödenir. İstenirse +%1,5 bedelle kur sabitlenir (vadeli kur).
+- **Fire:** Kendi makinenle işlemede fasonun yerine yalnızca %1,2 net fire maliyeti vardır (hurda satışı düşülmüş).
+- **Bobin dilme hattı** (2,5 Mn ₺, Bayi): HRP bobini 3 mm siyah sac levhaya çevirir. Günde en fazla 30 t, 300 ₺/t işçilik, %1 fire.
 
 ## 9. İlerleme
 
@@ -208,6 +249,11 @@ Perakende satışlar da tonaja sayılır.
 
 İlk iş, kendi yerin, ilk dükkan, 25 perakende satış, ilk araç, ilk makine, 100 t, 3 şehirde tesis, 10 sadık müşteri, sigorta, 1.000 t, 1 Mn ₺, ilk ithalat, fiber lazer, 10 Mn ₺, 10.000 t, 100 Mn ₺. Her başarım nakit ödül (1.000 ₺ – 2 Mn ₺) ve +2 itibar verir.
 
+### Eğitim ve günlük görevler
+
+- **İlk adımlar (8 adım, ödüllü):** ilk aracılık → ilk depo → stok al → stoktan teslim → Esnaf ol → vadeli satış → dükkan aç → ihaleye gir.
+- **Günlük görevler:** Her gün 3 görev gelir: sipariş kapat, X t kategori sat, X ₺ kâr et, dükkanda perakende satış. Her biri (unvan+1) × 2.000 ₺ ve itibar +1 verir.
+
 ## 9b. Rekabet: rakip şirketler
 
 Oyuncu sektörde yalnız değildir. 7 bot şirket kendi başına büyür, şube açar, ihaleye girer ve müşteri kapar.
@@ -222,6 +268,8 @@ Oyuncu sektörde yalnız değildir. 7 bot şirket kendi başına büyür, şube 
 | Anadolu Yapı Demir | Konya | Perakendeci | ~400 bin ₺ | Dükkan odaklı, ihalede pahalı |
 | Karadeniz Sac | Samsun | Temkinli (sac) | ~800 bin ₺ | Sac uzmanı |
 
+Her rakibin bir patronu vardır (Hikmet Özler, Ferhat Kaya, Nur Aydemir…). Patronlar iş kaptıklarında, ihale kazandıklarında ve fiyat savaşı açtıklarında karakterlerine uygun sözler söyler ("Bu şehir ikimize dar.").
+
 İflas eden rakibin yerine 20–40 gün sonra yeni bir şirket girer (Yıldırım Metal, Atlas Demir, Toros Çelik…).
 
 **Rakiplerin oyuncuya etkisi:**
@@ -231,6 +279,8 @@ Oyuncu sektörde yalnız değildir. 7 bot şirket kendi başına büyür, şube 
 - **Fiyat savaşı:** Bir rakip bir kategoride 6 gün fiyat kırar. O kategoride marjlar −%3 düşer ve rakip daha sık araya girer.
 - **Eleman ayartma:** Rakip, satış elemanına teklif yapar. 60.000 ₺ prim verilmezse eleman gider.
 - **Konkordato:** Rakip iflas ederse deposu (120 t, forklift dahil) normal fiyatın %40'ına satışa çıkar.
+- **Müşteri kaybı:** Sadık müşterinin siparişini geciktirirsen rakibe geçer. Rakibin kaptığı her işte sadakati azalır.
+- **Rakip satın alma (Bayi'den itibaren):** Net değeri seninkinin %35'inden az olan rakip, net değerinin 1,3 katına satın alınabilir. Şubeleri sana küçük depo olarak geçer; itibar +5.
 
 **İhaleler (Esnaf'tan itibaren, 6–12 günde bir):** Büyük projeler: otoyol viyadüğü, şehir hastanesi, metro, TOKİ, doğalgaz hattı, tersane… Oyuncu kâr marjı seçer (%2/4/6/8/11) ve tutarın %3'ü kadar teminat yatırır. Rakipler karakterlerine göre gizli teklif verir, en düşük teklif kazanır. Kazanan 10 gün içinde teslim eder, ödeme 30 gün vadelidir. Kaybedenin teminatı iade edilir. Teslim edilmezse teminat yanar ve itibar −10 düşer. Sonuçlar tüm tekliflerle birlikte gösterilir.
 
@@ -257,7 +307,7 @@ Oyuncu sektörde yalnız değildir. 7 bot şirket kendi başına büyür, şube 
   - **Durgunluk** (6 gün): Günde 1 teklif eksik gelir.
 - **Yılın Tüccarı (her 1 Mart):** Sıralamada ilk 5'e ödül verilir: 5 Mn / 2 Mn / 1 Mn / 500 bin / 250 bin ₺, ayrıca itibar +5.
 
-## 9d. Menü, zorluk ve kayıt
+## 9d. Menü, zorluk, senaryolar ve miras
 
 - **Ana menü:** Devam et (şirket, tarih, unvan, net değer, sıra), Yeni oyun, Nasıl oynanır, Rekorlar, Ayarlar. Altında canlı fiyat bandı akar. Oyun içinde sol üstteki menü düğmesiyle duraklatma.
 - **Yeni oyun:** şirket adı, merkez şehir, zorluk.
@@ -268,6 +318,11 @@ Oyuncu sektörde yalnız değildir. 7 bot şirket kendi başına büyür, şube 
 | Normal | 5.000 ₺ | ×1 | %3,5 | %20 |
 | Zor | 2.000 ₺ | ×1,35 | %4,5 | %25 |
 
+- **Senaryolar:**
+  - **Kur Krizi (90 gün):** Toptancı olarak başlarsın; 85 t stok, 300 bin ₺ nakit ve 1,5 Mn ₺ kredi borcun vardır. Dolar 20 gün boyunca her gün %1 yükselir, talep 30 gün düşük kalır. Hedef: 90. günde 3 Mn ₺ net değer.
+  - **Deprem Bölgesi (120 gün):** Gaziantep'te Esnaf olarak başlarsın; bölgede inşaat demiri talebi üç kattır. Hedef: 1.000 t inşaat demiri satmak.
+- **Miras (prestij):** Demir Baronu olunca şirket satılabilir. Her 20 Mn ₺ net değer için 1 miras puanı kazanılır (en az 1, en çok 20). Her puan yeni oyunlarda kalıcı olarak +10.000 ₺ başlangıç, +2 itibar (en çok 70) ve tekliflerde +%0,2 fiyat verir.
+- **Ses ve titreşim:** Satış, ihale, uyarı ve gün sonu için sentezlenmiş sesler. Ayarlardan kapatılabilir.
 - **Rekorlar:** Baron olunca, her yıl sonunda ve iflasta sonuç kaydedilir (en iyi 10).
 - **Ayarlar:** ay sonu raporu, gün sonu bildirimi, tüm verileri sil.
 - **İflastan önce kurtarma:** Ay sonunda kasa eksiye düşerse banka önce alacakları otomatik kırdırır, sonra kredi limitinden otomatik kredi açar. İflas ancak bunlar yetmezse olur.
@@ -275,12 +330,9 @@ Oyuncu sektörde yalnız değildir. 7 bot şirket kendi başına büyür, şube 
 
 ## 10. Prototipte olmayanlar (sonraki sürümler)
 
-1. **Şehirler arası fiyat farkı:** Her şehirde ayrı piyasa fiyatı. Ucuz şehirden alıp pahalı şehre satma (arbitraj).
-2. **Rakiplerle doğrudan ilişki:** Rakiple ortak ihale (konsorsiyum), rakip satın alma, rakipten stok alıp satma.
+2. **Rakiplerle ortaklık:** Büyük ihalede konsorsiyum, rakipten acil stok alıp satma.
 3. **Çok oyunculu lig:** Gerçek oyuncularla aynı piyasada haftalık rekabet.
-4. **Kur riski:** İthalat dolar bazlı olur, ödeme gemi geldiğinde yapılır.
-5. **Bobin dilme / boyuna kesme hattı:** Bobin alıp sac ve şerit üretilir (dikey büyüme).
-6. **Fire ve hurda:** Kesimde %2–3 fire oluşur ve hurdacıya satılır.
+5. **Profil hattı:** Şeritten kutu profil üretimi (dikey büyümenin ikinci adımı).
 7. **Pas ve stok yaşı:** Açık sahada uzun bekleyen sac değer kaybeder.
 8. **Müşteri ilişkileri:** Bayram hediyesi, tahsilat görüşmesi mini oyunu, müşteri kaybı.
 9. **Haftalık lig (Game Center):** Herkes aynı rastgele tohumla 60 gün oynar, en yüksek net değer kazanır.
@@ -316,7 +368,7 @@ Nakit satılmaz. Böylece oyun "kazanmak için öde" olmaz ve Apple'ın 3.1.1 ku
 - **Üretim sürümü:** Factory King ile aynı altyapı. Kurallar Unity'den bağımsız C# çekirdeğinde (`DemirBaronu.Core`, netstandard2.1) ve NUnit testleriyle yazılır. Arayüz UI Toolkit ile kurulur. Mevcut GitHub Actions → TestFlight hattı (`.github/workflows/ios-testflight.yml`) yeniden kullanılır.
 - **Kayıt:** sürümlü JSON, sağlama toplamı, iCloud. Hesap sistemi yok.
 - **Rastgelelik:** tohumlu RNG. Haftalık lig ve tekrar oynatma için gerekli.
-- **Denge testi:** otomatik "akıllı tüccar" ve "rastgele tüccar" botları oynar. 3. sürümde (rakipler, ihaleler, mevsimler, etkinlikler dahil, Normal zorluk) ölçülen değerler, 8 deneme: haberleri kullanmayan sade akıllı bot **417–536. günde** baron oldu, hiç iflas etmedi, 700. günde 8 denemenin 7'sinde sektör lideriydi. İhalelerde %4 teklifle kazanma oranı yaklaşık %45'ti. Rastgele aracılık yapan bot 200 günde Toptancı'da kaldı. Haberleri ve mevsimleri takip eden gerçek oyuncunun daha hızlı ilerlemesi beklenir.
+- **Denge testi:** otomatik "akıllı tüccar" ve "rastgele tüccar" botları oynar. 4. sürümde (tahsilat ve mahkeme, şehir fiyatları, kur, görevler dahil, Normal zorluk) ölçülen değerler, 6 deneme: haberleri kullanmayan sade akıllı bot **357–388. günde** baron oldu ve hiç iflas etmedi. 700 günde 4–11 alacağı karşılıksız çıktı; icra ve uzlaşmayla 7–26 Mn ₺ geri alındı, 0,8–1,8 Mn ₺ hukuk masrafı ödendi. Rastgele aracılık yapan bot 200 günde Toptancı'da kaldı.
 
 ## 14. Yol haritası
 
