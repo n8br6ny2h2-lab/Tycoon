@@ -13,6 +13,7 @@ Boru, profil, sac ve inşaat demiri ticareti üzerine gün tabanlı bir ticaret 
 
 - Tasarım belgesi: [DemirBaronu/GDD.md](DemirBaronu/GDD.md)
 - Telefonda oynanabilir prototip (tek dosya): [DemirBaronu/web/play.html](DemirBaronu/web/play.html)
+- iOS uygulaması (Capacitor) ve App Store adımları: [DemirBaronu/APPSTORE.md](DemirBaronu/APPSTORE.md) · bulut derleme: `.github/workflows/demirbaronu-testflight.yml`
 
 ## Klasör yapısı
 

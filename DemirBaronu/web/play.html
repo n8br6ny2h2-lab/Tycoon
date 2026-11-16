@@ -1272,7 +1272,7 @@ function endDay() {
     if (S.cash < 0) items.push(["Eksi bakiye faizi", -S.cash * OVERDRAFT_RATE]);
     const costs = items.reduce((a, [, v]) => a + v, 0);
     const taxable = S.mProfit - costs, tax = Math.max(0, taxable) * taxRate();
-    if (tax > 0) items.push([`Geçici vergi (%${taxRate() * 100})`, tax]);
+    if (tax > 0) items.push([`Geçici vergi (%${Math.round(taxRate() * 100)})`, tax]);
     S.stats.taxes += tax;
     const total = costs + tax;
     S.cash -= total;
@@ -1411,7 +1411,7 @@ const ACT = {
     toast(`${S.name} kuruldu. İlk teklife Aracılık'la başla.`); },
   toggleSet: k => { SET[k] = !SET[k]; saveSet(); showMenu("settings"); },
   wipe: () => { if (!UI.confirmWipe) { UI.confirmWipe = true; return showMenu("settings"); }
-    try { localStorage.removeItem(KEY); localStorage.removeItem(KEY_REC); } catch (e) {} UI.confirmWipe = false; newGame(); showMenu("main"); toast("Tüm veriler silindi."); },
+    unpersist(KEY); unpersist(KEY_REC); UI.confirmWipe = false; newGame(); showMenu("main"); toast("Tüm veriler silindi."); },
 };
 
 // =====================================================================
@@ -1518,7 +1518,7 @@ function orderCard(o, active) {
       <div class="oamt"><span class="num">${tl(orderValue(o))}</span><small class="num">${nf0.format(o.price)} ₺/t · piyasa ${pct(over)}</small></div></div>
     <div class="oprod"><b>${ton(o.qty)}</b> ${p.name} <span class="muted">· ${p.spec}</span></div>
     <div class="chips">${o.tender ? `<span class="chip hot">İhale</span>` : ""}${o.rival ? `<span class="chip b">Rakip: ${esc((rivalById(o.rival) || {}).name || "")}</span>` : ""}${o.black ? `<span class="chip b">Daha önce ödemedi</span>` : ""}${payChip(o)}${riskChip(o)}${o.loyal ? `<span class="chip g">Sadık müşteri</span>` : ""}
-      ${o.proc ? `<span class="chip hot">${PROCS[o.proc].name}${hasMachine(o.proc, p.cat) ? "" : " (fason %" + PROCS[o.proc].fason * 100 + ")"}</span>` : ""}
+      ${o.proc ? `<span class="chip hot">${PROCS[o.proc].name}${hasMachine(o.proc, p.cat) ? "" : " (fason %" + Math.round(PROCS[o.proc].fason * 100) + ")"}</span>` : ""}
       <span class="chip ${left <= 1 ? "b" : ""}">Son teslim: ${left <= 0 ? "bugün" : left + " gün"}</span>
       ${active ? "" : o.rival ? `<span class="chip b">Bugün almazsan rakip alır</span>` : `<span class="chip">Teklif ${o.expires - S.day <= 1 ? "yarın düşer" : (o.expires - S.day) + " gün geçerli"}</span>`}</div>
     <div class="btns">
@@ -1580,7 +1580,7 @@ function tradePanel(p) {
   const byCity = CITIES.map(c => [c, priceAt(p.id, c.id)]).sort((a, b) => a[1] - b[1]), cheap = byCity[0], dear = byCity[byCity.length - 1];
   const sup = mode => { const b = supplyBlock(mode, q, l), s = SUPPLY[mode], c = buyCost(p.id, q, mode, l.city);
     const sub = b || (mode === "imp" ? `peşinat ${tl(c * 0.3 * (UI.hedge ? 1.015 : 1))} · 20 gün` : tl(c) + (s.days ? " · " + s.days + " gün" : " · hemen"));
-    return `<button class="btn ${mode === "spot" ? "hot" : "st"}" data-act="buy" data-v="${p.id}:${mode}" ${b || q <= 0 ? "disabled" : ""}>${s.name}${s.disc ? " −%" + s.disc * 100 : ""}<small>${sub}</small></button>`; };
+    return `<button class="btn ${mode === "spot" ? "hot" : "st"}" data-act="buy" data-v="${p.id}:${mode}" ${b || q <= 0 ? "disabled" : ""}>${s.name}${s.disc ? " −%" + Math.round(s.disc * 100) : ""}<small>${sub}</small></button>`; };
   return `<div class="trade">
     <div class="line2"><span>30 gün en düşük <b>${nf0.format(lo)}</b></span><span>en yüksek <b>${nf0.format(hi)}</b></span></div>
     ${S.locs.length > 1 ? `<div class="filter">${S.locs.map(x => `<button aria-pressed="${x.id === l.id}" data-act="pickLoc" data-v="${x.id}">${C[x.city].name} · ${LOC_TYPES[x.type].name} (${ton(sq(x, p.id))})</button>`).join("")}</div>` : ""}
@@ -1590,7 +1590,7 @@ function tradePanel(p) {
     <div class="line2"><span>${C[l.city].name} fiyatı</span><b>${nf0.format(m)} ₺/t</b></div>
     <div class="line2"><span>En ucuz ${cheap[0].name} <b>${nf0.format(cheap[1])}</b></span><span>en pahalı ${dear[0].name} <b>${nf0.format(dear[1])}</b></span></div>
     ${level() >= SUPPLY.imp.lvl ? `<div class="filter"><button aria-pressed="${!!UI.hedge}" data-act="hedge">İthalatta kuru sabitle (+%1,5)</button></div>` : ""}
-    ${discount(q) ? `<div class="line2"><span>Toplu alım indirimi</span><b>−%${discount(q) * 100}</b></div>` : ""}
+    ${discount(q) ? `<div class="line2"><span>Toplu alım indirimi</span><b>−%${Math.round(discount(q) * 100)}</b></div>` : ""}
     <div class="btns">${sup("spot")}${sup("mill")}${sup("imp")}</div>
     <div class="btns"><button class="btn" data-act="sell" data-v="${p.id}" ${have <= 0 ? "disabled" : ""}>Bu tesisten piyasaya sat<small>${nf0.format(m * SELLBACK)} ₺/t · elde ${ton(have)}</small></button></div>
   </div>`;
@@ -1685,7 +1685,7 @@ function renderRival() {
       <div class="oamt"><span class="num">${ton(t.qty)}</span><small>${p.name}</small></div></div>
       <div class="line2"><span>Piyasa (ihale açıldığında)</span><b>${nf0.format(t.base)} ₺/t</b></div>
       ${t.bid === null ? `<div class="muted">Kâr marjını seç. Rakipler de gizli teklif veriyor, en düşük teklif kazanır. Teminat tutarın %3'ü; kaybedersen iade edilir, teslim edemezsen yanar.</div>
-        <div class="bids">${BID_OPTS.map(m => `<button class="btn st" data-act="bid" data-v="${t.id}:${m}" ${S.cash < tenderValue(t, m) * 0.03 ? "disabled" : ""}>%${m * 100}<small>${tlShort(tenderValue(t, m))}</small></button>`).join("")}</div>`
+        <div class="bids">${BID_OPTS.map(m => `<button class="btn st" data-act="bid" data-v="${t.id}:${m}" ${S.cash < tenderValue(t, m) * 0.03 ? "disabled" : ""}>%${Math.round(m * 100)}<small>${tlShort(tenderValue(t, m))}</small></button>`).join("")}</div>`
         : `<div class="chips"><span class="chip hot">Teklifin: %${nf1.format(t.bid * 100)} · ${tl(tenderValue(t, t.bid))}</span><span class="chip">Teminat ${tl(t.deposit)}</span></div>`}
     </div>`;
   }
@@ -1812,7 +1812,7 @@ function renderCompany() {
     <div class="btns">${S.vehicles[k] ? `<button class="btn ghost sm" data-act="vehSell" data-v="${k}">Sat</button>` : ""}<button class="btn st sm" data-act="veh" data-v="${k}" ${S.cash < v.price ? "disabled" : ""}>${tl(v.price)}</button></div></div>`;
   h += `<div class="muted">Kendi aracın yalnızca yakıt öder. Nakliyeci aynı şehirde 150 ₺/t, şehirler arası 250 ₺ + 1,1 ₺/km alır.</div></div></section>`;
   h += `<section class="sec"><h2>Atölye makineleri</h2><div class="card">`;
-  for (const [k, m] of Object.entries(MACHINES)) h += `<div class="item"><div><b>${m.name}</b><div class="muted">${m.desc}.${m.proc ? ` ${PROCS[m.proc].name} siparişinde %${PROCS[m.proc].fason * 100} fason masrafı yerine yalnızca %1,2 fire.` : ""}${m.lvl && level() < m.lvl ? ` ${LEVELS[m.lvl].name} unvanında açılır.` : ""}</div></div>
+  for (const [k, m] of Object.entries(MACHINES)) h += `<div class="item"><div><b>${m.name}</b><div class="muted">${m.desc}.${m.proc ? ` ${PROCS[m.proc].name} siparişinde %${Math.round(PROCS[m.proc].fason * 100)} fason masrafı yerine yalnızca %1,2 fire.` : ""}${m.lvl && level() < m.lvl ? ` ${LEVELS[m.lvl].name} unvanında açılır.` : ""}</div></div>
     ${S.machines[k] ? `<span class="chip g">Kurulu</span>` : `<button class="btn st sm" data-act="mach" data-v="${k}" ${S.cash < m.price || (m.lvl && level() < m.lvl) ? "disabled" : ""}>${tl(m.price)}</button>`}</div>`;
   h += `</div></section>`;
   h += `<section class="sec"><h2>Personel</h2><div class="card">`;
@@ -1837,7 +1837,7 @@ function renderCompany() {
   const mc = monthlyCosts(), mt = mc.reduce((a, [, v]) => a + v, 0);
   h += `<section class="sec"><h2>Ay sonu</h2><div class="card"><div class="kv">${mc.map(([k, v]) => `<span>${k}</span><span>${tl(v)}</span>`).join("")}
     <span><b>Sabit giderler</b></span><span><b>${tl(mt)}</b></span><span>Bu ayki kâr (şimdiye kadar)</span><span class="${S.mProfit >= 0 ? "good" : "bad"}">${tl(S.mProfit)}</span>
-    <span>Tahmini vergi (%${taxRate() * 100})</span><span>${tl(Math.max(0, S.mProfit - mt) * taxRate())}</span></div></div></section>`;
+    <span>Tahmini vergi (%${Math.round(taxRate() * 100)})</span><span>${tl(Math.max(0, S.mProfit - mt) * taxRate())}</span></div></div></section>`;
   const loyal = Object.entries(S.rel).filter(([, v]) => v >= 3).sort((a, b) => b[1] - a[1]);
   h += `<section class="sec"><div class="sechead"><h2>Sadık müşteriler</h2><span class="muted">${loyal.length}</span></div><div class="card">
     ${loyal.length ? loyal.slice(0, 8).map(([f, v]) => `<div class="line2"><span>${esc(f)}</span><b>${v} iş</b></div>`).join("") : `<div class="muted">Bir firmaya 3 kez teslimat yapınca sadık müşterin olur: daha iyi fiyat, daha düşük risk.</div>`}</div></section>`;
@@ -1871,6 +1871,7 @@ let AC = null;
 function beep(kind) {
   if (SET.sound) try {
     AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    if (AC.state === "suspended") AC.resume();
     const seq = { cash: [[1318, 0.06], [1760, 0.14]], win: [[523, 0.1], [659, 0.1], [784, 0.1], [1047, 0.28]], error: [[180, 0.18]], bad: [[392, 0.16], [262, 0.32]], day: [[660, 0.05]] }[kind] || [];
     let t = AC.currentTime;
     for (const [fq, d] of seq) {
@@ -1880,7 +1881,11 @@ function beep(kind) {
       o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t + d + 0.02); t += d * 0.9;
     }
   } catch (e) {}
-  if (SET.vibe) try { if (navigator.vibrate) navigator.vibrate(kind === "error" || kind === "bad" ? [40, 40, 40] : kind === "win" ? [20, 30, 60] : 12); } catch (e) {}
+  if (SET.vibe) try {
+    const H = NATIVE && NATIVE.Haptics;
+    if (H) Promise.resolve(kind === "error" || kind === "bad" ? H.notification({ type: "ERROR" }) : kind === "win" ? H.notification({ type: "SUCCESS" }) : H.impact({ style: kind === "cash" ? "MEDIUM" : "LIGHT" })).catch(() => {});
+    else if (navigator.vibrate) navigator.vibrate(kind === "error" || kind === "bad" ? [40, 40, 40] : kind === "win" ? [20, 30, 60] : 12);
+  } catch (e) {}
 }
 function toast(msg, bad) {
   if (bad) beep("error");
@@ -1923,18 +1928,31 @@ function info(msg) { if (SET.toasts) toast(msg); }
 // =====================================================================
 const KEY = "demir-baronu-v2", KEY_REC = "demir-baronu-records", KEY_SET = "demir-baronu-settings";
 let LEG = { points: 0 };
-try { Object.assign(LEG, JSON.parse(localStorage.getItem("demir-baronu-legacy") || "{}")); } catch (e) {}
-function saveLeg() { try { localStorage.setItem("demir-baronu-legacy", JSON.stringify(LEG)); } catch (e) {} }
+const KEY_LEG = "demir-baronu-legacy";
+try { Object.assign(LEG, JSON.parse(localStorage.getItem(KEY_LEG) || "{}")); } catch (e) {}
+function saveLeg() { persist(KEY_LEG, JSON.stringify(LEG)); }
 const legacyGain = () => Math.max(1, Math.min(20, Math.floor(netWorth() / 20e6)));
 let SET = { monthModal: true, toasts: true, sound: true, vibe: true };
 try { Object.assign(SET, JSON.parse(localStorage.getItem(KEY_SET) || "{}")); } catch (e) {}
-function saveSet() { try { localStorage.setItem(KEY_SET, JSON.stringify(SET)); } catch (e) {} }
+function saveSet() { persist(KEY_SET, JSON.stringify(SET)); }
 function getRecords() { try { return JSON.parse(localStorage.getItem(KEY_REC) || "[]"); } catch (e) { return []; } }
 function addRecord(result) {
   const r = getRecords(); r.push({ name: S.name, diff: S.diff, result, day: S.day, nw: Math.round(netWorth()), tons: Math.round(S.tons), rank: myRank() });
-  r.sort((a, b) => b.nw - a.nw); try { localStorage.setItem(KEY_REC, JSON.stringify(r.slice(0, 10))); } catch (e) {}
+  r.sort((a, b) => b.nw - a.nw); persist(KEY_REC, JSON.stringify(r.slice(0, 10)));
 }
-function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+function save() { persist(KEY, JSON.stringify(S)); }
+// In the iOS app (Capacitor) saves are mirrored to the app's own storage, which iOS never clears, and the Taptic Engine is used.
+// In a browser NATIVE is null and nothing changes.
+const NATIVE = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform() ? window.Capacitor.Plugins : null;
+function persist(k, v) { try { localStorage.setItem(k, v); } catch (e) {} if (NATIVE && NATIVE.Preferences) Promise.resolve(NATIVE.Preferences.set({ key: k, value: v })).catch(() => {}); }
+function unpersist(k) { try { localStorage.removeItem(k); } catch (e) {} if (NATIVE && NATIVE.Preferences) Promise.resolve(NATIVE.Preferences.remove({ key: k })).catch(() => {}); }
+async function restoreNative() {
+  if (!NATIVE || !NATIVE.Preferences) return;
+  for (const k of [KEY, KEY_REC, KEY_SET, KEY_LEG]) {
+    try { const r = await NATIVE.Preferences.get({ key: k }); if (r && r.value != null && localStorage.getItem(k) == null) localStorage.setItem(k, r.value); } catch (e) {}
+  }
+  try { Object.assign(SET, JSON.parse(localStorage.getItem(KEY_SET) || "{}")); Object.assign(LEG, JSON.parse(localStorage.getItem(KEY_LEG) || "{}")); } catch (e) {}
+}
 function load() { try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s && s.v === 2) return s; } catch (e) {} return null; }
 
 document.addEventListener("click", e => {
@@ -1959,5 +1977,6 @@ function start(data) {
   else showMenu("main");
 }
 window.claude?.hot?.snapshot?.(() => ({ S, UI }));
-window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+const boot = () => window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+if (NATIVE) restoreNative().then(boot, boot); else boot();
 </script>

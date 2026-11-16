@@ -1,0 +1,15 @@
+{
+  "appId": "com.demirbaronu.app",
+  "appName": "Demir Baronu",
+  "webDir": "www",
+  "backgroundColor": "#101418",
+  "ios": {
+    "contentInset": "never",
+    "backgroundColor": "#101418",
+    "scrollEnabled": false,
+    "limitsNavigationsToAppBoundDomains": true
+  },
+  "plugins": {
+    "StatusBar": { "style": "DARK", "overlaysWebView": true }
+  }
+}

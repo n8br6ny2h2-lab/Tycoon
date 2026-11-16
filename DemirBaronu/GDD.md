@@ -377,7 +377,7 @@ Nakit satılmaz. Böylece oyun "kazanmak için öde" olmaz ve Apple'ın 3.1.1 ku
 | Aşama | İçerik | Süre (tahmini) |
 |---|---|---|
 | 0 | Tasarım belgesi + oynanabilir web prototipi | ✅ bitti |
-| 1 | C# çekirdek: piyasa, sipariş, depo, banka, kayıt + testler | 2 hafta |
+| 1 | iOS uygulaması: Capacitor sarmalayıcı, bulut derleme → TestFlight, mağaza metinleri, ekran görüntüleri | ✅ hazır, ilk derleme hesap ayarlarından sonra |
 | 2 | Unity arayüzü (5 ekran), ses, haptik | 2 hafta |
 | 3 | Şehir fiyat farkları, rakipler, ihaleler, kur riski | 3 hafta |
 | 4 | IAP, ödüllü reklam, Game Center ligi | 1 hafta |
