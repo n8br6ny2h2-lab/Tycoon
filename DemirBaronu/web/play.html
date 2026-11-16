@@ -155,7 +155,26 @@ svg.nw { width: 100%; height: 90px; display: block; }
 /* HUD menu button */
 .hleft { display: flex; align-items: center; gap: 8px; min-width: 0; }
 #menuBtn { width: 32px; height: 28px; border-radius: 6px; background: var(--panel2); display: inline-grid; place-items: center; flex: none; }
-#menuBtn svg { width: 18px; height: 18px; stroke: var(--fg); fill: none; stroke-width: 2; }
+#menuBtn svg, .menuBtn2 svg { width: 18px; height: 18px; stroke: var(--fg); fill: none; stroke-width: 2; }
+.menuBtn2 { width: 32px; height: 28px; border-radius: 6px; background: var(--hot); display: inline-grid; place-items: center; flex: none; }
+.menuBtn2 svg { stroke: var(--hot-ink); }
+/* Store */
+.skus { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.sku { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 6px; min-width: 0; position: relative; }
+.sku.wide { grid-column: 1 / -1; }
+.sku.hl { border-color: var(--hot); background: linear-gradient(160deg, rgba(255,123,44,.14), var(--panel) 60%); }
+.sku b { font-size: 15px; }
+.sku .amt { font-family: var(--num); font-size: 24px; font-weight: 700; color: var(--good); line-height: 1.1; }
+.sku .d { font-size: 12.5px; color: var(--muted); line-height: 1.4; flex: 1; }
+.sku .tag { position: absolute; top: -8px; right: 10px; background: var(--hot); color: var(--hot-ink); font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
+.sku .btn { flex: 0 0 auto; }
+.sw { display: flex; gap: 4px; } .sw i { width: 22px; height: 22px; border-radius: 6px; border: 1px solid var(--line); }
+.legal { font-size: 11.5px; color: var(--muted); line-height: 1.45; }
+.legal a { color: var(--steel); }
+/* Themes (bought in the store) */
+:root[data-skin="skingold"] { --hot: #e8b84a; --hot-ink: #231a00; --steel: #d9c79a; }
+:root[data-skin="skinsteel"] { --bg: #15181b; --panel: #1f2327; --panel2: #2a2f34; --line: #394047; --hot: #c9d3dc; --hot-ink: #121518; --steel: #9fb0bf; }
+:root[data-skin="skinnight"] { --bg: #0b1020; --panel: #121a33; --panel2: #1a2444; --line: #26335a; --hot: #5aa9ff; --hot-ink: #04122a; --steel: #9db7ff; }
 /* Main menu */
 #menu { position: fixed; inset: 0; z-index: 25; background: radial-gradient(120% 70% at 50% 0%, #22303b 0%, var(--bg) 62%); overflow-y: auto; }
 #menu .inner { width: 100%; max-width: 480px; margin: 0 auto; box-sizing: border-box; min-height: 100%;
@@ -224,7 +243,7 @@ svg.map text { font-family: var(--body); }
 
 <div id="app">
   <header id="hud" class="gut">
-    <div class="hrow"><div class="hleft"><button id="menuBtn" data-act="pause" aria-label="Menü"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><span id="coName"></span></div><span id="dayChip"></span></div>
+    <div class="hrow"><div class="hleft"><button id="menuBtn" data-act="pause" aria-label="Menü"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><button id="shopBtn" class="menuBtn2" data-act="shop" aria-label="Mağaza"><svg viewBox="0 0 24 24"><path d="M4 9h16l-1.5 10h-13z"/><path d="M8 9V7a4 4 0 0 1 8 0v2"/></svg></button><span id="coName"></span></div><span id="dayChip"></span></div>
     <div class="hrow" style="align-items:flex-end">
       <div id="cash" class="num"></div>
       <span id="titleChip" class="title"></span>
@@ -482,9 +501,38 @@ const PROJECTS = [
 const FAIRS = [["TÜYAP Metal İşleme Fuarı", "ist"], ["Ankara Yapı ve Çelik Fuarı", "ank"], ["İzmir Demir-Çelik ve Makine Fuarı", "izm"],
   ["Konya Tarım Makineleri Fuarı", "kon"], ["Bursa Endüstri Fuarı", "bur"], ["Gaziantep Yapı Fuarı", "gaz"]];
 const BID_OPTS = [0.02, 0.04, 0.06, 0.08, 0.11];
+// In-app purchases. type: c = consumable, n = non-consumable (permanent), s = auto-renewable subscription.
+// App Store product id = "demirbaronu." + key. price = suggested TRY price (shown only in the browser demo; the app shows Apple's price).
+const IAP = {
+  starter: { type: "c", sec: "featured", name: "Başlangıç Paketi", price: 49.99, desc: () => "75.000 ₺ nakit, bedava küçük depo, bir kamyonet ve itibar +10. Hesap başına bir kez." },
+  cash1: { type: "c", sec: "cash", name: "Cep Harçlığı", price: 29.99, cash: [0.05, 25000] },
+  cash2: { type: "c", sec: "cash", name: "Sermaye Çantası", price: 99.99, cash: [0.15, 100000], tag: "Popüler" },
+  cash3: { type: "c", sec: "cash", name: "Banka Kasası", price: 249.99, cash: [0.4, 400000] },
+  cash4: { type: "c", sec: "cash", name: "Holding Sermayesi", price: 549.99, cash: [1, 1500000], tag: "En iyi değer" },
+  offers: { type: "c", sec: "boost", name: "Satış Atağı", price: 19.99, desc: () => "Hemen 6 yeni müşteri teklifi gelir." },
+  broker: { type: "c", sec: "boost", name: "Fabrika Torpili", price: 14.99, desc: () => "Bugün +5 aracılık sevkiyatı ve sevkiyat başına 20 t sınırı." },
+  rep: { type: "c", sec: "boost", name: "İtibar Kampanyası", price: 39.99, desc: () => "İtibar +20: daha çok teklif, daha iyi fiyat." },
+  express: { type: "c", sec: "boost", name: "Ekspres Teslimat", price: 29.99, desc: () => "Yoldaki tüm fabrika ve gemi sevkiyatları yarın gelir." },
+  intel: { type: "c", sec: "boost", name: "İhale Kulisi", price: 24.99, desc: () => "Açık ihalelerde rakiplerin en düşük teklifini gör." },
+  lawyer: { type: "c", sec: "boost", name: "Hukuk Bürosu", price: 59.99, desc: () => "Takip, icra ve davadaki tüm alacakların %85'i hemen tahsil edilir." },
+  amnesty: { type: "c", sec: "boost", name: "Vergi ve Faiz Affı", price: 49.99, desc: () => "Bu ay sonunda kredi faizi ve geçici vergi alınmaz." },
+  vip: { type: "n", sec: "perm", name: "Ticaret Odası Üyeliği", price: 149.99, desc: () => "Kalıcı: her gün +1 teklif, tekliflerde +%0,5 fiyat, +1 aracılık sevkiyatı." },
+  manager: { type: "n", sec: "perm", name: "Operasyon Müdürü", price: 99.99, desc: () => "Kalıcı: tek dokunuşla tüm kârlı siparişleri teslim et, 7 günü tek seferde geç." },
+  legacy: { type: "n", sec: "perm", name: "Aile Mirası", price: 129.99, desc: () => "Kalıcı +3 miras puanı: her yeni oyunda +30.000 ₺, +6 itibar, tekliflerde +%0,6." },
+  bundle: { type: "n", sec: "perm", name: "Baron Koleksiyonu", price: 179.99, desc: () => "Operasyon Müdürü ve 3 tema bir arada. Ayrı ayrı 249,96 TL.", tag: "%28 indirim" },
+  skingold: { type: "n", sec: "skin", name: "Altın Tema", price: 49.99, sw: ["#e8b84a", "#2a2412"] },
+  skinsteel: { type: "n", sec: "skin", name: "Paslanmaz Tema", price: 49.99, sw: ["#c9d3dc", "#1f2327"] },
+  skinnight: { type: "n", sec: "skin", name: "Gece Mavisi Tema", price: 49.99, sw: ["#5aa9ff", "#121a33"] },
+  clubweek: { type: "s", sec: "club", name: "Baron Kulübü · Haftalık", price: 49.99, days: 7, per: "hafta" },
+  clubmonth: { type: "s", sec: "club", name: "Baron Kulübü · Aylık", price: 149.99, days: 30, per: "ay", tag: "%30 avantajlı" },
+};
+const STORE_PREFIX = "demirbaronu.";
+const PRIVACY_URL = "https://[GIZLILIK-ADRESI]"; // set to the published privacy page before App Store review
+const TERMS_URL = "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/";
 const YEAR_PRIZES = [5000000, 2000000, 1000000, 500000, 250000];
-const BROKER_SHIP = 500, BROKER_MARKUP = 0.035, SELLBACK = 0.965, BROKER_MAX_T = 8;
-const brokerQuota = () => 3;
+const BROKER_SHIP = 500, BROKER_MARKUP = 0.035, SELLBACK = 0.965;
+const brokerMax = () => (S.brokerBoost === S.day ? 20 : 8);
+const brokerQuota = () => 3 + (owns("vip") ? 1 : 0) + (clubOn() ? 2 : 0) + (S.brokerBoost === S.day ? 5 : 0);
 const OVERDRAFT_RATE = 0.05, INS_RATE = 0.002;
 
 // =====================================================================
@@ -665,7 +713,7 @@ function genOffer() {
   if (black) risk = "C";
   const proc = Math.random() < 0.28 ? pick(PROC_BY_CAT[prod.cat]) : null;
   const war = S.priceWar && S.priceWar.cat === prod.cat;
-  const margin = rnd(0.04, 0.115) + (S.rep - 50) / 1200 + 0.004 * S.staff.sales + (loyal ? 0.015 : 0) - (war ? 0.03 : 0) + (S.legacy || 0) * 0.002;
+  const margin = rnd(0.04, 0.115) + (S.rep - 50) / 1200 + 0.004 * S.staff.sales + (loyal ? 0.015 : 0) - (war ? 0.03 : 0) + (S.legacy || 0) * 0.002 + (owns("vip") ? 0.005 : 0);
   // competitors with a branch in that city chase the same customer
   const here = S.rivals.filter(r => r.alive && r.cities.includes(city.id));
   let rival = null;
@@ -677,9 +725,9 @@ function genOffer() {
 }
 function genOffers() {
   if (evOn("bayram")) return 0;
-  const max = LEVELS[level()].max + S.staff.sales + (fairOn() ? 2 : 0);
+  const max = LEVELS[level()].max + S.staff.sales + (fairOn() ? 2 : 0) + (owns("vip") ? 1 : 0);
   let n = 1 + Math.floor(Math.random() * (1.6 + level() * 0.8 + S.staff.sales * 0.7 + S.rep / 60));
-  n = Math.max(0, Math.round(n * season().offers) + (fairOn() ? 2 : 0) - (evOn("recession") ? 1 : 0));
+  n = Math.max(0, Math.round(n * season().offers) + (fairOn() ? 2 : 0) - (evOn("recession") ? 1 : 0) + (owns("vip") ? 1 : 0));
   let made = 0;
   while (n-- > 0 && S.offers.length < max) { S.offers.push(genOffer()); made++; }
   return made;
@@ -740,7 +788,7 @@ function deliverStock(o) {
 }
 function deliverBroker(o) {
   if (o.tender) return toast("İhale işleri stoktan teslim edilir.", true);
-  if (o.qty > BROKER_MAX_T) return toast(`Fabrika aracıya en fazla ${BROKER_MAX_T} t sevk eder. Bu siparişi stoktan teslim etmelisin.`, true);
+  if (o.qty > brokerMax()) return toast(`Fabrika aracıya en fazla ${brokerMax()} t sevk eder. Bu siparişi stoktan teslim etmelisin.`, true);
   if (S.brokerToday >= brokerQuota()) return toast(`Fabrika bugün en fazla ${brokerQuota()} aracılık sevkiyatı yapıyor.`, true);
   const cost = brokerCost(o), profit = orderValue(o) - cost;
   if (o.pay > 0) {
@@ -950,11 +998,16 @@ function genTender() {
   S.news.unshift({ day: S.day, text: `Yeni ihale: ${proj}. Rekabet sekmesinden teklif ver.`, big: true });
 }
 const tenderValue = (t, m) => t.qty * r10(t.base * (1 + m));
+// Rival bids are decided once, so a bought "İhale Kulisi" shows the real ones.
+function rollBids(t) {
+  const alive = S.rivals.filter(r => r.alive).sort(() => Math.random() - 0.5).slice(0, rint(2, 4));
+  t.rbids = alive.map(r => { const st = STYLES[r.style]; const m = rnd(st.bid[0], st.bid[1]) - (diff().aggr - 1) * 0.02 - (r.cat === P[t.prod].cat ? 0.01 : 0); return { id: r.id, m: Math.max(0.005, m) }; });
+}
 function resolveTenders() {
   S.tenders = S.tenders.filter(t => {
     if (t.due > S.day) return true;
-    const alive = S.rivals.filter(r => r.alive).sort(() => Math.random() - 0.5).slice(0, rint(2, 4));
-    const bids = alive.map(r => { const st = STYLES[r.style]; let m = rnd(st.bid[0], st.bid[1]) - (diff().aggr - 1) * 0.02 - (r.cat === P[t.prod].cat ? 0.01 : 0); return { r, m: Math.max(0.005, m) }; });
+    if (!t.rbids) rollBids(t);
+    const bids = t.rbids.map(b => ({ r: rivalById(b.id), m: b.m })).filter(b => b.r && b.r.alive);
     if (t.bid !== null) bids.push({ me: true, m: t.bid });
     bids.sort((a, b) => a.m - b.m || (a.me ? -1 : 1));
     const w = bids[0];
@@ -1268,10 +1321,12 @@ function endDay() {
   const made = genOffers();
   let monthMsg = null;
   if ((S.day - 1) % 30 === 0) {
-    const items = monthlyCosts();
+    let items = monthlyCosts();
+    if (S.amnesty) items = items.filter(([k]) => k !== "Kredi faizi");
     if (S.cash < 0) items.push(["Eksi bakiye faizi", -S.cash * OVERDRAFT_RATE]);
     const costs = items.reduce((a, [, v]) => a + v, 0);
-    const taxable = S.mProfit - costs, tax = Math.max(0, taxable) * taxRate();
+    const taxable = S.mProfit - costs, tax = S.amnesty ? 0 : Math.max(0, taxable) * taxRate() * (clubOn() ? 0.75 : 1);
+    if (S.amnesty) { items.push(["Faiz ve vergi affı uygulandı", 0]); S.amnesty = false; }
     if (tax > 0) items.push([`Geçici vergi (%${Math.round(taxRate() * 100)})`, tax]);
     S.stats.taxes += tax;
     const total = costs + tax;
@@ -1288,8 +1343,11 @@ function endDay() {
     }
     if (S.cash < -overdraftLimit()) { S.over = true; addRecord("İflas"); save(); render(); return showModal("bankrupt"); }
   }
+  let clubBonus = 0;
+  if (clubOn()) { clubBonus = Math.max(2000, Math.round(Math.max(0, netWorth()) * 0.003)); S.cash += clubBonus; S.stats.club = (S.stats.club || 0) + clubBonus; }
   S.nwHist.push(Math.round(netWorth())); if (S.nwHist.length > 180) S.nwHist.shift();
   const parts = [`Gün ${S.day}`];
+  if (clubBonus) parts.push(`kulüp payı ${tl(clubBonus)}`);
   if (made) parts.push(`${made} yeni teklif`);
   if (wi.n) parts.push(`dükkan ${wi.n} satış ${tl(wi.rev)}`);
   if (collected) parts.push(`tahsilat ${tl(collected)}`);
@@ -1370,6 +1428,24 @@ const ACT = {
   menuGo: v => { UI.confirmWipe = false; if (v === "continue") { hideMenu(); render(); if (S.cards.length) showModal("card"); return; } showMenu(v); },
   setDiff: v => { UI.newDiff = v; showMenu("new"); },
   setScen: v => { UI.newScen = v; showMenu("new"); },
+  shop: v => { UI.storeFrom = v === "menu" ? "menu" : "game"; showMenu("store"); },
+  buyIAP: v => buyIAP(v),
+  demoYes: () => { const k = UI.demoBuy; closeModal(); if (k) grant(k, { transactionId: "demo-" + Date.now() }); },
+  useSkin: v => { ENT.skin = v || ""; saveEnt(); applySkin(); showMenu("store"); },
+  restoreIAP: async () => { if (!StoreN()) return toast("Deneme modunda geri yüklenecek satın alma yok.");
+    try { const n = await syncEntitlements(true); toast(n ? `${n} ürün geri yüklendi.` : "Bu Apple hesabında geri yüklenecek ürün bulunamadı."); } catch (e) { toast("Geri yükleme başarısız: " + ((e && e.message) || e), true); }
+    showMenu("store"); },
+  manageSubs: () => { const N = StoreN(); if (N) Promise.resolve(N.manageSubscriptions()).catch(() => {}); },
+  autoDeliver: () => {
+    const t0 = toast; toast = () => {}; let n = 0, profit = 0, before = S.stats.profit;
+    for (const o of [...S.active, ...S.offers].sort((a, b) => orderValue(b) - orderValue(a))) {
+      const src = bestSource(o), sp = src ? orderValue(o) - o.qty * src.l.stock[o.prod].cost - src.total : -1, bp = orderValue(o) - brokerCost(o);
+      if (src && sp > 0 && (o.pay === 0 || S.cash >= src.total)) { deliverStock(o); n++; }
+      else if (!o.tender && o.pay === 0 && bp > 0 && o.qty <= brokerMax() && S.brokerToday < brokerQuota()) { deliverBroker(o); n++; }
+    }
+    toast = t0; profit = S.stats.profit - before;
+    toast(n ? `Operasyon Müdürü ${n} siparişi teslim etti. Kâr ${tl(profit)}.` : "Şu an kârlı teslim edilecek sipariş yok."); save(); render(); },
+  skip7: () => { for (let i = 0; i < 7 && !S.over; i++) { endDay(); if (!document.getElementById("modal").hidden) break; } },
   hedge: () => { UI.hedge = !UI.hedge; render(); },
   mapCity: v => { UI.newCity = v; render(); },
   // pick the city nearest to where the map was tapped
@@ -1489,7 +1565,7 @@ function renderHud() {
   document.getElementById("coName").textContent = S.name;
   document.getElementById("dayChip").innerHTML = `<b>${dateStr()}</b> · Yıl ${yearOf()} · ${season().name}`;
   const c = document.getElementById("cash"); c.textContent = tl(S.cash); c.classList.toggle("neg", S.cash < 0);
-  document.getElementById("titleChip").textContent = LEVELS[level()].name;
+  document.getElementById("titleChip").textContent = LEVELS[level()].name + (clubOn() ? " ★" : "");
   document.getElementById("hudStats").innerHTML =
     `<span>Net değer <b>${tl(netWorth())}</b></span><span>Stok <b>${nf1.format(stockTotal())}/${nf0.format(capTotal())} t</b></span><span>İtibar <b class="${S.rep < 35 ? "bad" : ""}">${Math.round(S.rep)}</b></span><span>Sıra <b>${myRank()}/${aliveCount()}</b></span>` +
     (S.loan ? `<span>Kredi <b>${tl(S.loan)}</b></span>` : "");
@@ -1504,7 +1580,7 @@ const payChip = o => o.pay ? `<span class="chip w">${o.pay} gün vade</span>` : 
 const riskChip = o => `<span class="chip ${o.risk === "A" ? "st" : o.risk === "B" ? "w" : "b"}">Risk ${o.risk}</span>`;
 function orderCard(o, active) {
   const p = P[o.prod], m = priceAt(o.prod, o.city), over = o.price / m - 1;
-  const bc = brokerCost(o), bp = orderValue(o) - bc, brokerBig = o.qty > BROKER_MAX_T;
+  const bc = brokerCost(o), bp = orderValue(o) - bc, brokerBig = o.qty > brokerMax();
   const brokerDisabled = brokerBig || (o.pay > 0 && S.cash < bc) || S.brokerToday >= brokerQuota();
   const src = bestSource(o), left = o.deadline - S.day, have = stockQty(o.prod);
   const sp = src ? orderValue(o) - o.qty * src.l.stock[o.prod].cost - src.total : 0;
@@ -1522,7 +1598,7 @@ function orderCard(o, active) {
       <span class="chip ${left <= 1 ? "b" : ""}">Son teslim: ${left <= 0 ? "bugün" : left + " gün"}</span>
       ${active ? "" : o.rival ? `<span class="chip b">Bugün almazsan rakip alır</span>` : `<span class="chip">Teklif ${o.expires - S.day <= 1 ? "yarın düşer" : (o.expires - S.day) + " gün geçerli"}</span>`}</div>
     <div class="btns">
-      <button class="btn ${src ? "" : "st"}" data-act="broker" data-v="${o.id}" ${brokerDisabled ? "disabled" : ""}>Aracılık<small class="${bp < 0 && !brokerBig ? "bad" : ""}">${brokerBig ? "En fazla " + BROKER_MAX_T + " t" : (bp >= 0 ? "+" : "") + tl(bp) + (o.pay ? " · " + tl(bc) + " peşin" : "")}</small></button>
+      <button class="btn ${src ? "" : "st"}" data-act="broker" data-v="${o.id}" ${brokerDisabled ? "disabled" : ""}>Aracılık<small class="${bp < 0 && !brokerBig ? "bad" : ""}">${brokerBig ? "En fazla " + brokerMax() + " t" : (bp >= 0 ? "+" : "") + tl(bp) + (o.pay ? " · " + tl(bc) + " peşin" : "")}</small></button>
       ${stockBtn}
       ${!active && !o.neg ? `<button class="btn ghost" data-act="negotiate" data-v="${o.id}">Pazarlık<small>+%3 iste</small></button>` : ""}
       ${active ? `<button class="btn ghost" data-act="cancel" data-v="${o.id}" aria-label="Siparişi iptal et">İptal</button>` : ""}
@@ -1530,6 +1606,7 @@ function orderCard(o, active) {
 }
 function renderOrders() {
   let h = "";
+  if (owns("manager")) h += `<div class="btns"><button class="btn st" data-act="autoDeliver">Kârlı olanları teslim et<small>Operasyon Müdürü</small></button><button class="btn" data-act="skip7">7 gün ilerle<small>olay çıkarsa durur</small></button></div>`;
   const sp = scenProgress();
   if (sp && !S.scen.done) h += `<div class="banner"><span class="t">Senaryo · ${SCENARIOS[S.scen.id].name}</span><p>${SCENARIOS[S.scen.id].desc}</p><p>${sp.text}</p><div class="bar"><i style="width:${sp.pct * 100}%"></i></div></div>`;
   if (S.tut < TUT.length) { const t = TUT[S.tut];
@@ -1550,6 +1627,8 @@ function renderMarket() {
   const cats = [["all", "Tümü"], ...Object.entries(CATS).map(([k, c]) => [k, c.name])];
   let h = `<div class="filter">${cats.map(([k, n]) => `<button aria-pressed="${UI.cat === k}" data-act="cat" data-v="${k}">${n}</button>`).join("")}
     <button aria-pressed="${UI.onlyStock}" data-act="onlyStock">Stoktakiler</button></div>`;
+  if (clubOn()) { const up = Object.keys(CATS).map(k => [k, catDrift(k) + catDrift("__global")]).sort((a, b) => b[1] - a[1]);
+    h += `<div class="banner"><span class="t">Analist notu · Baron Kulübü</span><p>${up[0][1] > 0.001 ? `Yükselişte: <b>${CATS[up[0][0]].name}</b>. ` : "Belirgin yükseliş yok. "}${up[up.length - 1][1] < -0.001 ? `Düşüşte: <b>${CATS[up[up.length - 1][0]].name}</b>. ` : ""}Dolar ${S.fx > (S.fxPrev || S.fx) ? "yükseliyor" : "sakin"}.</p></div>`; }
   const fxc = S.fx / (S.fxPrev || S.fx) - 1;
   h += `<div class="line2"><span>Dolar/TL <b>${S.fx.toFixed(2).replace(".", ",")}</b> <span class="${fxc > 0 ? "bad" : "good"}">${pct(fxc)}</span></span><span>Fiyatlar Türkiye ortalaması · ₺/t</span></div>`;
   if (S.events.length) h += `<div class="chips">${S.events.map(e => `<span class="chip ${e.drift > 0 ? "g" : "b"}">${e.cat === "all" ? "Tüm piyasa" : CATS[e.cat].name} ${e.drift > 0 ? "▲" : "▼"} ${e.days} gün</span>`).join("")}</div>`;
@@ -1686,7 +1765,9 @@ function renderRival() {
       <div class="line2"><span>Piyasa (ihale açıldığında)</span><b>${nf0.format(t.base)} ₺/t</b></div>
       ${t.bid === null ? `<div class="muted">Kâr marjını seç. Rakipler de gizli teklif veriyor, en düşük teklif kazanır. Teminat tutarın %3'ü; kaybedersen iade edilir, teslim edemezsen yanar.</div>
         <div class="bids">${BID_OPTS.map(m => `<button class="btn st" data-act="bid" data-v="${t.id}:${m}" ${S.cash < tenderValue(t, m) * 0.03 ? "disabled" : ""}>%${Math.round(m * 100)}<small>${tlShort(tenderValue(t, m))}</small></button>`).join("")}</div>`
-        : `<div class="chips"><span class="chip hot">Teklifin: %${nf1.format(t.bid * 100)} · ${tl(tenderValue(t, t.bid))}</span><span class="chip">Teminat ${tl(t.deposit)}</span></div>`}
+        : ""}
+      ${t.intel && t.rbids && t.rbids.length ? (() => { const lo = t.rbids.slice().sort((a, b) => a.m - b.m)[0]; return `<div class="chips"><span class="chip w">Kulis: en düşük rakip teklifi %${nf1.format(lo.m * 100)} · ${esc((rivalById(lo.id) || {}).name || "")}</span></div>`; })() : ""}
+      ${t.bid === null ? "" : `<div class="chips"><span class="chip hot">Teklifin: %${nf1.format(t.bid * 100)} · ${tl(tenderValue(t, t.bid))}</span><span class="chip">Teminat ${tl(t.deposit)}</span></div>`}
     </div>`;
   }
   if (S.tenderLog.length) h += `<div class="card"><b>Son ihale sonuçları</b>${S.tenderLog.map(l => `<div><div class="muted" style="padding-top:6px">${esc(l.proj)} · ${ton(l.qty)} ${P[l.prod].name} · ${dateStr(l.day)}</div>
@@ -1705,6 +1786,121 @@ const hasGame = () => S && S.seen.intro;
 function showMenu(view) { UI.menu = view; const m = document.getElementById("menu"); m.hidden = false; m.innerHTML = `<div class="inner gut">${menuHtml(view)}</div>`; m.scrollTop = 0;
   const f = m.querySelector(".mbtn, input"); if (f && view !== "new") f.focus(); }
 function hideMenu() { UI.menu = null; const m = document.getElementById("menu"); m.hidden = true; m.innerHTML = ""; }
+// ---------- in-app purchases ----------
+const KEY_ENT = "demir-baronu-ent";
+let ENT = { own: {}, clubUntil: 0, skin: "", tx: [], starter: false, legacyGranted: false };
+try { Object.assign(ENT, JSON.parse(localStorage.getItem(KEY_ENT) || "{}")); } catch (e) {}
+function saveEnt() { ENT.tx = ENT.tx.slice(-300); persist(KEY_ENT, JSON.stringify(ENT)); }
+const owns = k => !!(ENT.own[k] || (ENT.own.bundle && ["manager", "skingold", "skinsteel", "skinnight"].includes(k)));
+const clubOn = () => ENT.clubUntil > Date.now();
+const SHOP = { prices: {}, loaded: false, busy: false };
+const StoreN = () => (NATIVE && NATIVE.Store) || null;
+const cashPack = ([pct, min]) => Math.max(min, Math.round(Math.max(0, S ? netWorth() : 0) * pct / 1000) * 1000);
+const priceText = k => StoreN() ? (SHOP.prices[k] || (SHOP.loaded ? "" : "…")) : IAP[k].price.toFixed(2).replace(".", ",") + " TL";
+function applySkin() { document.documentElement.dataset.skin = ENT.skin && owns(ENT.skin) ? ENT.skin : ""; }
+async function shopInit() {
+  const N = StoreN(); if (!N) { SHOP.loaded = true; return; }
+  try { N.addListener("transaction", onTx); } catch (e) {}
+  try { const r = await N.getProducts({ ids: Object.keys(IAP).map(k => STORE_PREFIX + k) }); for (const p of (r && r.products) || []) SHOP.prices[p.id.slice(STORE_PREFIX.length)] = p.price; } catch (e) {}
+  try { await syncEntitlements(false); } catch (e) {}
+  SHOP.loaded = true; if (UI.menu === "store") showMenu("store");
+}
+async function syncEntitlements(restore) {
+  const N = StoreN(); if (!N) return 0;
+  const r = await (restore ? N.restore() : N.entitlements());
+  const own = {}; let until = 0;
+  for (const t of (r && r.owned) || []) { const k = String(t.productId).replace(STORE_PREFIX, ""); if (!IAP[k]) continue;
+    if (IAP[k].type === "n") own[k] = true; if (IAP[k].type === "s") until = Math.max(until, t.expires || 0); }
+  ENT.own = own; ENT.clubUntil = until; grantOnce(); saveEnt(); applySkin(); if (S) render();
+  return Object.keys(own).length + (until > Date.now() ? 1 : 0);
+}
+function onTx(t) {
+  if (!t || !t.productId || ENT.tx.includes(t.transactionId)) return;
+  const k = String(t.productId).replace(STORE_PREFIX, ""); if (!IAP[k]) return;
+  if (t.revoked) { delete ENT.own[k]; saveEnt(); applySkin(); return; }
+  ENT.tx.push(t.transactionId); grant(k, t);
+}
+function grantOnce() { if (owns("legacy") && !ENT.legacyGranted) { ENT.legacyGranted = true; LEG.points += 3; saveLeg(); } }
+function storeBlock(k) {
+  const it = IAP[k];
+  if (it.type === "c" && (!hasGame() || S.over)) return "Önce oyuna başla";
+  if (it.type === "n" && owns(k)) return "Sende var";
+  if (k === "bundle" && ["manager", "skingold", "skinsteel", "skinnight"].every(x => ENT.own[x])) return "Parçaları sende";
+  if (k === "starter" && ENT.starter) return "Alındı";
+  if (k === "lawyer" && !S.recv.some(r => ["takip", "icra", "dava"].includes(r.status))) return "Takipte alacak yok";
+  if (k === "intel" && !S.tenders.some(t => !t.intel)) return "Açık ihale yok";
+  if (k === "express" && !S.incoming.length) return "Yolda sevkiyat yok";
+  if (k === "amnesty" && S.amnesty) return "Bu ay için alındı";
+  if (k === "broker" && S.brokerBoost === S.day) return "Bugün etkin";
+  if (it.type === "s" && clubOn()) return "Üyesin";
+  if (StoreN() && SHOP.loaded && !SHOP.prices[k]) return "Mağazada henüz yok";
+  return null;
+}
+async function buyIAP(k) {
+  const it = IAP[k], b = storeBlock(k); if (!it || b) return b && toast(b, true);
+  const N = StoreN();
+  if (!N) { UI.demoBuy = k; return showModal("demobuy"); }
+  if (SHOP.busy) return; SHOP.busy = true; showMenu("store");
+  try {
+    const r = await N.purchase({ id: STORE_PREFIX + k });
+    if (r.status === "purchased") { if (!ENT.tx.includes(r.transactionId)) { ENT.tx.push(r.transactionId); grant(k, r); } }
+    else if (r.status === "pending") toast("Satın alma onay bekliyor. Onaylanınca kendiliğinden eklenecek.");
+  } catch (e) { toast("Satın alma tamamlanamadı: " + ((e && e.message) || e), true); }
+  SHOP.busy = false; if (UI.menu === "store") showMenu("store");
+}
+function grant(k, t) {
+  const it = IAP[k];
+  if (it.type === "n") { ENT.own[k] = true; grantOnce(); if (k.startsWith("skin")) ENT.skin = k; if (k === "bundle") ENT.skin = ENT.skin || "skingold"; applySkin(); }
+  else if (it.type === "s") ENT.clubUntil = Math.max(ENT.clubUntil, (t && t.expires) || Date.now() + it.days * 864e5);
+  else if (S) applyConsumable(k);
+  saveEnt(); if (S) save(); beep("win"); toast(`${it.name} eklendi.`); if (S) render(); if (UI.menu === "store") showMenu("store");
+}
+function applyConsumable(k) {
+  const it = IAP[k];
+  if (it.cash) { const a = cashPack(it.cash); S.cash += a; S.news.unshift({ day: S.day, text: `${it.name}: kasaya ${tl(a)} girdi.` }); }
+  if (k === "starter") { ENT.starter = true; S.cash += 75000; S.rep = Math.min(100, S.rep + 10); S.vehicles.van++;
+    if (!S.locs.length) S.locs.push({ id: S.nextId++, city: S.home, type: "depot", tier: 1, stock: {}, fork: 0, crane: 0, clerks: 0, used: 0 });
+    else if (S.locs[0].type === "depot" && S.locs[0].tier < 1) S.locs[0].tier = 1; }
+  if (k === "rep") S.rep = Math.min(100, S.rep + 20);
+  if (k === "offers") for (let i = 0; i < 6; i++) S.offers.push(genOffer());
+  if (k === "broker") S.brokerBoost = S.day;
+  if (k === "express") S.incoming.forEach(i => { i.arrive = Math.min(i.arrive, S.day + 1); i.delayed = 1; });
+  if (k === "intel") S.tenders.forEach(t => { if (!t.rbids) rollBids(t); t.intel = true; });
+  if (k === "lawyer") S.recv = S.recv.filter(r => { if (!["takip", "icra", "dava"].includes(r.status)) return true;
+    const amt = Math.round(r.amount * 0.85); recover(amt, `Hukuk bürosu ${r.cust} alacağının ${tl(amt)} kısmını tahsil etti.`); return false; });
+  if (k === "amnesty") S.amnesty = true;
+  checkAch(); checkLevel();
+}
+function skuCard(k, opts = {}) {
+  const it = IAP[k], b = storeBlock(k), pr = priceText(k);
+  const amt = it.cash ? `<span class="amt">+${tlShort(cashPack(it.cash))}${tlShort(cashPack(it.cash)).endsWith("₺") ? "" : " ₺"}</span>` : "";
+  const sw = it.sw ? `<div class="sw"><i style="background:${it.sw[0]}"></i><i style="background:${it.sw[1]}"></i></div>` : "";
+  const using = it.sec === "skin" && owns(k);
+  return `<div class="sku ${opts.wide ? "wide" : ""} ${opts.hl ? "hl" : ""}">${it.tag ? `<span class="tag">${it.tag}</span>` : ""}<b>${it.name}</b>${amt}${sw}
+    <div class="d">${it.cash ? "Oyun içi sermaye. Net değerin büyüdükçe paket de büyür." : it.desc ? it.desc() : ""}</div>
+    ${using ? `<button class="btn ${ENT.skin === k ? "" : "st"} sm" data-act="useSkin" data-v="${ENT.skin === k ? "" : k}">${ENT.skin === k ? "Kullanılıyor · kapat" : "Kullan"}</button>`
+      : `<button class="btn hot sm" data-act="buyIAP" data-v="${k}" ${b || SHOP.busy || !pr ? "disabled" : ""}>${b || pr || "…"}</button>`}</div>`;
+}
+function storeHtml() {
+  const demo = !StoreN(), fromGame = hasGame() && !S.over;
+  const club = clubOn();
+  let h = `<div class="mhead"><button class="btn ghost sm" data-act="menuGo" data-v="${fromGame && UI.storeFrom === "game" ? "continue" : "main"}" aria-label="Geri">‹ ${fromGame && UI.storeFrom === "game" ? "Oyuna dön" : "Geri"}</button><h2>Mağaza</h2></div>`;
+  if (demo) h += `<div class="hint"><b>Deneme modu.</b> Bu tarayıcı sürümünde gerçek ödeme alınmaz; satın almalar denemek için ücretsiz eklenir. iPhone uygulamasında bu düğmeler App Store ödeme ekranını açar.</div>`;
+  if (SHOP.busy) h += `<div class="hint">Satın alma işleniyor…</div>`;
+  h += `<div class="skus">`;
+  if (!ENT.starter) h += skuCard("starter", { wide: true, hl: true });
+  h += `<div class="sku wide hl"><span class="tag">Abonelik</span><b>Baron Kulübü${club ? " · üyesin" : ""}</b>
+    <div class="d">Her gün net değerinin %0,3'ü kadar kâr payı (en az 2.000 ₺), günde +2 aracılık sevkiyatı, piyasa analist notu, ay sonu vergisinde %25 indirim ve isminin yanında ★.${club ? ` Üyeliğin ${new Date(ENT.clubUntil).toLocaleDateString("tr-TR")} tarihine kadar aktif.` : ""}</div>
+    <div class="btns">${["clubweek", "clubmonth"].map(k => { const b = storeBlock(k), pr = priceText(k); return `<button class="btn ${k === "clubmonth" ? "hot" : "st"}" data-act="buyIAP" data-v="${k}" ${b || SHOP.busy || !pr ? "disabled" : ""}>${IAP[k].per === "ay" ? "Aylık" : "Haftalık"}<small>${b || (pr ? pr + " / " + IAP[k].per : "…")}</small></button>`; }).join("")}</div>
+    <div class="legal">Baron Kulübü otomatik yenilenen bir aboneliktir. Ücret, satın almayı onayladığında Apple hesabından alınır. Dönem bitiminden en az 24 saat önce iptal edilmezse abonelik aynı süre ve fiyatla yenilenir. Aboneliği App Store hesap ayarlarından yönetebilir ve iptal edebilirsin. <a href="${TERMS_URL}" target="_blank" rel="noopener">Kullanım Koşulları</a> · <a href="${PRIVACY_URL}" target="_blank" rel="noopener">Gizlilik Politikası</a></div></div>`;
+  h += `</div><h2>Sermaye paketleri</h2><div class="skus">${["cash1", "cash2", "cash3", "cash4"].map(k => skuCard(k)).join("")}</div>`;
+  h += `<h2>Güçlendiriciler</h2><div class="skus">${Object.keys(IAP).filter(k => IAP[k].sec === "boost").map(k => skuCard(k)).join("")}</div>`;
+  h += `<h2>Kalıcı ürünler</h2><div class="skus">${["vip", "manager", "legacy"].map(k => skuCard(k)).join("")}${skuCard("bundle", { hl: true })}</div>`;
+  h += `<h2>Temalar</h2><div class="skus">${["skingold", "skinsteel", "skinnight"].map(k => skuCard(k)).join("")}<div class="sku"><b>Varsayılan</b><div class="sw"><i style="background:#ff7b2c"></i><i style="background:#182027"></i></div><div class="d">Hadde turuncusu</div><button class="btn sm" data-act="useSkin" data-v="" ${ENT.skin ? "" : "disabled"}>${ENT.skin ? "Kullan" : "Kullanılıyor"}</button></div></div>`;
+  h += `<div class="btns"><button class="btn" data-act="restoreIAP">Satın alımları geri yükle</button>${StoreN() ? `<button class="btn ghost" data-act="manageSubs">Abonelikleri yönet</button>` : ""}</div>
+    <div class="legal">Sermaye ve güçlendiriciler tüketilebilir ürünlerdir; satın alındığı anda oynadığın şirkete eklenir ve geri yüklenmez. Kalıcı ürünler ve Baron Kulübü aynı Apple hesabıyla geri yüklenebilir. Tüm ürünler yalnızca oyun içinde geçerlidir ve gerçek para değeri yoktur.</div>`;
+  return h;
+}
 const back = t => `<div class="mhead"><button class="btn ghost sm" data-act="menuGo" data-v="main" aria-label="Geri">‹ Geri</button><h2>${t}</h2></div>`;
 function menuHtml(v) {
   if (v === "new") {
@@ -1741,10 +1937,12 @@ function menuHtml(v) {
     <h3>Rakipler</h3><p>Rakipler şube açtıkları şehirlerde müşterini kovalar. "Rakip" etiketli teklif yalnızca o gün açıktır. Pazarlıkla %3 fazla isteyebilirsin ama rakipli işte müşteri rakibe gidebilir. Rakipler fiyat savaşı açar, elemanını ayartır, bazen iflas eder ve tesisi ucuza satılır.</p>
     <h3>İhaleler</h3><p>Büyük projeler kapalı zarfla verilir. Kâr marjını seç, %3 teminat yatır. En düşük teklif kazanır. Kazanırsan 10 günde teslim etmelisin.</p>
     <h3>Etkinlikler ve mevsimler</h3><p>Fuar, bayram, meydan okuma, fabrika kampanyası, vergi denetimi ve durgunluk dönemleri gelir. Yazın inşaat demiri, kışın boru talebi artar. Yıl sonunda ilk 5'e girene ödül var.</p>
+    <h3>Mağaza</h3><p>Sol üstteki turuncu çanta düğmesinden mağazaya girersin: sermaye paketleri, güçlendiriciler, kalıcı ürünler, temalar ve Baron Kulübü üyeliği. Oyunu satın almadan da baştan sona oynayabilirsin.</p>
     <h3>Ay sonu</h3><p>Her 30 günde kira, maaş, araç, faiz, sigorta ve kârının vergisi kesilir. Kasa eksi bakiye sınırının altına düşerse iflas edersin.</p></div>`;
   if (v === "records") { const r = getRecords();
     return `${back("Rekorlar")}<div class="card">${r.length ? r.map((x, i) => `<div class="lb"><span class="rk">${i + 1}</span><span></span><div style="min-width:0">${esc(x.name)}<small>${esc(x.result)} · ${(DIFFS[x.diff] || DIFFS.normal).name} · ${x.day}. gün · ${nf0.format(x.tons)} t · ${x.rank}. sıra</small></div><span class="v">${tl(x.nw)}</span></div>`).join("")
       : `<div class="muted">Henüz rekor yok. Baron olduğunda, yıl sonunda ya da iflas ettiğinde sonucun buraya yazılır.</div>`}</div>`; }
+  if (v === "store") return storeHtml();
   if (v === "settings") return `${back("Ayarlar")}<div class="card">
     <div class="toggle"><div><b>Ay sonu raporu</b><div class="muted">Her ay sonunda gider ve vergi özetini göster</div></div><button aria-pressed="${SET.monthModal}" data-act="toggleSet" data-v="monthModal">${SET.monthModal ? "Açık" : "Kapalı"}</button></div>
     <div class="toggle"><div><b>Gün sonu bildirimi</b><div class="muted">Her gün sonunda özet baloncuğu göster</div></div><button aria-pressed="${SET.toasts}" data-act="toggleSet" data-v="toasts">${SET.toasts ? "Açık" : "Kapalı"}</button></div>
@@ -1760,6 +1958,7 @@ function menuHtml(v) {
     <div class="tape" aria-hidden="true"><div>${items}${items}</div></div>
     ${g ? `<button class="mbtn hot" data-act="menuGo" data-v="continue"><span>Devam et<small>${esc(S.name)} · ${dateStr()} Yıl ${yearOf()} · ${LEVELS[level()].name} · ${tl(netWorth())} · ${myRank()}. sıra</small></span><span class="arrow">›</span></button>` : ""}
     <button class="mbtn ${g ? "" : "hot"}" data-act="menuGo" data-v="new"><span>Yeni oyun<small>Şirketini kur, şehrini ve zorluğu seç</small></span><span class="arrow">›</span></button>
+    <button class="mbtn" data-act="shop" data-v="menu"><span>Mağaza<small>Sermaye, güçlendiriciler, Baron Kulübü, temalar</small></span><span class="arrow">›</span></button>
     <button class="mbtn" data-act="menuGo" data-v="help"><span>Nasıl oynanır<small>Aracılık, tesisler, rakipler, ihaleler</small></span><span class="arrow">›</span></button>
     <button class="mbtn" data-act="menuGo" data-v="records"><span>Rekorlar<small>En iyi şirketlerin</small></span><span class="arrow">›</span></button>
     <button class="mbtn" data-act="menuGo" data-v="settings"><span>Ayarlar<small>Bildirimler, verileri sil</small></span><span class="arrow">›</span></button>
@@ -1911,6 +2110,8 @@ function showModal(kind, data) {
   else if (kind === "bankrupt") h = `<h3>İflas</h3><p>Ay sonu giderleri ödenemedi. Kasa ${tl(S.cash)} ile eksi bakiye sınırını aştı.</p><p class="muted">${S.day} gün dayandın, ${ton(S.tons)} sattın, unvanın ${L.name}.</p><div class="btns"><button class="btn" data-act="toMenu">Ana menü</button><button class="btn hot" data-act="restart">Yeni şirket kur</button></div>`;
   else if (kind === "scen") h = data.won ? `<h3>Senaryo kazanıldı</h3><p>${SCENARIOS[S.scen.id].name}: ${SCENARIOS[S.scen.id].desc}. Başardın.</p><p class="muted">İstersen bu şirketle serbest oyuna devam edebilirsin.</p><button class="btn hot" data-act="close">Devam et</button>`
     : `<h3>Senaryo kaybedildi</h3><p>${SCENARIOS[S.scen.id].name}: hedefe süre içinde ulaşılamadı.</p><div class="btns"><button class="btn" data-act="close">Serbest devam et</button><button class="btn hot" data-act="restart">Yeniden dene</button></div>`;
+  else if (kind === "demobuy") { const it = IAP[UI.demoBuy];
+    h = `<h3>${it.name}</h3><p>Bu, oyunun tarayıcı sürümü. Gerçek ödeme alınmaz. iPhone uygulamasında bu adımda App Store ödeme ekranı açılır (${it.price.toFixed(2).replace(".", ",")} TL${it.type === "s" ? " / " + it.per : ""}).</p><div class="btns"><button class="btn" data-act="close">Vazgeç</button><button class="btn hot" data-act="demoYes">Ücretsiz dene</button></div>`; }
   else if (kind === "sellco") h = `<h3>Şirketi sat?</h3><p>${esc(S.name)} satılır ve ${legacyGain()} miras puanı kazanırsın. Sonra yeni şirketini kurarsın; miras bonusları kalıcıdır.</p><div class="btns"><button class="btn" data-act="close">Vazgeç</button><button class="btn hot" data-act="sellCoYes">Sat</button></div>`;
   else if (kind === "reset") h = `<h3>Yeni oyun?</h3><p>Bu şirketteki tüm ilerleme silinir.</p><div class="btns"><button class="btn" data-act="close">Vazgeç</button><button class="btn hot" data-act="resetYes">Yeni şirket kur</button></div>`;
   md.innerHTML = `<div class="box" role="dialog" aria-modal="true">${h}</div>`;
@@ -1948,10 +2149,11 @@ function persist(k, v) { try { localStorage.setItem(k, v); } catch (e) {} if (NA
 function unpersist(k) { try { localStorage.removeItem(k); } catch (e) {} if (NATIVE && NATIVE.Preferences) Promise.resolve(NATIVE.Preferences.remove({ key: k })).catch(() => {}); }
 async function restoreNative() {
   if (!NATIVE || !NATIVE.Preferences) return;
-  for (const k of [KEY, KEY_REC, KEY_SET, KEY_LEG]) {
+  for (const k of [KEY, KEY_REC, KEY_SET, KEY_LEG, KEY_ENT]) {
     try { const r = await NATIVE.Preferences.get({ key: k }); if (r && r.value != null && localStorage.getItem(k) == null) localStorage.setItem(k, r.value); } catch (e) {}
   }
-  try { Object.assign(SET, JSON.parse(localStorage.getItem(KEY_SET) || "{}")); Object.assign(LEG, JSON.parse(localStorage.getItem(KEY_LEG) || "{}")); } catch (e) {}
+  try { Object.assign(SET, JSON.parse(localStorage.getItem(KEY_SET) || "{}")); Object.assign(LEG, JSON.parse(localStorage.getItem(KEY_LEG) || "{}"));
+    Object.assign(ENT, JSON.parse(localStorage.getItem(KEY_ENT) || "{}")); } catch (e) {}
 }
 function load() { try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s && s.v === 2) return s; } catch (e) {} return null; }
 
@@ -1978,5 +2180,6 @@ function start(data) {
 }
 window.claude?.hot?.snapshot?.(() => ({ S, UI }));
 const boot = () => window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
-if (NATIVE) restoreNative().then(boot, boot); else boot();
+const bootAll = () => { applySkin(); boot(); shopInit(); };
+if (NATIVE) restoreNative().then(bootAll, bootAll); else bootAll();
 </script>

@@ -341,18 +341,22 @@ Her rakibin bir patronu vardır (Hikmet Özler, Ferhat Kaya, Nur Aydemir…). Pa
 
 ## 11. Para kazanma (App Store)
 
-İlke: **para ile kazanılmaz, zaman kazanılır.** Ticaret becerisi her zaman belirleyicidir.
+Oyun ücretsizdir ve satın almadan baştan sona oynanabilir. Mağazada 21 isteğe bağlı ürün vardır; kimlikler, fiyatlar ve etkiler `APPSTORE.md` (H bölümü) içindedir.
 
-| Ürün | Tür | Fiyat (TR) | İçerik |
-|---|---|---|---|
-| Reklamsız | Tüketilmeyen | 149,99 ₺ | Tüm geçiş reklamlarını kaldırır |
-| Baron Paketi | Tüketilmeyen | 249,99 ₺ | Reklamsız + 2. kayıt yuvası + altın şirket logosu |
-| Piyasa Analisti | Aylık abonelik | 99,99 ₺ | Ertesi günün haber başlığını önceden gösterir ve 90 günlük grafik açar |
-| Kozmetik | Tüketilen | 29,99–79,99 ₺ | Kamyon boyaları, ofis temaları |
+| Grup | Adet | Fiyat aralığı (TL) |
+|---|---|---|
+| Sermaye paketleri (net değerle ölçeklenir) | 4 | 29,99 – 549,99 |
+| Başlangıç paketi (bir kez) | 1 | 49,99 |
+| Güçlendiriciler (yalnızca işe yarayacakları anda satılır) | 7 | 14,99 – 59,99 |
+| Kalıcı ürünler | 4 | 99,99 – 179,99 |
+| Temalar | 3 | 49,99 |
+| Baron Kulübü aboneliği | 2 | 49,99 / hafta · 149,99 / ay |
 
-Ödüllü reklam (isteğe bağlı): ay sonunda faizi bir kez sıfırlar, fason kesimi bir kez bedava yapar veya kaybedilen bir teklifi geri getirir. Günde en fazla 5 kez.
-
-Nakit satılmaz. Böylece oyun "kazanmak için öde" olmaz ve Apple'ın 3.1.1 kuralına uyulur.
+- **Tasarım ilkeleri:**
+  - Sermaye paketleri net değerle büyür; böylece oyunun her aşamasında anlamlı kalır.
+  - Güçlendiriciler, işe yaramayacakları durumda satın alınamaz (takipte alacak yokken Hukuk Bürosu gibi).
+  - Abonelik günlük küçük bir avantaj verir, oyunu kendi başına bitirmez.
+- **Teknik:** StoreKit 2 ile uygulamanın kendi eklentisi kullanılır, üçüncü taraf servis yoktur. Tarayıcı sürümünde aynı mağaza "deneme modu"nda çalışır ve ödeme almaz.
 
 ## 12. Ekranlar
 
