@@ -244,10 +244,12 @@ Perakende satışlar da tonaja sayılır.
 | Muhasebeci | 40.000 ₺ | 1 | Karşılıksız çek riski ve faktoring maliyeti yarıya |
 | Gece bekçisi | 22.000 ₺ | 1 | Hırsızlık olasılığı üçte bire |
 | Tezgâhtar | 25.000 ₺ | Dükkan başına 3 | Kapı müşterisi +%50 |
+| Hukuk müşaviri | 45.000 ₺ | 1 | İcra ve dava masrafı yarıya, kazanma şansı +%15 |
+| İş güvenliği uzmanı | 30.000 ₺ | 1 | İş kazası olasılığı dörtte bire |
 
-### Başarımlar (17)
+### Başarımlar (23)
 
-İlk iş, kendi yerin, ilk dükkan, 25 perakende satış, ilk araç, ilk makine, 100 t, 3 şehirde tesis, 10 sadık müşteri, sigorta, 1.000 t, 1 Mn ₺, ilk ithalat, fiber lazer, 10 Mn ₺, 10.000 t, 100 Mn ₺. Her başarım nakit ödül (1.000 ₺ – 2 Mn ₺) ve +2 itibar verir.
+İlk iş, kendi yerin, ilk dükkan, 25 perakende satış, ilk araç, ilk makine, 100 t, 3 şehirde tesis, 10 sadık müşteri, sigorta, 1.000 t, 1 Mn ₺, ilk ithalat, fiber lazer, 10 Mn ₺, 10.000 t, 100 Mn ₺, fuarcı, ilk ihale, ilk üçte, sektör lideri, dava kazan, rakip satın al. Her başarım nakit ödül (1.000 ₺ – 2 Mn ₺) ve +2 itibar verir.
 
 ### Eğitim ve günlük görevler
 
