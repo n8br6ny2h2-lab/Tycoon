@@ -178,7 +178,7 @@ svg.nw { width: 100%; height: 90px; display: block; }
 .legal { font-size: 11.5px; color: var(--muted); line-height: 1.45; }
 .legal a { color: var(--steel); }
 /* Themes (bought in the store) */
-:root[data-skin="skingold"] { --hot: #e8b84a; --hot-ink: #231a00; --steel: #d9c79a; }
+:root[data-skin="skingold"] { --bg: #14100a; --panel: #1f1a10; --panel2: #2b2416; --line: #3d3220; --hot: #ffcc4d; --hot-ink: #231a00; --steel: #e6d3a3; --muted: #b3a27f; }
 :root[data-skin="skinsteel"] { --bg: #15181b; --panel: #1f2327; --panel2: #2a2f34; --line: #394047; --hot: #c9d3dc; --hot-ink: #121518; --steel: #9fb0bf; }
 :root[data-skin="skinnight"] { --bg: #0b1020; --panel: #121a33; --panel2: #1a2444; --line: #26335a; --hot: #5aa9ff; --hot-ink: #04122a; --steel: #9db7ff; }
 /* Main menu */
@@ -567,7 +567,7 @@ const PRODUCTS = [
   ["trapez", "Boyalı Trapez Sac", "sac", "RAL 9002 · 0,50 mm", "m² ≈ 4,6 kg", 41000, 2, 1.5],
   ["bobin", "HRP Bobin 2 mm", "sac", "S235JR · 1250 mm genişlik", "rulo ≈ 20 t", 26500, 3, 1],
   ["delikli", "Delikli Sac 1 mm", "sac", "R5 T8 · 1000×2000", "levha ≈ 10 kg", 39000, 3, 0.6],
-  ["hardox", "Aşınma Plakası 10 mm", "sac", "Hardox 450 · 2000×6000", "levha ≈ 942 kg", 78000, 4, 0.4],
+  ["hardox", "Aşınma Plakası 10 mm", "sac", "Aşınmaya dayanıklı sac 450 HB · 2000×6000", "levha ≈ 942 kg", 78000, 4, 0.4],
   ["kutu20", "Kutu Profil 20×20×1,5", "profil", "S235JRH · 6 m", "boy ≈ 5,0 kg", 31000, 0, 2],
   ["kutu40", "Kutu Profil 40×40×2", "profil", "S235JRH · 6 m", "boy ≈ 13,9 kg", 30000, 0, 3],
   ["dik6040", "Dikdörtgen Profil 60×40×2", "profil", "S235JRH · 6 m", "boy ≈ 17,6 kg", 30200, 0, 2],
@@ -683,7 +683,7 @@ const LEVELS = [
   { name: "Esnaf", tons: 25, worth: 20000, qty: [1, 6], loan: 50000, max: 4, locs: 2, perk: "Vadeli satış, kredi, 2. tesis, 12 yeni ürün" },
   { name: "Toptancı", tons: 150, worth: 250000, qty: [3, 18], loan: 250000, max: 6, locs: 3, perk: "Fabrikadan toplu alım, 3. tesis, 12 yeni ürün" },
   { name: "Bayi", tons: 800, worth: 1500000, qty: [6, 40], loan: 1000000, max: 8, locs: 5, perk: "Gemiyle ithalat, 5 tesis, paslanmaz ve alüminyum" },
-  { name: "Distribütör", tons: 3000, worth: 8000000, qty: [12, 80], loan: 4000000, max: 10, locs: 8, perk: "8 tesis, HEB, spiral boru, Hardox" },
+  { name: "Distribütör", tons: 3000, worth: 8000000, qty: [12, 80], loan: 4000000, max: 10, locs: 8, perk: "8 tesis, HEB, spiral boru, aşınma plakası" },
   { name: "Demir Baronu", tons: 12000, worth: 40000000, qty: [20, 150], loan: 15000000, max: 12, locs: 12, perk: "Zirve" },
 ];
 // Facility types. cap = stock tons, handle = tons loaded out per day (before forklifts/cranes), walk = shop walk-in customers/day
@@ -859,7 +859,7 @@ const IAP = {
   clubmonth: { type: "s", sec: "club", name: "Baron Kulübü · Aylık", price: 149.99, days: 30, per: "ay", tag: "%30 avantajlı" },
 };
 const STORE_PREFIX = "demirbaronu.";
-const PRIVACY_URL = "https://[GIZLILIK-ADRESI]"; // set to the published privacy page before App Store review
+const PRIVACY_URL = "https://www.kavcigames.workers.dev/demir-baronu/privacy.html";
 const TERMS_URL = "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/";
 const YEAR_PRIZES = [5000000, 2000000, 1000000, 500000, 250000];
 const BROKER_SHIP = 500, BROKER_MARKUP = 0.035, SELLBACK = 0.965;
@@ -2423,7 +2423,7 @@ function storeHtml() {
   h += `</div><h2>Sermaye paketleri</h2><div class="skus">${["cash1", "cash2", "cash3", "cash4"].map(k => skuCard(k)).join("")}</div>`;
   h += `<h2>Güçlendiriciler</h2><div class="skus">${Object.keys(IAP).filter(k => IAP[k].sec === "boost").map(k => skuCard(k)).join("")}</div>`;
   h += `<h2>Kalıcı ürünler</h2><div class="skus">${["vip", "manager", "legacy"].map(k => skuCard(k)).join("")}${skuCard("bundle", { hl: true })}</div>`;
-  h += `<h2>Temalar</h2><div class="skus">${["skingold", "skinsteel", "skinnight"].map(k => skuCard(k)).join("")}<div class="sku"><b>Varsayılan</b><div class="sw"><i style="background:#ff7b2c"></i><i style="background:#182027"></i></div><div class="d">Hadde turuncusu</div><button class="btn sm" data-act="useSkin" data-v="" ${ENT.skin ? "" : "disabled"}>${ENT.skin ? "Kullan" : "Kullanılıyor"}</button></div></div>`;
+  h += `<h2>Temalar</h2><div class="skus">${["skingold", "skinsteel", "skinnight"].map(k => skuCard(k)).join("")}<div class="sku"><b>Varsayılan</b><div class="sw"><i style="background:#f7c548"></i><i style="background:#142331"></i></div><div class="d">Altın ve lacivert</div><button class="btn sm" data-act="useSkin" data-v="" ${ENT.skin ? "" : "disabled"}>${ENT.skin ? "Kullan" : "Kullanılıyor"}</button></div></div>`;
   h += `<div class="btns"><button class="btn" data-act="restoreIAP">Satın alımları geri yükle</button>${StoreN() ? `<button class="btn ghost" data-act="manageSubs">Abonelikleri yönet</button>` : ""}</div>
     <div class="legal">Sermaye ve güçlendiriciler tüketilebilir ürünlerdir; satın alındığı anda oynadığın şirkete eklenir ve geri yüklenmez. Kalıcı ürünler ve Baron Kulübü aynı Apple hesabıyla geri yüklenebilir. Tüm ürünler yalnızca oyun içinde geçerlidir ve gerçek para değeri yoktur.</div>`;
   return h;
@@ -2465,7 +2465,7 @@ function menuHtml(v) {
     <h3>Rakipler</h3><p>Rakipler şube açtıkları şehirlerde müşterini kovalar. "Rakip" etiketli teklif yalnızca o gün açıktır. Pazarlıkla %3 fazla isteyebilirsin ama rakipli işte müşteri rakibe gidebilir. Rakipler fiyat savaşı açar, elemanını ayartır, bazen iflas eder ve tesisi ucuza satılır.</p>
     <h3>İhaleler</h3><p>Büyük projeler kapalı zarfla verilir. Kâr marjını seç, %3 teminat yatır. En düşük teklif kazanır. Kazanırsan 10 günde teslim etmelisin.</p>
     <h3>Etkinlikler ve mevsimler</h3><p>Fuar, bayram, meydan okuma, fabrika kampanyası, vergi denetimi ve durgunluk dönemleri gelir. Yazın inşaat demiri, kışın boru talebi artar. Yıl sonunda ilk 5'e girene ödül var.</p>
-    <h3>Mağaza</h3><p>Sol üstteki turuncu çanta düğmesinden mağazaya girersin: sermaye paketleri, güçlendiriciler, kalıcı ürünler, temalar ve Baron Kulübü üyeliği. Oyunu satın almadan da baştan sona oynayabilirsin.</p>
+    <h3>Mağaza</h3><p>Üst çubuktaki sarı Mağaza düğmesinden (ya da kasanın yanındaki + ile) mağazaya girersin: sermaye paketleri, güçlendiriciler, kalıcı ürünler, temalar ve Baron Kulübü üyeliği. Oyunu satın almadan da baştan sona oynayabilirsin.</p>
     <h3>Ay sonu</h3><p>Her 30 günde kira, maaş, araç, faiz, sigorta ve kârının vergisi kesilir. Kasa eksi bakiye sınırının altına düşerse iflas edersin.</p></div>`;
   if (v === "records") { const r = getRecords();
     return `${back("Rekorlar")}<div class="card">${r.length ? r.map((x, i) => `<div class="lb"><span class="rk">${i + 1}</span><span></span><div style="min-width:0">${esc(x.name)}<small>${esc(x.result)} · ${(DIFFS[x.diff] || DIFFS.normal).name} · ${x.day}. gün · ${nf0.format(x.tons)} t · ${x.rank}. sıra</small></div><span class="v">${tl(x.nw)}</span></div>`).join("")

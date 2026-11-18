@@ -60,14 +60,14 @@ Fiyatlar oyun içi temsilî ₺/ton değerleridir, gerçek piyasa verisi kullan�
 
 | Kategori | Ürünler (açılış unvanı) | Oynaklık / bağlı olduğu olaylar |
 |---|---|---|
-| **Sac & Levha** (11) | HRP 3 mm, DKP 1 mm *(başlangıç)* · DKP 2 mm, kalın levha 10 mm, galvaniz 0,8 mm, baklavalı 4/5 mm *(Esnaf)* · ST52/S355 20 mm, boyalı trapez *(Toptancı)* · HRP bobin, delikli sac *(Bayi)* · Hardox 450 *(Distribütör)* | Yüksek: ithalat, gümrük, otomotiv |
+| **Sac & Levha** (11) | HRP 3 mm, DKP 1 mm *(başlangıç)* · DKP 2 mm, kalın levha 10 mm, galvaniz 0,8 mm, baklavalı 4/5 mm *(Esnaf)* · ST52/S355 20 mm, boyalı trapez *(Toptancı)* · HRP bobin, delikli sac *(Bayi)* · aşınma plakası 450 *(Distribütör)* | Yüksek: ithalat, gümrük, otomotiv |
 | **Profil** (14) | Kutu 20×20 ve 40×40, dikdörtgen 60×40, köşebent 30 ve 50 *(başlangıç)* · kutu 80×80, lama 40×5, NPU 100 *(Esnaf)* · dikdörtgen 100×50, T demir, NPI 120, IPE 200 *(Toptancı)* · HEA 200 *(Bayi)* · HEB 300 *(Distribütör)* | Orta: inşaat sezonu, haddehane duruşları |
 | **Boru** (9) | Sanayi borusu Ø21,3 ve Ø48,3 *(başlangıç)* · doğalgaz DN25 *(Esnaf)* · doğalgaz DN50, galvaniz 1" *(Toptancı)* · kazan borusu, dikişsiz API 5L, sondaj Ø219 *(Bayi)* · spiral kaynaklı Ø508 *(Distribütör)* | Orta: altyapı ihaleleri |
 | **İnşaat demiri** (6) | Nervürlü Ø8 ve Ø12 *(başlangıç)* · Ø16, hasır çelik Q188 *(Esnaf)* · Ø32, filmaşin *(Toptancı)* | Çok yüksek: konut kredisi, kentsel dönüşüm, deprem bölgesi ihaleleri |
 | **Dolu mil** (3) | Yuvarlak dolu Ø50 *(Esnaf)* · kare dolu 20×20 *(Toptancı)* · C45 transmisyon mili Ø80 *(Bayi)* | Düşük: makine imalatı |
 | **Paslanmaz & Alüminyum** (5) | Paslanmaz 304 sac, alüminyum 5754 levha *(Bayi)* · 316L sac, 304 boru, alüminyum kutu profil *(Distribütör)* | En yüksek: LME nikel fiyatı. Ton fiyatı 4–5 kat, sipariş tonajı ¼ |
 
-Her ürünün bir **talep ağırlığı** vardır: kutu profil 40×40, HRP sac ve Ø12 nervürlü en sık istenir; Hardox ve 316L nadirdir.
+Her ürünün bir **talep ağırlığı** vardır: kutu profil 40×40, HRP sac ve Ø12 nervürlü en sık istenir; aşınma plakası ve 316L nadirdir.
 
 ## 6. Piyasa modeli
 
@@ -278,7 +278,7 @@ Toplu alım indirimi ayrıca uygulanır: 10 t −%1, 50 t −%2, 200 t −%3. Yo
 | Esnaf | 25 | 20.000 ₺ | Vadeli satış, kredi, 12 ürün | 50.000 ₺ | 2 | 1–6 t |
 | Toptancı | 150 | 250.000 ₺ | Fabrikadan alım, 12 ürün | 250.000 ₺ | 3 | 3–18 t |
 | Bayi | 800 | 1,5 Mn ₺ | İthalat, paslanmaz ve alüminyum | 1 Mn ₺ | 5 | 6–40 t |
-| Distribütör | 3.000 | 8 Mn ₺ | HEB, spiral boru, Hardox, 316L | 4 Mn ₺ | 8 | 12–80 t |
+| Distribütör | 3.000 | 8 Mn ₺ | HEB, spiral boru, aşınma plakası, 316L | 4 Mn ₺ | 8 | 12–80 t |
 | **Demir Baronu** | 12.000 | 40 Mn ₺ | Oyunun hedefi, sonra serbest oyun | 15 Mn ₺ | 12 | 20–150 t |
 
 Perakende satışlar da tonaja sayılır.

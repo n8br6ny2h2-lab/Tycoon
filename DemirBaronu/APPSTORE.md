@@ -73,7 +73,7 @@ App Store Connect → uygulaman → **1.0 Hazırlanıyor**:
 2. **Metinler:** aşağıdaki tabloları kopyala.
 3. **Yapı:** "Yapı" bölümünde + ile TestFlight'a yüklenen yapıyı seç.
 4. **Uygulama Gizliliği:**
-   - Gizlilik politikası URL'si gir (bkz. G).
+   - Gizlilik politikası URL'si: `https://www.kavcigames.workers.dev/demir-baronu/privacy.html` (bkz. G).
    - "Veri toplama" sorusuna **Hayır, bu uygulamadan veri toplamıyoruz** de.
 5. **Yaş derecesi:** Anketteki tüm içerik sorularına **Hiçbiri / Hayır** de. Oyunda kumar, şiddet ya da sohbet yok. Sonuç 4+ çıkar.
 6. **Fiyatlandırma:** Ücretsiz, tüm ülkeler (ya da yalnızca Türkiye).
@@ -81,7 +81,24 @@ App Store Connect → uygulaman → **1.0 Hazırlanıyor**:
 8. **Uygulama İnceleme bilgileri:**
    - Ad, telefon, e-posta.
    - Giriş bilgisi gerekmez. "Oturum açma gerekli" kutusunu boş bırak.
-   - Not: `Tamamen çevrimdışı çalışan, gün tabanlı bir ticaret simülasyonu. Hesap ve reklam yok. Uygulama içi satın almalar sol üstteki turuncu çanta düğmesiyle açılan Mağaza ekranındadır; ana menüden de açılır. Satın alımları geri yükleme düğmesi Mağaza'nın en altındadır.`
+   - **Not** (İngilizce yaz, inceleme ekibi İngilizce okur; aşağıdaki kutuyu olduğu gibi kopyala):
+
+```
+Demir Baronu is a fully offline, day-based trading simulation about the Turkish steel trade. No account, no ads, no tracking, no network requests.
+
+How to reach the in-app purchases:
+1. Tap "Yeni oyun" (New game), then "Ticarete başla" (Start trading).
+2. Tap the yellow "Mağaza" (Store) button in the top bar (or the green + next to the cash amount).
+3. The "Baron Kulübü" auto-renewable subscription (weekly / monthly) is the second card, right below the Starter Pack. The title, length, price, auto-renewal and cancellation text, and links to the Terms of Use (Apple standard EULA) and our Privacy Policy are shown directly under the purchase buttons.
+4. "Restore Purchases" ("Satın alımları geri yükle") is at the bottom of the Store.
+
+What makes the game its own:
+- 48 real steel products with real standards, sizes and piece weights (S235JR sheet, DKP, galvanized, box and rectangular sections, NPU, IPE, HEA/HEB beams, seamless and spiral pipe, rebar, mesh, stainless, aluminium).
+- A real collections system: credit sales can be paid late, partly or never; the player can call, negotiate, start enforcement (icra) or go to court, and may face lawsuits.
+- Sealed-bid public tenders against 7 rival companies, a living market with exchange-rate risk and import, and a map of all 81 provinces of Turkey with their industries.
+All art is drawn in code at run time; there are no third-party assets or brands.
+```
+
 9. **İncelemeye Gönder.** İnceleme genelde 1–3 gün sürer. Onaylanınca **Yayınla**.
 
 ### Türkçe metinler
@@ -104,11 +121,11 @@ KOMİSYONCULUKTAN BARONLUĞA
 • Komisyoncu → Esnaf → Toptancı → Bayi → Distribütör → Demir Baronu.
 
 48 ÜRÜN, GERÇEK ÖLÇÜLER
-• Siyah sac, DKP, galvaniz, baklavalı, Hardox; kutu ve dikdörtgen profil, köşebent, NPU, IPE, HEA, HEB; sanayi, doğalgaz, dikişsiz ve spiral boru; nervürlü demir, hasır çelik; paslanmaz ve alüminyum.
+• Siyah sac, DKP, galvaniz, baklavalı, aşınmaya dayanıklı sac; kutu ve dikdörtgen profil, köşebent, NPU, IPE, HEA, HEB; sanayi, doğalgaz, dikişsiz ve spiral boru; nervürlü demir, hasır çelik; paslanmaz ve alüminyum.
 • Her üründe norm, ölçü ve boy ağırlığı.
 
-15 ŞEHİR, DEPO VE DÜKKAN
-• İkitelli'den Ostim'e, Başpınar'dan Çiğli'ye tesis aç.
+81 İL, 30 SANAYİ ŞEHRİ, DEPO VE DÜKKAN
+• Haritada ile dokun, sanayisini gör. İkitelli'den Ostim'e, Başpınar'dan Çiğli'ye tesis aç.
 • Dükkanına her gün kapıdan müşteri gelsin.
 • Forklift, tavan vinci, kamyon, TIR; giyotin makas, abkant, fiber lazer, bobin dilme hattı.
 • Şehirler arasında fiyat farkı var: ucuz yerden al, pahalı yerde sat.
@@ -139,6 +156,7 @@ BARON KULÜBÜ (isteğe bağlı abonelik)
 • Her gün net değerinin %0,3'ü kadar kâr payı, günde +2 aracılık sevkiyatı, piyasa analist notu, ay sonu vergisinde %25 indirim.
 • Haftalık ya da aylık; otomatik yenilenir. Dönem bitiminden en az 24 saat önce App Store hesap ayarlarından iptal edilebilir.
 • Kullanım Koşulları: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+• Gizlilik Politikası: https://www.kavcigames.workers.dev/demir-baronu/privacy.html
 ```
 
 ### İngilizce metinler (isteğe bağlı ikinci dil)
@@ -174,7 +192,7 @@ App Store Connect → uygulaman → **Para Kazanma → Uygulama İçi Satın Alm
 - **Fiyat:** Fiyatlandırma → Türkiye; diğer ülkeler otomatik
 - **Türkçe yerelleştirme:** Görünen ad ve Açıklama
 - **İnceleme ekran görüntüsü:** `appstore/iap-review.png`
-- **İnceleme notu:** "Mağaza: sol üstteki turuncu çanta düğmesi."
+- **İnceleme notu:** "Mağaza: üst çubuktaki sarı Mağaza düğmesi. Baron Kulübü aboneliği Mağaza'nın en üstündedir."
 
 | Ürün kimliği | Tür | Fiyat (TL) | Görünen ad (≤30) | Açıklama (≤45) |
 |---|---|---|---|---|
@@ -223,7 +241,7 @@ TestFlight'tan kurulan uygulamada satın almalar **ücretsizdir** (Apple'ın den
 
 ### Uygulamada yapılacak tek değişiklik
 
-`web/play.html` içinde `PRIVACY_URL` sabitini yayınladığın gizlilik sayfasının adresiyle değiştir. Apple, abonelik ekranında çalışan bir gizlilik bağlantısı ister. Kullanım koşulları için Apple'ın standart sözleşmesi bağlıdır.
+`web/play.html` içindeki `PRIVACY_URL` artık `https://www.kavcigames.workers.dev/demir-baronu/privacy.html` adresini gösteriyor. Apple, abonelik ekranında çalışan bir gizlilik bağlantısı ister; bu yüzden sayfa yayına girmeden incelemeye gönderme. Adresi tarayıcıda açıp sayfanın göründüğünü kontrol et. Kullanım koşulları için Apple'ın standart sözleşmesi bağlıdır.
 
 ### Ürünler oyunda ne yapar
 
@@ -240,7 +258,7 @@ Güçlendiriciler yalnızca işe yarayacakları anda satılır. Örneğin takipt
 
 ## G. Gizlilik politikası ve destek adresi
 
-Apple bir **gizlilik politikası URL'si** ve bir **destek URL'si** ister. Hazır sayfa: `web/privacy.html`. İçindeki `[İLETİŞİM E-POSTASI]` ve `[GELİŞTİRİCİ ADI]` alanlarını doldur ve sayfayı herkese açık bir adreste yayınla. Seçenekler:
+Apple bir **gizlilik politikası URL'si** ve bir **destek URL'si** ister. Hazır sayfa: `web/privacy.html`. İçindeki `[İLETİŞİM E-POSTASI]` ve `[GELİŞTİRİCİ ADI]` alanlarını doldur. Sayfa `https://www.kavcigames.workers.dev/demir-baronu/privacy.html` adresinde yayınlanacak (oyundaki bağlantı ve App Store metni bu adresi kullanıyor). Başka bir yerde yayınlarsan üç yeri de değiştir: oyundaki `PRIVACY_URL`, App Store Connect'teki gizlilik URL'si ve açıklamanın son satırı. Diğer seçenekler:
 
 - **GitHub Pages:** Depo herkese açıksa Settings → Pages. Depo gizliyse ücretsiz yol, ayrı ve herkese açık küçük bir depoya yalnızca bu dosyayı koymaktır.
 - **GitLab Pages:** GitLab'de herkese açık bir projeye `public/index.html` olarak koy.
@@ -263,10 +281,14 @@ Yalnızca TestFlight'ta denemek için version'ı aynı bırakabilirsin. Yapı nu
 | 5.1.1 Gizlilik | — | Gizlilik URL'si çalışır olmalı, "veri toplanmıyor" beyanı doğru olmalı |
 | 2.3 Meta veri | — | Ekran görüntüleri gerçek oyun ekranlarıdır; adda başka markanın adı yok |
 | 3.1.1 Satın alma | — | Tüm dijital ürünler Apple'ın uygulama içi satın almasıyla satılır, dışarıya ödeme bağlantısı yok. "Satın alımları geri yükle" düğmesi var |
-| 3.1.2 Abonelik | Orta | Fiyat, süre, otomatik yenileme metni, Kullanım Koşulları ve Gizlilik bağlantıları abonelik düğmelerinin hemen altında. `PRIVACY_URL` gerçek adres olmalı |
+| 3.1.2 Abonelik | Orta | Fiyat, süre, otomatik yenileme metni, Kullanım Koşulları ve Gizlilik bağlantıları abonelik düğmelerinin hemen altında. Gizlilik sayfası yayında olmalı; açıklamanın sonunda da iki bağlantı var |
+| 5.2.1 Marka | Düşük | Ürün adlarında tescilli marka yok (aşınma plakası genel adla yazılır) |
+| 4.3 Benzer uygulama | Orta | Aynı hesaptan başka tycoon oyunları da gönderilecekse inceleme notunda oyunun özgün yanları anlatılır (yukarıdaki İngilizce not) |
 
 ## Teknik notlar
 
+- **Gizlilik bildirimi (privacy manifest):** `ios/App/App/PrivacyInfo.xcprivacy` uygulama hedefine eklidir: takip yok, takip alan adı yok, veri toplanmıyor; kayıtlar için UserDefaults kullanımı nedeni CA92.1. Capacitor kendi bildirimini ayrıca getirir. App Store Connect'teki "Uygulama Gizliliği" cevapları (veri toplanmıyor) bununla aynıdır.
+- **Ağ bağlantısı yok:** uygulama paketinde yazı tipleri gömülüdür, Google Fonts ya da başka bir adrese istek gitmez. Uygulamada "Google", "Android" ya da başka bir mağaza adı geçmez.
 - **Capacitor 8.6.0:** Swift Package Manager kullanır, CocoaPods yok. Eklentiler: Haptics (titreşim motoru), Preferences (kayıtlar iOS'un silmediği uygulama deposuna da yazılır), Status Bar.
 - **Satın alma:** Uygulamanın kendi eklentisi `ios/App/App/StorePlugin.swift` (StoreKit 2), `ViewController.swift` ile köprüye kaydedilir. JS tarafında `window.Capacitor.Plugins.Store` kullanılır.
   - Kalıcı ürünler ve abonelik her açılışta `Transaction.currentEntitlements`'tan okunur.
