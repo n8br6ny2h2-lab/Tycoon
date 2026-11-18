@@ -30,7 +30,9 @@ select { font: inherit; color: var(--fg); background: var(--bg); border: 1px sol
 .good { color: var(--good); } .bad { color: var(--bad); } .warn { color: var(--warn); }
 
 /* HUD */
-#hud { padding-block: 10px 8px; border-bottom: 1px solid var(--line); background: linear-gradient(180deg, #151b21, var(--bg)); }
+#hud { padding-block: 10px 8px; border-bottom: 1px solid var(--line); background: linear-gradient(180deg, #151b21, var(--bg)); position: relative; overflow: hidden; }
+#hud > :not(#hudfx) { position: relative; z-index: 1; }
+#hudfx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; opacity: .38; }
 .hrow { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 #coName { font-family: var(--display); font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--steel);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
@@ -203,7 +205,7 @@ svg.nw { width: 100%; height: 90px; display: block; }
 .help h3 { font-family: var(--display); font-size: 15px; color: var(--hot); margin: 6px 0 0; letter-spacing: .03em; }
 .help p { margin: 0; line-height: 1.5; color: var(--fg); font-size: 14px; }
 /* Competition */
-.lb { display: grid; grid-template-columns: 24px 10px minmax(0,1fr) auto; gap: 2px 8px; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.lb { display: grid; grid-template-columns: 24px 28px minmax(0,1fr) auto; gap: 2px 8px; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
 .lb .dot { width: 10px; height: 10px; border-radius: 3px; }
 .lb .rk { font-family: var(--num); font-size: 16px; font-weight: 700; color: var(--muted); }
 .lb.me { color: var(--hot); font-weight: 600; }
@@ -238,11 +240,32 @@ svg.map text { font-family: var(--body); }
 .task { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; padding: 3px 0; }
 .task.done { color: var(--good); }
 .task b { font-family: var(--num); font-weight: 600; white-space: nowrap; }
+/* Visuals */
+canvas.scene { width: 100%; height: 118px; display: block; border-radius: 6px; background: var(--panel2); }
+canvas.pscene { width: 100%; height: 64px; display: block; border-radius: 6px; }
+canvas.mscene { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 210px; pointer-events: none; opacity: .85; }
+#menu .inner.scenic { padding-bottom: max(200px, env(safe-area-inset-bottom, 0px)); }
+#menu .inner { position: relative; z-index: 1; }
+#fx { position: fixed; inset: 0; pointer-events: none; z-index: 28; overflow: hidden; }
+.fxtruck { position: absolute; left: 0; bottom: calc(132px + env(safe-area-inset-bottom, 0px)); width: 120px; height: 40px; animation: drive 1.5s cubic-bezier(.45,.05,.55,.95) forwards; }
+@keyframes drive { from { transform: translateX(-130px); } to { transform: translateX(calc(100vw + 10px)); } }
+.fxmoney { position: absolute; font-family: var(--num); font-weight: 700; font-size: 22px; color: var(--good); text-shadow: 0 2px 8px rgba(0,0,0,.6); animation: rise 1.4s ease-out forwards; white-space: nowrap; }
+.fxmoney.bad { color: var(--bad); }
+@keyframes rise { from { transform: translateY(0); opacity: 0; } 15% { opacity: 1; } to { transform: translateY(-46px); opacity: 0; } }
+.fxburst { position: absolute; inset: 0; width: 100%; height: 100%; }
+#cash.shake { animation: shake .45s; }
+@keyframes shake { 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
+svg.ava { width: 28px; height: 28px; display: block; }
+.mono { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; font-family: var(--display); font-size: 12px; color: #fff; flex: none; letter-spacing: .02em; }
+.art { display: grid; place-items: center; height: 84px; margin-top: -4px; }
+.art svg { height: 100%; width: auto; }
+@media (prefers-reduced-motion: reduce) { .fxtruck, .fxmoney, #cash.shake { animation: none; } }
 @media (prefers-reduced-motion: reduce) { #toast div { animation: none; } .tape div { animation: none; } }
 </style>
 
 <div id="app">
   <header id="hud" class="gut">
+    <canvas id="hudfx" data-scene="hud" aria-hidden="true"></canvas>
     <div class="hrow"><div class="hleft"><button id="menuBtn" data-act="pause" aria-label="Menü"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><button id="shopBtn" class="menuBtn2" data-act="shop" aria-label="Mağaza"><svg viewBox="0 0 24 24"><path d="M4 9h16l-1.5 10h-13z"/><path d="M8 9V7a4 4 0 0 1 8 0v2"/></svg></button><span id="coName"></span></div><span id="dayChip"></span></div>
     <div class="hrow" style="align-items:flex-end">
       <div id="cash" class="num"></div>
@@ -259,6 +282,7 @@ svg.map text { font-family: var(--body); }
 </div>
 <div id="menu" hidden></div>
 <div id="toast" aria-live="polite"></div>
+<div id="fx" aria-hidden="true"></div>
 <div id="modal" hidden></div>
 
 <script>
@@ -549,7 +573,7 @@ const nf2 = new Intl.NumberFormat("tr-TR", { minimumFractionDigits: 1, maximumFr
 function tl(x) { const a = Math.abs(x); if (a >= 1e9) return nf2.format(x / 1e9) + " Mr ₺"; if (a >= 1e7) return nf2.format(x / 1e6) + " Mn ₺"; return nf0.format(Math.round(x)) + " ₺"; }
 const ton = x => nf1.format(x) + " t";
 const tlShort = x => Math.abs(x) >= 1e6 ? nf2.format(x / 1e6) + " Mn" : Math.abs(x) >= 1e4 ? nf0.format(x / 1e3) + " bin" : nf0.format(x) + " ₺";
-const pct = x => (x >= 0 ? "+" : "") + nf1.format(x * 100) + "%";
+const pct = x => Math.abs(x) < 0.0005 ? "0%" : (x >= 0 ? "+" : "") + nf1.format(x * 100) + "%";
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const r10 = x => Math.round(x / 10) * 10;
 const r2 = x => Math.round(x * 100) / 100;
@@ -782,7 +806,7 @@ function deliverStock(o) {
   if (o.proc && hasMachine(o.proc, P[o.prod].cat)) S.stats.scrap += o.qty * 0.02;
   if (Math.random() < 0.012 + (o.proc && !hasMachine(o.proc, P[o.prod].cat) ? 0.03 : 0))
     S.suits.push({ id: S.nextId++, kind: "quality", cust: o.cust, claim: Math.round(orderValue(o) * rnd(0.1, 0.25)), start: S.day + rint(3, 10), stage: "pending" });
-  finishDeal(o, profit, "stock"); beep("cash");
+  finishDeal(o, profit, "stock"); beep("cash"); fxTruck(P[o.prod].cat); fxMoney((profit >= 0 ? "+" : "") + tlShort(profit), profit < 0);
   toast(`${o.cust}: ${ton(o.qty)} ${C[src.l.city].name} tesisinden ${C[o.city].name}'a gitti. Kâr ${tl(profit)}${o.pay ? " (" + o.pay + " gün vadede)" : ""}.`);
   save(); render();
 }
@@ -797,7 +821,7 @@ function deliverBroker(o) {
   } else S.cash += profit;
   S.brokerToday++;
   removeOrder(o.id);
-  finishDeal(o, profit, "broker"); beep("cash");
+  finishDeal(o, profit, "broker"); beep("cash"); fxTruck(P[o.prod].cat); fxMoney((profit >= 0 ? "+" : "") + tlShort(profit), profit < 0);
   toast(`Aracılık: ${o.cust} siparişi fabrikadan sevk edildi. ${profit >= 0 ? "Kâr" : "Zarar"} ${tl(profit)}.`, profit < 0);
   save(); render();
 }
@@ -898,7 +922,7 @@ function checkLevel() {
   if (l > S.lastLevel) {
     S.lastLevel = l;
     S.news.unshift({ day: S.day, text: `Yeni unvan: ${LEVELS[l].name}. Açılanlar: ${LEVELS[l].perk}.`, big: true });
-    beep("win");
+    beep("win"); fxBurst("confetti");
     if (l === LEVELS.length - 1 && !S.seen.baron) { S.seen.baron = true; addRecord("Demir Baronu"); showModal("baron"); } else showModal("level");
   }
 }
@@ -1020,7 +1044,7 @@ function resolveTenders() {
       S.active.push({ id: t.id, cust: t.proj, city: t.city, prod: t.prod, qty: t.qty, pay: 30, risk: "A", proc: null, loyal: false, rival: null, neg: true,
         price: r10(t.base * (1 + t.bid)), deadline: S.day + t.deliver, expires: S.day + 99, tender: true, deposit: t.deposit });
       S.news.unshift({ day: S.day, text: `İhaleyi kazandın: ${t.proj}, ${ton(t.qty)} ${P[t.prod].name}. ${t.deliver} gün içinde teslim et.`, big: true });
-      toast(`İhale kazanıldı: ${t.proj}. Aktif siparişlerine eklendi.`); beep("win");
+      toast(`İhale kazanıldı: ${t.proj}. Aktif siparişlerine eklendi.`); beep("win"); fxBurst("confetti");
     } else if (w) {
       if (t.bid !== null) { S.cash += t.deposit; toast(`${t.proj} ihalesini ${w.r.name} %${nf1.format(w.m * 100)} ile kazandı. Teminatın iade edildi.`, true); }
       w.r.tons += t.qty; w.r.nw += tenderValue(t, w.m) * 0.04;
@@ -1358,6 +1382,7 @@ function endDay() {
   if (lost) toast(`Karşılıksız çek: −${tl(lost)}`, true);
   if (failed) toast(`${failed} sipariş gecikti ve iptal oldu`, true);
   checkLevel(); checkAch(); genDaily(); beep(lost ? "bad" : "day");
+  if (lost) fxShake(); else if (wi.rev > 0) fxMoney("+" + tlShort(wi.rev));
   save(); render();
   if (monthMsg && SET.monthModal) showModal("month", monthMsg);
   if (S.cards.length) showModal("card");
@@ -1485,7 +1510,7 @@ const ACT = {
     newGame((UI.newName || "").trim().slice(0, 28) || "Demir Ticaret", UI.newHome || "ist", UI.newDiff || "normal", UI.newScen || "free");
     S.seen.intro = true; UI.tab = "orders"; UI.newCity = S.home; UI.open = null; save(); hideMenu(); render();
     toast(`${S.name} kuruldu. İlk teklife Aracılık'la başla.`); },
-  toggleSet: k => { SET[k] = !SET[k]; saveSet(); showMenu("settings"); },
+  toggleSet: k => { SET[k] = !SET[k]; saveSet(); showMenu("settings"); if (k === "anim") visMount(); },
   wipe: () => { if (!UI.confirmWipe) { UI.confirmWipe = true; return showMenu("settings"); }
     unpersist(KEY); unpersist(KEY_REC); UI.confirmWipe = false; newGame(); showMenu("main"); toast("Tüm veriler silindi."); },
 };
@@ -1564,7 +1589,7 @@ function spark(hist) {
 function renderHud() {
   document.getElementById("coName").textContent = S.name;
   document.getElementById("dayChip").innerHTML = `<b>${dateStr()}</b> · Yıl ${yearOf()} · ${season().name}`;
-  const c = document.getElementById("cash"); c.textContent = tl(S.cash); c.classList.toggle("neg", S.cash < 0);
+  setCash(S.cash);
   document.getElementById("titleChip").textContent = LEVELS[level()].name + (clubOn() ? " ★" : "");
   document.getElementById("hudStats").innerHTML =
     `<span>Net değer <b>${tl(netWorth())}</b></span><span>Stok <b>${nf1.format(stockTotal())}/${nf0.format(capTotal())} t</b></span><span>İtibar <b class="${S.rep < 35 ? "bad" : ""}">${Math.round(S.rep)}</b></span><span>Sıra <b>${myRank()}/${aliveCount()}</b></span>` +
@@ -1590,7 +1615,7 @@ function orderCard(o, active) {
   else if (active) stockBtn = `<button class="btn" data-act="tab" data-v="market">Stok al<small>${sourceBlock(o) || ton(have) + " / " + ton(o.qty) + " var"}</small></button>`;
   else stockBtn = `<button class="btn" data-act="accept" data-v="${o.id}">Kabul et<small>${left} gün içinde teslim</small></button>`;
   return `<div class="card">
-    <div class="ohead"><div class="ocust">${esc(o.cust)}<small>${C[o.city].name}${nearest !== null ? ` · en yakın tesisine ${nearest ? nf0.format(nearest) + " km" : "aynı şehir"}` : ""}</small></div>
+    <div class="ohead">${mono(o.cust)}<div class="ocust" style="flex:1">${esc(o.cust)}<small>${C[o.city].name}${nearest !== null ? ` · en yakın tesisine ${nearest ? nf0.format(nearest) + " km" : "aynı şehir"}` : ""}</small></div>
       <div class="oamt"><span class="num">${tl(orderValue(o))}</span><small class="num">${nf0.format(o.price)} ₺/t · piyasa ${pct(over)}</small></div></div>
     <div class="oprod"><b>${ton(o.qty)}</b> ${p.name} <span class="muted">· ${p.spec}</span></div>
     <div class="chips">${o.tender ? `<span class="chip hot">İhale</span>` : ""}${o.rival ? `<span class="chip b">Rakip: ${esc((rivalById(o.rival) || {}).name || "")}</span>` : ""}${o.black ? `<span class="chip b">Daha önce ödemedi</span>` : ""}${payChip(o)}${riskChip(o)}${o.loyal ? `<span class="chip g">Sadık müşteri</span>` : ""}
@@ -1661,6 +1686,7 @@ function tradePanel(p) {
     const sub = b || (mode === "imp" ? `peşinat ${tl(c * 0.3 * (UI.hedge ? 1.015 : 1))} · 20 gün` : tl(c) + (s.days ? " · " + s.days + " gün" : " · hemen"));
     return `<button class="btn ${mode === "spot" ? "hot" : "st"}" data-act="buy" data-v="${p.id}:${mode}" ${b || q <= 0 ? "disabled" : ""}>${s.name}${s.disc ? " −%" + Math.round(s.disc * 100) : ""}<small>${sub}</small></button>`; };
   return `<div class="trade">
+    <canvas class="pscene" data-scene="prod" data-id="${p.id}" data-anim="0" role="img" aria-label="${esc(p.name)} yığını"></canvas>
     <div class="line2"><span>30 gün en düşük <b>${nf0.format(lo)}</b></span><span>en yüksek <b>${nf0.format(hi)}</b></span></div>
     ${S.locs.length > 1 ? `<div class="filter">${S.locs.map(x => `<button aria-pressed="${x.id === l.id}" data-act="pickLoc" data-v="${x.id}">${C[x.city].name} · ${LOC_TYPES[x.type].name} (${ton(sq(x, p.id))})</button>`).join("")}</div>` : ""}
     <div class="qty">${[0.5, 1, 5, 10, 20, 50, 100].map(v => `<button aria-pressed="${q === v}" data-act="qty" data-v="${v}">${nf1.format(v)}</button>`).join("")}
@@ -1679,6 +1705,7 @@ function locCard(l) {
   let h = `<div class="card">
     <div class="item"><div><b>${locName(l)}</b><div class="muted">${LOC_TYPES[l.type].name} · ${t.name}${C[l.city].port ? " · liman şehri" : ""}</div></div>
       <span class="chip ${l.type === "shop" ? "hot" : "st"}">${LOC_TYPES[l.type].name}</span></div>
+    <canvas class="scene" data-scene="loc" data-id="${l.id}" role="img" aria-label="${esc(locName(l))}: ${t.name}, ${nf1.format(used)} t stok"></canvas>
     <div class="line2"><span>Doluluk${inc ? ` (+${ton(inc)} yolda)` : ""}</span><b>${nf1.format(used)} / ${cap} t</b></div>
     <div class="bar"><i class="${(used + inc) / cap > 0.9 ? "full" : ""}" style="width:${Math.min(100, (used + inc) / cap * 100)}%"></i></div>
     <div class="line2"><span>Yükleme bugün</span><b>${ton(l.used)} / ${ton(locHandle(l))}</b></div>
@@ -1713,6 +1740,7 @@ function renderStock() {
   let h = `<section class="sec"><div class="sechead"><h2>Harita</h2><span class="muted">şehre dokun · fiyat farkları</span></div><div class="card">${mapSvg()}${cityInfo(UI.newCity || S.home)}
     <div class="legend"><span><i style="background:var(--hot)"></i>Senin tesisin</span><span><i style="background:var(--muted)"></i>Şehir</span><span>Küçük renkli noktalar: rakip şubeleri</span></div></div></section>`;
   h += `<section class="sec"><div class="sechead"><h2>Tesisler</h2><span class="muted">${S.locs.length}/${maxLocs()} · ${nf1.format(stockTotal())}/${nf0.format(capTotal())} t</span></div>`;
+  if (!S.locs.length) h += `<canvas class="scene" data-scene="empty" data-anim="0" role="img" aria-label="Boş arsa: kiralık depo"></canvas>`;
   if (!S.locs.length) h += `<div class="hint">Henüz tesisin yok. <b>Depo</b> ucuzdur ve stok tutar. <b>Dükkan</b> pahalıdır ama her gün kapıdan perakende müşteri gelir ve stoğunu %8–16 kârla satar.</div>`;
   h += S.locs.map(locCard).join("") + `</section>`;
   if (S.incoming.length) h += `<section class="sec"><h2>Yoldaki sevkiyatlar</h2><div class="card">${S.incoming.map(i => `<div class="line2"><span>${ton(i.q)} ${P[i.pid].name} → ${C[locById(i.loc).city].name} · ${SUPPLY[i.mode].name}</span><b>Gün ${i.arrive}</b></div>`).join("")}</div></section>`;
@@ -1742,7 +1770,7 @@ function eventBanner() {
 function lbRows(rows) {
   let rank = 0;
   return rows.map(r => { if (r.alive) rank++;
-    return `<div class="lb ${r.me ? "me" : ""} ${r.alive ? "" : "dead"}"><span class="rk">${r.alive ? rank : "—"}</span><span class="dot" style="background:${r.color}"></span>
+    return `<div class="lb ${r.me ? "me" : ""} ${r.alive ? "" : "dead"}"><span class="rk">${r.alive ? rank : "—"}</span>${avatar(r.me ? S.name : r.owner || r.name, r.color, r.me)}
       <div style="min-width:0">${esc(r.name)}<small>${r.alive ? `${r.owner ? esc(r.owner) + " · " : ""}${r.style} · ${r.cities} şehir · 30 günde ${nf0.format(r.t30)} t` : r.acquired ? "Senin tarafından satın alındı" : "Konkordato"}</small></div><span class="v">${r.alive ? tl(r.nw) : "—"}</span></div>`; }).join("");
 }
 function renderRival() {
@@ -1783,7 +1811,8 @@ function renderRival() {
 }
 // ---------- main menu ----------
 const hasGame = () => S && S.seen.intro;
-function showMenu(view) { UI.menu = view; const m = document.getElementById("menu"); m.hidden = false; m.innerHTML = `<div class="inner gut">${menuHtml(view)}</div>`; m.scrollTop = 0;
+function showMenu(view) { UI.menu = view; const m = document.getElementById("menu"); m.hidden = false;
+  m.innerHTML = (view === "main" || view === "new" ? `<canvas class="mscene" data-scene="menu" aria-hidden="true"></canvas>` : "") + `<div class="inner gut ${view === "main" || view === "new" ? "scenic" : ""}">${menuHtml(view)}</div>`; m.scrollTop = 0; visMount();
   const f = m.querySelector(".mbtn, input"); if (f && view !== "new") f.focus(); }
 function hideMenu() { UI.menu = null; const m = document.getElementById("menu"); m.hidden = true; m.innerHTML = ""; }
 // ---------- in-app purchases ----------
@@ -1853,7 +1882,7 @@ function grant(k, t) {
   if (it.type === "n") { ENT.own[k] = true; grantOnce(); if (k.startsWith("skin")) ENT.skin = k; if (k === "bundle") ENT.skin = ENT.skin || "skingold"; applySkin(); }
   else if (it.type === "s") ENT.clubUntil = Math.max(ENT.clubUntil, (t && t.expires) || Date.now() + it.days * 864e5);
   else if (S) applyConsumable(k);
-  saveEnt(); if (S) save(); beep("win"); toast(`${it.name} eklendi.`); if (S) render(); if (UI.menu === "store") showMenu("store");
+  saveEnt(); if (S) save(); beep("win"); fxBurst("coins"); toast(`${it.name} eklendi.`); if (S) render(); if (UI.menu === "store") showMenu("store");
 }
 function applyConsumable(k) {
   const it = IAP[k];
@@ -1946,6 +1975,7 @@ function menuHtml(v) {
   if (v === "settings") return `${back("Ayarlar")}<div class="card">
     <div class="toggle"><div><b>Ay sonu raporu</b><div class="muted">Her ay sonunda gider ve vergi özetini göster</div></div><button aria-pressed="${SET.monthModal}" data-act="toggleSet" data-v="monthModal">${SET.monthModal ? "Açık" : "Kapalı"}</button></div>
     <div class="toggle"><div><b>Gün sonu bildirimi</b><div class="muted">Her gün sonunda özet baloncuğu göster</div></div><button aria-pressed="${SET.toasts}" data-act="toggleSet" data-v="toasts">${SET.toasts ? "Açık" : "Kapalı"}</button></div>
+    <div class="toggle"><div><b>Animasyonlar</b><div class="muted">Hareketli tesis sahneleri, kamyonlar, efektler. Kapatınca pil tasarrufu olur</div></div><button aria-pressed="${SET.anim}" data-act="toggleSet" data-v="anim">${SET.anim ? "Açık" : "Kapalı"}</button></div>
     <div class="toggle"><div><b>Ses</b><div class="muted">Satış, ihale ve uyarı sesleri</div></div><button aria-pressed="${SET.sound}" data-act="toggleSet" data-v="sound">${SET.sound ? "Açık" : "Kapalı"}</button></div>
     <div class="toggle"><div><b>Titreşim</b><div class="muted">Destekleyen telefonlarda</div></div><button aria-pressed="${SET.vibe}" data-act="toggleSet" data-v="vibe">${SET.vibe ? "Açık" : "Kapalı"}</button></div>
     <div class="toggle"><div><b>Tüm verileri sil</b><div class="muted">Kayıtlı şirketi ve rekorları siler</div></div><button data-act="wipe" style="${UI.confirmWipe ? "background:var(--bad);color:#fff" : ""}">${UI.confirmWipe ? "Emin misin?" : "Sil"}</button></div></div>
@@ -2054,12 +2084,296 @@ function renderCompany() {
   h += `<button class="btn ghost" style="align-self:flex-start" data-act="reset">Yeni oyun başlat</button>`;
   return h;
 }
+// =====================================================================
+// VISUALS: canvas scenes (facilities, menu, season particles, products), screen effects, avatars, modal art.
+// Scenes draw a still frame at once; animation runs only for canvases on screen, at most 30 fps, and stops when
+// "Animasyonlar" is off, the page is hidden or the viewer prefers reduced motion.
+// =====================================================================
+const VIS = { live: new Set(), raf: 0, last: 0, T: null, io: null, cashShown: null, cashAnim: 0, lastTruck: 0 };
+function hash(str) { let h = 2166136261; for (const ch of String(str)) { h ^= ch.codePointAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+function rng(seed) { let s = seed >>> 0 || 1; return () => (s = (Math.imul(s, 1664525) + 1013904223) >>> 0) / 4294967296; }
+function tokens() { const st = getComputedStyle(document.documentElement), g = n => st.getPropertyValue(n).trim();
+  return { bg: g("--bg"), panel: g("--panel"), panel2: g("--panel2"), line: g("--line"), fg: g("--fg"), muted: g("--muted"), hot: g("--hot"), steel: g("--steel"), good: g("--good"), warn: g("--warn"), bad: g("--bad") }; }
+const SKY = { "İlkbahar": ["#1d2c33", "#2d4540"], "Yaz": ["#242833", "#4a3e2a"], "Sonbahar": ["#26222a", "#4a2f24"], "Kış": ["#1b2430", "#36465a"] };
+function prep(cv) {
+  const r = cv.getBoundingClientRect(), d = Math.min(2, window.devicePixelRatio || 1);
+  const w = Math.max(1, Math.round(r.width)), h = Math.max(1, Math.round(r.height));
+  if (cv.width !== Math.round(w * d) || cv.height !== Math.round(h * d)) { cv.width = Math.round(w * d); cv.height = Math.round(h * d); }
+  const g = cv.getContext("2d"); g.setTransform(d, 0, 0, d, 0, 0); g.clearRect(0, 0, w, h); return [g, w, h];
+}
+const seasonName = () => (S && S.day ? season().name : "İlkbahar");
+function sky(g, w, h, base, seed) {
+  const [a, b] = SKY[seasonName()] || SKY["İlkbahar"];
+  const gr = g.createLinearGradient(0, 0, 0, base); gr.addColorStop(0, a); gr.addColorStop(1, b);
+  g.fillStyle = gr; g.fillRect(0, 0, w, base);
+  const r = rng(seed); g.fillStyle = "rgba(10,14,18,.45)";
+  for (let x = -10; x < w; x += 8 + r() * 18) { const bh = 8 + r() * 22; g.fillRect(x, base - bh, 6 + r() * 14, bh); if (r() < 0.25) g.fillRect(x + 3, base - bh - 10, 3, 10); }
+  g.fillStyle = "#1a2026"; g.fillRect(0, base, w, h - base);
+  g.fillStyle = "rgba(255,255,255,.05)"; g.fillRect(0, base, w, 1);
+}
+// One stack of goods, ~16px wide at scale 1, standing on y = base
+function unit(g, cat, x, base, sc) {
+  const s = sc || 1;
+  if (cat === "sac" || cat === "ozel") {
+    const c1 = cat === "ozel" ? "#d5dee6" : "#8fa3b5", c2 = cat === "ozel" ? "#b4c0cb" : "#71859a";
+    for (let i = 0; i < 4; i++) { g.fillStyle = i % 2 ? c1 : c2; g.fillRect(x, base - (i + 1) * 3 * s, 16 * s, 2.6 * s); }
+    g.fillStyle = "rgba(255,255,255,.25)"; g.fillRect(x, base - 12 * s, 16 * s, 0.8 * s);
+    if (cat === "ozel") { g.strokeStyle = "rgba(255,255,255,.6)"; g.lineWidth = 1; g.beginPath(); g.moveTo(x + 4 * s, base - 1 * s); g.lineTo(x + 8 * s, base - 11 * s); g.stroke(); }
+  } else if (cat === "profil") {
+    for (let r0 = 0; r0 < 2; r0++) for (let c = 0; c < 3; c++) { const px = x + c * 5.4 * s, py = base - (r0 + 1) * 5.4 * s;
+      g.fillStyle = "#c98a2b"; g.fillRect(px, py, 5 * s, 5 * s); g.fillStyle = "#3a2a12"; g.fillRect(px + 1.4 * s, py + 1.4 * s, 2.2 * s, 2.2 * s); }
+  } else if (cat === "boru" || cat === "dolu") {
+    const rr = 2.8 * s; let row = 0;
+    for (const n of [3, 2, 1]) { for (let i = 0; i < n; i++) { const cx = x + rr + i * rr * 2 + row * rr, cy = base - rr - row * rr * 1.75;
+      g.beginPath(); g.arc(cx, cy, rr, 0, 7); g.fillStyle = cat === "boru" ? "#3c9a6c" : "#9a80cf"; g.fill();
+      g.beginPath(); g.arc(cx, cy, rr * (cat === "boru" ? 0.55 : 0.3), 0, 7); g.fillStyle = cat === "boru" ? "#15261e" : "rgba(255,255,255,.35)"; g.fill(); }
+      row++; }
+  } else if (cat === "insaat") {
+    g.strokeStyle = "#a85b34"; g.lineWidth = 1.2 * s;
+    for (let i = 0; i < 6; i++) { g.beginPath(); g.moveTo(x, base - 1.5 * s - i * 1.6 * s); g.lineTo(x + 18 * s, base - 1 * s - i * 1.6 * s); g.stroke(); }
+    g.strokeStyle = VIS.T.hot; g.lineWidth = 1.4 * s;
+    for (const tx of [4, 13]) { g.beginPath(); g.moveTo(x + tx * s, base); g.lineTo(x + tx * s, base - 10.5 * s); g.stroke(); }
+  }
+}
+function forklift(g, x, base, dir, carry, cat) {
+  g.save(); g.translate(x, base); g.scale(dir, 1);
+  g.fillStyle = "#e3b23c"; g.fillRect(-9, -9, 13, 6); g.fillRect(-7, -15, 2, 6); g.fillRect(-1, -15, 2, 6); g.fillRect(-7, -16, 8, 1.6);
+  g.fillStyle = "#59616a"; g.fillRect(5, -17, 1.6, 15); g.fillRect(5, -3, 7, 1.4);
+  if (carry) { g.save(); g.translate(5.5, -4); unit(g, cat, 0, 0, 0.45); g.restore(); }
+  g.fillStyle = "#111518"; g.beginPath(); g.arc(-6, -2, 2.4, 0, 7); g.arc(2, -2, 2.4, 0, 7); g.fill();
+  g.restore();
+}
+function truck(g, x, base, dir, cat, sc) {
+  const s = sc || 1; g.save(); g.translate(x, base); g.scale(dir * s, s);
+  g.fillStyle = "#2f5c82"; g.fillRect(12, -15, 11, 12); g.fillStyle = "#9fd0ff"; g.fillRect(16, -13, 6, 4);
+  g.fillStyle = VIS.T.hot; g.fillRect(12, -6, 11, 1.6);
+  g.fillStyle = "#3b444c"; g.fillRect(-14, -5, 27, 2.4);
+  if (cat) unit(g, cat, -12, -5, 1.2);
+  g.fillStyle = "#111518"; g.beginPath(); g.arc(-8, -2, 2.8, 0, 7); g.arc(4, -2, 2.8, 0, 7); g.arc(18, -2, 2.8, 0, 7); g.fill();
+  g.restore();
+}
+function person(g, x, base, color, t, seed) {
+  const bob = Math.sin(t * 8 + seed) * 0.8;
+  g.fillStyle = color; g.fillRect(x - 2.5, base - 11 + bob, 5, 7);
+  g.fillStyle = "#e0b48f"; g.beginPath(); g.arc(x, base - 13.5 + bob, 2.4, 0, 7); g.fill();
+  g.strokeStyle = "#2a2f35"; g.lineWidth = 1.4; g.beginPath();
+  const st = Math.sin(t * 8 + seed) * 2; g.moveTo(x - 1, base - 4 + bob); g.lineTo(x - 1 - st, base); g.moveTo(x + 1, base - 4 + bob); g.lineTo(x + 1 + st, base); g.stroke();
+}
+function shed(g, x, base, bw, bh, roof, doors) {
+  g.fillStyle = "#4a5763"; g.fillRect(x, base - bh, bw, bh);
+  g.fillStyle = "rgba(255,255,255,.06)"; for (let i = x + 3; i < x + bw; i += 4) g.fillRect(i, base - bh, 1, bh);
+  g.fillStyle = "#2d3741"; g.beginPath();
+  if (roof === "arch") { g.moveTo(x - 3, base - bh); g.quadraticCurveTo(x + bw / 2, base - bh - bh * 0.55, x + bw + 3, base - bh); }
+  else { g.moveTo(x - 3, base - bh); g.lineTo(x + bw / 2, base - bh - bh * 0.28); g.lineTo(x + bw + 3, base - bh); }
+  g.closePath(); g.fill();
+  const dw = Math.min(26, bw / (doors + 1)), gap = (bw - dw * doors) / (doors + 1);
+  for (let i = 0; i < doors; i++) { const dx = x + gap + i * (dw + gap), dh = bh * 0.62;
+    g.fillStyle = "#222a31"; g.fillRect(dx, base - dh, dw, dh); g.fillStyle = "rgba(255,255,255,.07)"; for (let y = base - dh + 2; y < base; y += 3) g.fillRect(dx, y, dw, 1); }
+  g.fillStyle = VIS.T.hot; g.fillRect(x + 4, base - bh + 4, Math.min(30, bw * 0.3), 3);
+}
+function shop(g, x, base, bw, bh, name, tier) {
+  g.fillStyle = "#5a4436"; g.fillRect(x, base - bh, bw, bh);
+  g.fillStyle = "rgba(0,0,0,.18)"; for (let y = base - bh + 4; y < base; y += 5) g.fillRect(x, y, bw, 1);
+  g.fillStyle = "#1f262c"; g.fillRect(x - 2, base - bh - 13, bw + 4, 12);
+  g.fillStyle = VIS.T.hot; g.font = "700 8px 'Chakra Petch', sans-serif"; g.textBaseline = "middle"; g.textAlign = "center";
+  g.fillText((tier >= 2 ? "YAPI MARKET · " : "") + String(name).toLocaleUpperCase("tr-TR").slice(0, Math.floor(bw / 5.2)), x + bw / 2, base - bh - 7, bw);
+  for (let i = 0; i < Math.ceil(bw / 8); i++) { g.fillStyle = i % 2 ? VIS.T.fg : VIS.T.hot; g.beginPath(); g.moveTo(x - 3 + i * 8, base - bh); g.lineTo(x + 5 + i * 8, base - bh); g.lineTo(x + 5 + i * 8, base - bh + 6); g.lineTo(x - 3 + i * 8, base - bh + 6); g.fill(); }
+  g.fillStyle = "rgba(255,217,154,.28)"; g.fillRect(x + 5, base - bh + 10, bw * 0.55, bh - 14);
+  g.fillStyle = "#2a2018"; g.fillRect(x + bw * 0.7, base - bh * 0.62, bw * 0.2, bh * 0.62);
+}
+// ---------- scenes ----------
+function drawLoc(cv, t) {
+  const l = S && locById(+cv.dataset.id); if (!l) return;
+  const [g, w, h] = prep(cv), base = h - 14, tier = l.tier, sd = hash(l.city + l.id);
+  sky(g, w, h, base, sd);
+  let yardX, yardW, bx = 10;
+  if (l.type === "shop") {
+    const bw = [74, 100, 130][tier], bh = [38, 46, 56][tier];
+    shop(g, bx, base, bw, bh, S.name, tier); yardX = bx + bw + 10; yardW = w - yardX - 8;
+    const walk = Math.min(4, Math.max(1, Math.round(tierOf(l).walk / 3 + l.clerks)));
+    if (!evOn("bayram")) for (let i = 0; i < walk; i++) { const sp = 0.06 + (i % 3) * 0.02, ph = ((t * sp + i / walk) % 1), px = w - 6 - ph * (w - bx - bw * 0.8);
+      if (px > bx + bw * 0.75) person(g, px, base, ["#3f6f9a", "#7a4f9a", "#4c8a5c", "#9a6a3f"][(i + sd) % 4], t, i); }
+  } else {
+    const bw = [56, 84, 92, 130, 120][tier], bh = [32, 42, 44, 56, 60][tier];
+    shed(g, bx, base, bw, bh, tier >= 3 ? "arch" : "gable", tier >= 3 ? 3 : tier >= 1 ? 2 : 1);
+    yardX = bx + bw + 8; yardW = w - yardX - 8;
+    if (tier === 4) { const sx = w * 0.74; yardW = sx - yardX - 6;
+      g.fillStyle = "#17344d"; g.fillRect(sx, base - 4, w - sx, h - base + 4);
+      g.strokeStyle = "rgba(160,210,255,.25)"; g.lineWidth = 1; for (let i = 0; i < 4; i++) { g.beginPath(); const yy = base + 2 + i * 3; for (let xx = sx; xx < w; xx += 6) g.lineTo(xx, yy + Math.sin(xx / 6 + t * 2 + i) * 0.8); g.stroke(); }
+      g.fillStyle = "#3a2a2a"; g.beginPath(); g.moveTo(sx + 14, base - 2); g.lineTo(w - 4, base - 2); g.lineTo(w - 10, base + 6); g.lineTo(sx + 20, base + 6); g.fill();
+      g.fillStyle = "#c9d3dc"; g.fillRect(w - 26, base - 12, 10, 10);
+      g.strokeStyle = "#e3b23c"; g.lineWidth = 2; g.beginPath(); g.moveTo(sx - 4, base); g.lineTo(sx - 4, base - 62); g.lineTo(w - 6, base - 62); g.moveTo(sx + 12, base); g.lineTo(sx + 12, base - 62); g.stroke();
+      const tx = sx + 6 + (0.5 - 0.5 * Math.cos(t * 0.5)) * (w - sx - 22); g.fillStyle = "#e3b23c"; g.fillRect(tx - 4, base - 64, 9, 5);
+      g.strokeStyle = "#9aa3ab"; g.lineWidth = 1; g.beginPath(); g.moveTo(tx, base - 59); g.lineTo(tx, base - 30); g.stroke(); unit(g, "sac", tx - 5, base - 26, 0.6); }
+    if (tier >= 2) { g.strokeStyle = "rgba(255,255,255,.14)"; g.lineWidth = 1; g.beginPath(); for (let x = yardX; x < yardX + yardW; x += 7) { g.moveTo(x, base); g.lineTo(x, base - 9); } g.moveTo(yardX, base - 7); g.lineTo(yardX + yardW, base - 7); g.stroke(); }
+  }
+  // stock: one stack per 1/14 of capacity, colored by product category
+  const cats = []; const per = Math.max(0.5, locCap(l) / 14);
+  for (const [id, s] of Object.entries(l.stock)) for (let k = 0; k < Math.ceil(s.q / per); k++) cats.push(P[id].cat);
+  const slots = Math.max(1, Math.floor(yardW / 21)), maxU = slots * 2;
+  cats.slice(0, maxU).forEach((c, i) => { const row = i < slots ? 0 : 1, col = row ? i - slots : i; unit(g, c, yardX + col * 21 + (row ? 6 : 0), base - (row ? 11 : 0), row ? 0.85 : 1); });
+  if (cats.length > maxU) { g.fillStyle = VIS.T.fg; g.font = "600 9px 'Saira Condensed', sans-serif"; g.textAlign = "right"; g.fillText(`+${cats.length - maxU}`, w - 4, base - 30); }
+  if (l.crane && yardW > 30) { const y0 = base - 50; g.strokeStyle = "#e3b23c"; g.lineWidth = 2; g.beginPath(); g.moveTo(yardX - 2, base); g.lineTo(yardX - 2, y0); g.lineTo(yardX + yardW, y0); g.lineTo(yardX + yardW, base); g.stroke();
+    const tx = yardX + 6 + (0.5 - 0.5 * Math.cos(t * 0.7 + sd)) * (yardW - 14); g.fillStyle = "#e3b23c"; g.fillRect(tx - 4, y0 - 2, 9, 5);
+    const hy = y0 + 10 + (0.5 - 0.5 * Math.cos(t * 1.4)) * 14; g.strokeStyle = "#9aa3ab"; g.lineWidth = 1; g.beginPath(); g.moveTo(tx, y0 + 3); g.lineTo(tx, hy); g.stroke(); unit(g, cats[0] || "profil", tx - 5, hy + 7, 0.6); }
+  for (let f = 0; f < Math.min(2, l.fork); f++) { const a = bx + 18, b = Math.max(a + 10, yardX + Math.min(yardW, 60) - 10), ph = 0.5 - 0.5 * Math.cos(t * 0.6 + f * 2.4 + sd), dir = Math.sin(t * 0.6 + f * 2.4 + sd) > 0 ? 1 : -1;
+    forklift(g, a + (b - a) * ph, base + 1, dir, dir < 0 && cats.length, cats[f] || "sac"); }
+  const fleetHere = S.locs[0] === l ? Math.min(3, S.vehicles.van + S.vehicles.truck + S.vehicles.tir) : 0;
+  for (let i = 0; i < fleetHere; i++) truck(g, l.type === "depot" && tier === 4 ? bx + 26 + i * 40 : w - 30 - i * 40, h - 1, -1, null, 0.8);
+  if (S.incoming.some(i => i.loc === l.id)) { const ph = (t * 0.12 + sd / 1e9) % 1; const tc = P[S.incoming.find(i => i.loc === l.id).pid].cat; truck(g, w + 30 - ph * (w * 0.55), base + 1, -1, tc, 1); }
+  if (l.used > 0) { const ph = (t * 0.15) % 1; truck(g, yardX - 30 + ph * (w - yardX + 60), base + 1, 1, cats[1] || cats[0] || "sac", 1); }
+}
+function drawMenu(cv, t) {
+  const [g, w, h] = prep(cv), base = h - 34;
+  const gr = g.createLinearGradient(0, 0, 0, base); gr.addColorStop(0, "rgba(16,20,24,0)"); gr.addColorStop(1, "rgba(255,123,44,.18)"); g.fillStyle = gr; g.fillRect(0, 0, w, base);
+  const r = rng(77); const chimneys = [];
+  g.fillStyle = "#151b21";
+  for (let x = -20; x < w + 20;) { const bw = 30 + r() * 60, bh = 30 + r() * 70; g.fillRect(x, base - bh, bw, bh);
+    if (r() < 0.5) { const cx = x + bw * (0.2 + r() * 0.6), ch = 30 + r() * 40; g.fillRect(cx, base - bh - ch, 7, ch); chimneys.push([cx + 3.5, base - bh - ch]); }
+    if (r() < 0.6) { g.fillStyle = "rgba(255,180,90,.25)"; for (let wy = base - bh + 8; wy < base - 8; wy += 10) for (let wx = x + 5; wx < x + bw - 8; wx += 10) if (r() < 0.4) g.fillRect(wx, wy, 4, 4); g.fillStyle = "#151b21"; }
+    x += bw + 4 + r() * 10; }
+  for (const [cx, cy] of chimneys) for (let k = 0; k < 6; k++) { const ph = (t * 0.12 + k / 6 + cx / 97) % 1; g.fillStyle = `rgba(180,190,200,${0.18 * (1 - ph)})`; g.beginPath(); g.arc(cx + ph * 18 + Math.sin(ph * 6 + k) * 3, cy - ph * 60, 3 + ph * 12, 0, 7); g.fill(); }
+  const gx = w * 0.68; g.strokeStyle = "#2b3640"; g.lineWidth = 4; g.beginPath(); g.moveTo(gx, base); g.lineTo(gx, base - 120); g.moveTo(gx + 60, base); g.lineTo(gx + 60, base - 120); g.moveTo(gx - 40, base - 118); g.lineTo(gx + 110, base - 118); g.stroke();
+  const tx = gx - 30 + (0.5 - 0.5 * Math.cos(t * 0.35)) * 130; g.fillStyle = "#3a4652"; g.fillRect(tx - 7, base - 122, 14, 8);
+  const hy = base - 100 + (0.5 - 0.5 * Math.cos(t * 0.7)) * 40; g.strokeStyle = "#3a4652"; g.lineWidth = 1.2; g.beginPath(); g.moveTo(tx, base - 114); g.lineTo(tx, hy); g.stroke(); g.fillStyle = "#3a4652"; g.fillRect(tx - 14, hy, 28, 5);
+  g.fillStyle = "#11161b"; g.fillRect(0, base, w, h - base);
+  g.fillStyle = "rgba(255,255,255,.12)"; for (let x = -(t * 40 % 30); x < w; x += 30) g.fillRect(x, base + 16, 14, 2);
+  const cats = ["sac", "profil", "boru", "insaat", "sac", "dolu"];
+  VIS.T = VIS.T || tokens();
+  for (let x = 12, i = 0; x < w * 0.5; x += 30, i++) unit(g, cats[i % cats.length], x, base, 1.3);
+  for (let i = 0; i < 3; i++) { const ph = (t * (0.05 + i * 0.015) + i * 0.37) % 1; truck(g, -60 + ph * (w + 120), base + 15, 1, cats[i], 1.9); }
+  { const ph = (t * 0.07 + 0.5) % 1; truck(g, w + 60 - ph * (w + 120), base + 32, -1, "boru", 1.9); }
+  const wx = w * 0.22, burst = (t * 0.8) % 1;
+  if (burst < 0.35) for (let k = 0; k < 10; k++) { const a = k * 0.63 + Math.floor(t * 0.8) * 1.7, d = burst * 70; g.fillStyle = `rgba(255,${180 + (k % 3) * 25},80,${1 - burst / 0.35})`; g.fillRect(wx + Math.cos(a) * d, base - 20 + Math.sin(a) * d * 0.6 + d * d * 0.004, 2, 2); }
+}
+function drawHud(cv, t) {
+  const [g, w, h] = prep(cv), sn = seasonName(), r = rng(9);
+  const kind = sn === "Kış" ? "snow" : sn === "Sonbahar" ? "leaf" : sn === "Yaz" ? "mote" : "pollen";
+  for (let i = 0; i < 26; i++) {
+    const sx = r(), sy = r(), sp = 0.3 + r() * 0.7, ph = r() * 6;
+    let x = (sx * w + Math.sin(t * 0.7 + ph) * 14 + (kind === "leaf" ? t * 14 * sp : 0)) % w, y;
+    if (kind === "mote") y = h - ((sy * h + t * 6 * sp) % h); else y = (sy * h + t * (kind === "snow" ? 14 : kind === "leaf" ? 10 : 5) * sp) % h;
+    if (kind === "snow") { g.fillStyle = "rgba(255,255,255,.7)"; g.beginPath(); g.arc(x, y, 1 + sp, 0, 7); g.fill(); }
+    else if (kind === "leaf") { g.save(); g.translate(x, y); g.rotate(t * sp + ph); g.fillStyle = ["#d9772f", "#b8551f", "#e3a13a"][i % 3]; g.beginPath(); g.ellipse(0, 0, 3.5, 1.6, 0, 0, 7); g.fill(); g.restore(); }
+    else if (kind === "pollen") { g.fillStyle = "rgba(200,240,170,.55)"; g.beginPath(); g.arc(x, y, 1.1, 0, 7); g.fill(); }
+    else { g.fillStyle = "rgba(255,210,140,.35)"; g.beginPath(); g.arc(x, y, 1.2, 0, 7); g.fill(); }
+  }
+}
+function drawProd(cv) {
+  const p = P[cv.dataset.id]; if (!p) return;
+  const [g, w, h] = prep(cv), base = h - 10;
+  const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, VIS.T.panel2); gr.addColorStop(1, VIS.T.panel); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  g.fillStyle = "rgba(255,255,255,.06)"; g.fillRect(0, base, w, 1);
+  const sc = 2.1, uw = 18 * sc; const n = Math.min(4, Math.floor((w - 20) / (uw + 6)));
+  for (let i = 0; i < n; i++) unit(g, p.cat, (w - n * (uw + 6)) / 2 + i * (uw + 6), base, sc);
+}
+function drawEmpty(cv) {
+  const [g, w, h] = prep(cv), base = h - 14; sky(g, w, h, base, 5);
+  g.strokeStyle = "rgba(255,255,255,.18)"; g.lineWidth = 1; g.beginPath(); for (let x = 20; x < w - 20; x += 8) { g.moveTo(x, base); g.lineTo(x, base - 10); } g.moveTo(20, base - 8); g.lineTo(w - 20, base - 8); g.stroke();
+  g.fillStyle = "#3b444c"; g.fillRect(w / 2 - 1, base - 40, 3, 40); g.fillStyle = VIS.T.hot; g.fillRect(w / 2 - 44, base - 58, 90, 22);
+  g.fillStyle = VIS.T.bg; g.font = "700 11px 'Chakra Petch', sans-serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("KİRALIK DEPO", w / 2 + 1, base - 47);
+}
+const DRAW = { loc: drawLoc, menu: drawMenu, hud: drawHud, prod: drawProd, empty: drawEmpty };
+function drawScene(cv, t) { try { VIS.T = VIS.T || tokens(); (DRAW[cv.dataset.scene] || (() => {}))(cv, t); } catch (e) {} }
+function visLoop(now) {
+  VIS.raf = 0;
+  if (!SET.anim || document.hidden) return;
+  if (now - VIS.last >= 33) { VIS.last = now; VIS.T = tokens(); const t = now / 1000;
+    for (const cv of VIS.live) { if (!cv.isConnected) { VIS.live.delete(cv); continue; } if (cv._vis !== false) drawScene(cv, t); } }
+  if (VIS.live.size) VIS.raf = requestAnimationFrame(visLoop);
+}
+function visMount() {
+  VIS.T = tokens();
+  if (!VIS.io && "IntersectionObserver" in window) VIS.io = new IntersectionObserver(es => es.forEach(e => { e.target._vis = e.isIntersecting; }));
+  document.querySelectorAll("canvas[data-scene]").forEach(cv => {
+    if (cv._mounted) return; cv._mounted = true; drawScene(cv, performance.now() / 1000);
+    if (cv.dataset.anim !== "0") { VIS.live.add(cv); if (VIS.io) VIS.io.observe(cv); }
+  });
+  if (SET.anim && !VIS.raf && VIS.live.size) VIS.raf = requestAnimationFrame(visLoop);
+}
+document.addEventListener("visibilitychange", () => { if (!document.hidden) visMount(); });
+window.addEventListener("resize", () => { document.querySelectorAll("canvas[data-scene]").forEach(cv => drawScene(cv, performance.now() / 1000)); });
+// ---------- screen effects ----------
+function fxTruck(cat) {
+  if (!SET.anim) return; const now = performance.now(); if (now - VIS.lastTruck < 350) return; VIS.lastTruck = now;
+  const fx = document.getElementById("fx"), el = document.createElement("canvas"); el.className = "fxtruck"; el.width = 240; el.height = 80; fx.appendChild(el);
+  const g = el.getContext("2d"); g.scale(2, 2); VIS.T = tokens(); truck(g, 50, 36, 1, cat, 1.7);
+  el.addEventListener("animationend", () => el.remove()); setTimeout(() => el.remove(), 2500);
+}
+function fxMoney(text, bad) {
+  if (!SET.anim) return; const c = document.getElementById("cash"), r = c.getBoundingClientRect(), el = document.createElement("div");
+  el.className = "fxmoney" + (bad ? " bad" : ""); el.textContent = text; el.style.left = (r.left + Math.min(r.width, 200) * 0.55) + "px"; el.style.top = (r.bottom + 6) + "px";
+  document.getElementById("fx").appendChild(el); setTimeout(() => el.remove(), 1500);
+}
+function fxBurst(kind) {
+  if (!SET.anim) return; const cv = document.createElement("canvas"); cv.className = "fxburst"; document.getElementById("fx").appendChild(cv);
+  const W = innerWidth, H = innerHeight, d = Math.min(2, devicePixelRatio || 1); cv.width = W * d; cv.height = H * d; const g = cv.getContext("2d"); g.scale(d, d);
+  const cols = kind === "coins" ? ["#ffc94a", "#e8a92a", "#fff0b0"] : ["#ff7b2c", "#4cd893", "#8fb6d8", "#ffc94a", "#c08cff"];
+  const ps = Array.from({ length: 70 }, () => ({ x: W / 2 + (Math.random() - 0.5) * 60, y: kind === "coins" ? H * 0.25 : H * 0.35, vx: (Math.random() - 0.5) * 9, vy: -4 - Math.random() * 7, r: 2 + Math.random() * 3, c: cols[Math.floor(Math.random() * cols.length)], a: Math.random() * 6 }));
+  const t0 = performance.now();
+  (function step(now) { const dt = (now - t0) / 1000; g.clearRect(0, 0, W, H);
+    for (const p of ps) { p.vy += 0.28; p.x += p.vx; p.y += p.vy; p.a += 0.2; g.fillStyle = p.c; g.globalAlpha = Math.max(0, 1 - dt / 1.6);
+      if (kind === "coins") { g.beginPath(); g.ellipse(p.x, p.y, p.r * 1.6, p.r * 1.6 * Math.abs(Math.cos(p.a)), 0, 0, 7); g.fill(); } else g.fillRect(p.x, p.y, p.r * 1.6, p.r); }
+    if (dt < 1.6) requestAnimationFrame(step); else cv.remove(); })(t0);
+}
+function fxShake() { if (!SET.anim) return; const c = document.getElementById("cash"); c.classList.remove("shake"); void c.offsetWidth; c.classList.add("shake"); }
+function setCash(v) {
+  const c = document.getElementById("cash"), from = VIS.cashShown;
+  c.classList.toggle("neg", v < 0);
+  if (from === null || !SET.anim || Math.abs(v - from) < 1 || document.hidden) { VIS.cashShown = v; c.textContent = tl(v); return; }
+  cancelAnimationFrame(VIS.cashAnim); const t0 = performance.now();
+  (function step(now) { const k = Math.min(1, (now - t0) / 450), e = 1 - Math.pow(1 - k, 3), x = from + (v - from) * e; c.textContent = tl(x); VIS.cashShown = x;
+    if (k < 1) VIS.cashAnim = requestAnimationFrame(step); else { VIS.cashShown = v; c.textContent = tl(v); } })(t0);
+}
+// ---------- avatars and logos ----------
+const FEMALE = new Set(["Nur Aydemir", "Gül Toros", "Leyla Aksu"]);
+function avatar(name, color, me) {
+  const h = hash(name), skin = ["#f1c7a3", "#e0ac85", "#c98e66", "#a8724f"][h % 4], hair = ["#2b2016", "#4a3420", "#7a7a7a", "#bdbdbd", "#1d1d1d"][(h >> 3) % 5];
+  const fem = FEMALE.has(name), style = fem ? 3 : (h >> 6) % 3, must = !fem && (h >> 9) % 3 === 0, glass = (h >> 11) % 4 === 0;
+  const hairP = style === 0 ? `<path d="M9 12a7 7 0 0 1 14 0v-1c0-4-3-6-7-6s-7 2-7 6z" fill="${hair}"/>`
+    : style === 1 ? `<path d="M9 13c0-5 3-8 7-8s7 3 7 7c-3-2-7-1-9-4-1 2-3 3-5 5z" fill="${hair}"/>`
+    : style === 2 ? `<path d="M9 13c0-2 0-3 1-4M23 13c0-2 0-3-1-4" stroke="${hair}" stroke-width="2"/>`
+    : `<path d="M8 20c0-9 2-15 8-15s8 6 8 15c-2-1-3-3-3-6-2 1-6 1-10-2 0 4-1 6-3 8z" fill="${hair}"/>`;
+  const hat = me ? `<path d="M8 11a8 7 0 0 1 16 0z" fill="var(--hot)"/><rect x="6.5" y="10.5" width="19" height="2" rx="1" fill="var(--hot)"/>` : hairP;
+  return `<svg class="ava" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15.5" fill="${me ? "var(--panel2)" : color}" fill-opacity="${me ? 1 : 0.28}" stroke="${me ? "var(--hot)" : color}"/>
+    <path d="M5 30c1-6 5-8 11-8s10 2 11 8z" fill="#2a3540"/><path d="M13 22l3 4 3-4z" fill="#e9eef2"/><path d="M15.2 23.5h1.6l.6 5h-2.8z" fill="${me ? "var(--hot)" : color}"/>
+    <rect x="14" y="18" width="4" height="4" fill="${skin}"/><circle cx="16" cy="13" r="6.5" fill="${skin}"/><circle cx="9.6" cy="13.5" r="1.2" fill="${skin}"/><circle cx="22.4" cy="13.5" r="1.2" fill="${skin}"/>
+    ${hat}<circle cx="13.6" cy="13.4" r=".8" fill="#1b1f24"/><circle cx="18.4" cy="13.4" r=".8" fill="#1b1f24"/>
+    ${must ? `<path d="M13 16.6q3-1.6 6 0q-3 .9-6 0z" fill="${hair}"/>` : `<path d="M14.2 16.6q1.8 1 3.6 0" stroke="#7a4a3a" stroke-width=".7" fill="none"/>`}
+    ${glass ? `<g fill="none" stroke="#1b1f24" stroke-width=".7"><rect x="11.6" y="12" width="3.8" height="2.8" rx="1"/><rect x="16.6" y="12" width="3.8" height="2.8" rx="1"/><path d="M15.4 13.2h1.2"/></g>` : ""}</svg>`;
+}
+function mono(name) {
+  const h = hash(name), ini = String(name).split(/\s+/).filter(w => /^[A-ZÇĞİÖŞÜ]/.test(w)).slice(0, 2).map(w => w[0]).join("") || String(name)[0];
+  return `<span class="mono" style="background:hsl(${h % 360} 32% 30%)" aria-hidden="true">${esc(ini)}</span>`;
+}
+// ---------- illustrations for pop-ups ----------
+const ART = {
+  fair: `<rect x="18" y="32" width="84" height="38" rx="3" fill="var(--panel2)" stroke="var(--line)"/><path d="M12 32h96l-8-14H20z" fill="var(--hot)"/><path d="M28 18v14M44 18v14M60 18v14M76 18v14M92 18v14" stroke="#000" stroke-opacity=".2"/><rect x="28" y="42" width="22" height="20" fill="var(--steel)" opacity=".6"/><rect x="58" y="42" width="34" height="6" fill="var(--fg)" opacity=".7"/><rect x="58" y="52" width="22" height="4" fill="var(--muted)"/><path d="M60 18V4l16 6-16 6" fill="var(--good)"/>`,
+  gift: `<path d="M86 14a14 14 0 1 0 6 24 11 11 0 1 1-6-24z" fill="var(--warn)"/><path d="M98 22l2 5 5 .5-4 3 1 5-4-3-4 3 1-5-4-3 5-.5z" fill="var(--warn)"/><rect x="26" y="34" width="44" height="34" rx="2" fill="var(--hot)"/><rect x="22" y="28" width="52" height="10" rx="2" fill="var(--hot)"/><rect x="44" y="28" width="8" height="40" fill="var(--fg)"/><path d="M48 28c-6-10-16-8-14-2s14 2 14 2c0 0 12 4 14-2s-8-8-14 2z" fill="none" stroke="var(--fg)" stroke-width="3"/>`,
+  bonus: `<rect x="22" y="22" width="76" height="44" rx="4" fill="var(--good)" opacity=".85"/><circle cx="60" cy="44" r="12" fill="none" stroke="var(--bg)" stroke-width="3"/><text x="60" y="49" text-anchor="middle" font-size="14" font-weight="700" fill="var(--bg)">₺</text><rect x="16" y="30" width="76" height="44" rx="4" fill="none" stroke="var(--good)" stroke-width="2" opacity=".5"/>`,
+  audit: `<rect x="30" y="10" width="46" height="60" rx="3" fill="var(--fg)" opacity=".9"/><path d="M38 24h30M38 32h30M38 40h20M38 48h26" stroke="var(--muted)" stroke-width="3"/><circle cx="76" cy="50" r="14" fill="none" stroke="var(--hot)" stroke-width="5"/><path d="M86 60l14 14" stroke="var(--hot)" stroke-width="7" stroke-linecap="round"/>`,
+  sale: `<path d="M20 70V36l40-22 40 22v34z" fill="#4a5763"/><rect x="44" y="46" width="32" height="24" fill="#222a31"/><rect x="34" y="28" width="52" height="16" rx="2" fill="var(--bad)" transform="rotate(-8 60 36)"/><text x="60" y="40" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" transform="rotate(-8 60 36)">SATILIK</text>`,
+  poach: `<circle cx="36" cy="28" r="10" fill="#e0ac85"/><path d="M20 66c0-14 7-22 16-22s16 8 16 22z" fill="var(--steel)"/><circle cx="84" cy="28" r="10" fill="#c98e66"/><path d="M68 66c0-14 7-22 16-22s16 8 16 22z" fill="var(--bad)"/><path d="M50 46h20M64 40l6 6-6 6" stroke="var(--warn)" stroke-width="4" fill="none" stroke-linecap="round"/>`,
+  suit: `<rect x="66" y="56" width="40" height="10" rx="2" fill="#6b4a33"/><g transform="rotate(-35 50 36)"><rect x="30" y="26" width="40" height="18" rx="4" fill="#8a5e3f"/><rect x="47" y="40" width="6" height="40" rx="2" fill="#6b4a33"/></g><path d="M78 46l4-6M88 46l-2-7M98 48l3-5" stroke="var(--warn)" stroke-width="2"/>`,
+  accident: `<path d="M60 8l44 64H16z" fill="var(--warn)"/><path d="M60 8l44 64H16z" fill="none" stroke="#1b1f24" stroke-width="3" stroke-linejoin="round"/><rect x="56" y="28" width="8" height="24" rx="2" fill="#1b1f24"/><circle cx="60" cy="60" r="4.5" fill="#1b1f24"/>`,
+  year: `<path d="M38 12h44v14a22 22 0 0 1-44 0z" fill="var(--warn)"/><path d="M38 18H26a10 10 0 0 0 14 14M82 18h12a10 10 0 0 1-14 14" fill="none" stroke="var(--warn)" stroke-width="4"/><rect x="56" y="46" width="8" height="12" fill="var(--warn)"/><rect x="42" y="58" width="36" height="10" rx="2" fill="#8a6a2a"/>`,
+  level: `<path d="M44 6h12l8 22H52zM76 6H64l-8 22h12z" fill="var(--hot)"/><circle cx="60" cy="48" r="22" fill="var(--warn)"/><circle cx="60" cy="48" r="15" fill="none" stroke="#8a6a2a" stroke-width="3"/><path d="M60 38l3 7 7 .5-5.5 4.5 2 7-6.5-4-6.5 4 2-7-5.5-4.5 7-.5z" fill="#8a6a2a"/>`,
+  baron: `<path d="M34 34l8-18 10 12 8-16 8 16 10-12 8 18z" fill="var(--warn)"/><circle cx="42" cy="16" r="3" fill="var(--warn)"/><circle cx="60" cy="12" r="3" fill="var(--warn)"/><circle cx="78" cy="16" r="3" fill="var(--warn)"/><rect x="30" y="40" width="60" height="9" rx="2" fill="var(--hot)"/><rect x="54" y="49" width="12" height="16" fill="var(--hot)"/><rect x="30" y="65" width="60" height="9" rx="2" fill="var(--hot)"/>`,
+  bankrupt: `<rect x="22" y="20" width="34" height="9" rx="2" fill="var(--muted)"/><rect x="34" y="29" width="10" height="14" fill="var(--muted)"/><path d="M34 43h10l-3 6h-7z" fill="var(--muted)"/><g transform="rotate(18 80 50)"><rect x="64" y="30" width="34" height="9" rx="2" fill="var(--muted)"/><rect x="76" y="39" width="10" height="18" fill="var(--muted)"/><rect x="64" y="57" width="34" height="9" rx="2" fill="var(--muted)"/></g><path d="M50 50l6 4-4 4 6 4" stroke="var(--bad)" stroke-width="3" fill="none"/>`,
+  scen: `<path d="M10 72q30-30 50-20t50-4v24z" fill="var(--panel2)"/><rect x="58" y="14" width="3" height="40" fill="var(--fg)"/><path d="M61 14h28l-6 8 6 8H61z" fill="var(--hot)"/>`,
+  month: `<rect x="32" y="14" width="56" height="56" rx="5" fill="var(--fg)"/><rect x="32" y="14" width="56" height="14" rx="5" fill="var(--hot)"/><rect x="42" y="8" width="4" height="12" rx="2" fill="var(--fg)"/><rect x="74" y="8" width="4" height="12" rx="2" fill="var(--fg)"/><text x="60" y="58" text-anchor="middle" font-size="24" font-weight="700" fill="var(--bg)">30</text>`,
+  shop: `<path d="M34 30h52l-5 38H39z" fill="var(--hot)"/><path d="M46 30v-6a14 14 0 0 1 28 0v6" fill="none" stroke="var(--hot)" stroke-width="5"/><circle cx="60" cy="48" r="9" fill="var(--warn)"/><text x="60" y="52.5" text-anchor="middle" font-size="12" font-weight="700" fill="#8a6a2a">₺</text>`,
+  sell: `<path d="M24 46l20-16 14 6 14-6 24 16-22 16-16-6-16 6z" fill="#e0ac85"/><path d="M44 30l16 18M72 30L56 48" stroke="#a8724f" stroke-width="3"/><rect x="40" y="58" width="40" height="12" rx="3" fill="var(--good)"/><text x="60" y="67" text-anchor="middle" font-size="8" font-weight="700" fill="var(--bg)">SATILDI</text>`,
+};
+const artFor = kind => ART[kind] ? `<div class="art" aria-hidden="true"><svg viewBox="0 0 120 80">${ART[kind]}</svg></div>` : "";
+
 function render() {
   renderHud();
   const m = document.getElementById("main"), top = m.scrollTop;
   m.innerHTML = UI.tab === "orders" ? renderOrders() : UI.tab === "market" ? renderMarket() : UI.tab === "stock" ? renderStock() : UI.tab === "rival" ? renderRival() : renderCompany();
   m.scrollTop = top;
   document.getElementById("endDay").disabled = S.over;
+  visMount();
 }
 
 // =====================================================================
@@ -2114,7 +2428,8 @@ function showModal(kind, data) {
     h = `<h3>${it.name}</h3><p>Bu, oyunun tarayıcı sürümü. Gerçek ödeme alınmaz. iPhone uygulamasında bu adımda App Store ödeme ekranı açılır (${it.price.toFixed(2).replace(".", ",")} TL${it.type === "s" ? " / " + it.per : ""}).</p><div class="btns"><button class="btn" data-act="close">Vazgeç</button><button class="btn hot" data-act="demoYes">Ücretsiz dene</button></div>`; }
   else if (kind === "sellco") h = `<h3>Şirketi sat?</h3><p>${esc(S.name)} satılır ve ${legacyGain()} miras puanı kazanırsın. Sonra yeni şirketini kurarsın; miras bonusları kalıcıdır.</p><div class="btns"><button class="btn" data-act="close">Vazgeç</button><button class="btn hot" data-act="sellCoYes">Sat</button></div>`;
   else if (kind === "reset") h = `<h3>Yeni oyun?</h3><p>Bu şirketteki tüm ilerleme silinir.</p><div class="btns"><button class="btn" data-act="close">Vazgeç</button><button class="btn hot" data-act="resetYes">Yeni şirket kur</button></div>`;
-  md.innerHTML = `<div class="box" role="dialog" aria-modal="true">${h}</div>`;
+  const artKind = kind === "card" ? (S.cards[0] || {}).kind : { demobuy: "shop", sellco: "sell", scen: "scen" }[kind] || kind;
+  md.innerHTML = `<div class="box" role="dialog" aria-modal="true">${artFor(artKind)}${h}</div>`;
   md.hidden = false;
   const f = md.querySelector("input, .btn.hot"); if (f) f.focus();
 }
@@ -2133,7 +2448,7 @@ const KEY_LEG = "demir-baronu-legacy";
 try { Object.assign(LEG, JSON.parse(localStorage.getItem(KEY_LEG) || "{}")); } catch (e) {}
 function saveLeg() { persist(KEY_LEG, JSON.stringify(LEG)); }
 const legacyGain = () => Math.max(1, Math.min(20, Math.floor(netWorth() / 20e6)));
-let SET = { monthModal: true, toasts: true, sound: true, vibe: true };
+let SET = { monthModal: true, toasts: true, sound: true, vibe: true, anim: !(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) };
 try { Object.assign(SET, JSON.parse(localStorage.getItem(KEY_SET) || "{}")); } catch (e) {}
 function saveSet() { persist(KEY_SET, JSON.stringify(SET)); }
 function getRecords() { try { return JSON.parse(localStorage.getItem(KEY_REC) || "[]"); } catch (e) { return []; } }
@@ -2180,6 +2495,6 @@ function start(data) {
 }
 window.claude?.hot?.snapshot?.(() => ({ S, UI }));
 const boot = () => window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
-const bootAll = () => { applySkin(); boot(); shopInit(); };
+const bootAll = () => { applySkin(); boot(); shopInit(); visMount(); };
 if (NATIVE) restoreNative().then(bootAll, bootAll); else bootAll();
 </script>

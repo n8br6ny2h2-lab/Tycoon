@@ -358,6 +358,29 @@ Oyun ücretsizdir ve satın almadan baştan sona oynanabilir. Mağazada 21 iste�
   - Abonelik günlük küçük bir avantaj verir, oyunu kendi başına bitirmez.
 - **Teknik:** StoreKit 2 ile uygulamanın kendi eklentisi kullanılır, üçüncü taraf servis yoktur. Tarayıcı sürümünde aynı mağaza "deneme modu"nda çalışır ve ödeme almaz.
 
+## 11b. Görsel tasarım
+
+Görsel dosya kullanılmaz. Her şey kodla çizilir (canvas ve SVG); bu yüzden uygulama küçük kalır ve internetsiz çalışır. Renkler arayüz temasından okunur; satın alınan temalar çizimlere de yansır.
+
+- **Tesis sahneleri:** her depo ve dükkan kartında yandan görünüm.
+  - **Bina:** Depo kademeye göre büyür: depo köşesi → depo + açık saha (çit) → lojistik depo (kemerli çatı, 3 kapı) → liman deposu (deniz, gemi, rıhtım vinci). Dükkan; tentesi, vitrini ve şirket adının yazılı tabelasıyla görünür. Yapı market tabelası da vardır.
+  - **Stok:** her 1/14 kapasite için bir yığın, ürün kategorisine göre çizilir: sac levha yığını, profil uçları, boru piramidi, nervürlü demir bağı, dolu mil, parlak paslanmaz.
+  - **Hareket:** forkliftler mal taşır, tavan vinci yük kaldırır, gelen sevkiyat kamyonu yaklaşır, o gün yükleme yapıldıysa kamyon çıkar, dükkana müşteriler yürür. Bayramda dükkan kapalıdır.
+- **Ana menü:** fabrika silueti, tüten bacalar, rıhtım vinci, yolda iki yönde giden yüklü kamyonlar, kaynak kıvılcımları.
+- **Mevsim efekti (üst bar):** kışın kar, sonbaharda yaprak, ilkbaharda polen, yazın sıcak hava zerreleri. Sahnelerin gökyüzü rengi de mevsime göre değişir.
+- **Ekran efektleri:**
+  - Teslimatta yüklü bir kamyon ekranı geçer ve "+kâr" yazısı yükselir.
+  - Kasa yeni değere sayarak gider.
+  - Satın almada para yağmuru, unvan ve ihale kazanımında konfeti çıkar.
+  - Karşılıksız çekte kasa titrer.
+- **Karakterler:** rakip patronların isimden üretilen portreleri (ten, saç, bıyık, gözlük; kadın patronlar uzun saçlı), oyuncunun baretli portresi, müşteri firmalar için baş harfli renkli logolar.
+- **Pencere çizimleri:** fuar standı, bayram, ikramiye, denetim, satılık depo, transfer, dava tokmağı, iş kazası, kupa, madalya, taç, kırık profil (iflas), senaryo bayrağı, takvim, mağaza, el sıkışma.
+- **Ürün çizimi:** al-sat panelinde seçilen ürünün yığın resmi.
+- **Performans:**
+  - Yalnızca ekranda görünen çizimler hareket eder, saniyede en fazla 30 kare.
+  - Uygulama arka plandayken çizim durur.
+  - Ayarlar → **Animasyonlar** ile tamamen kapatılabilir. "Hareketi azalt" kullananlarda kapalı başlar.
+
 ## 12. Ekranlar
 
 1. **Ana menü ve yeni oyun:** devam et, yeni oyun (ad, şehir, zorluk), nasıl oynanır, rekorlar, ayarlar. Karar kartları ve yıl sonu ödülü pencereleri
