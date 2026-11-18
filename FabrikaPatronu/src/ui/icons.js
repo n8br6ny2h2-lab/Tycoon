@@ -1,6 +1,6 @@
 // Ürün ikonları: her ürünün kendi şekli ve rengi (SVG, 32×32). Aynı ışık yönü ve kontur dili.
 import { RES } from "../data/resources.js";
-const shade = (hex, k) => { const n = parseInt(hex.slice(1), 16); let r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+const shade = (hex, k) => { let r, g, b; if (hex[0] === "#") { const n = parseInt(hex.slice(1), 16); r = n >> 16; g = (n >> 8) & 255; b = n & 255; } else { const m = hex.match(/\d+(\.\d+)?/g) || [0, 0, 0]; [r, g, b] = m.map(Number); }
   const f = v => Math.max(0, Math.min(255, Math.round(k < 0 ? v * (1 + k) : v + (255 - v) * k))); return `rgb(${f(r)},${f(g)},${f(b)})`; };
 let gid = 0;
 const S = {

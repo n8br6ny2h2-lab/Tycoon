@@ -19,7 +19,7 @@ import { claim } from "../core/quests.js";
 import { earn } from "../core/finance.js";
 import { level, day } from "../core/util.js";
 import { createMap, season, SEASON_NAME } from "./map.js";
-import { BUILD, box, truck, train, ship, plane, iso } from "./art.js";
+import { BUILD, box, truck, train, ship, plane, iso, shadowPass } from "./art.js";
 import * as SC from "./screens.js";
 import { tl, tlFull, n0, n1, esc, dateTxt, qtyTxt } from "./fmt.js";
 import { iconSvg } from "./icons.js";
@@ -82,10 +82,11 @@ function paintArts(root = document) {
     const look = cv.dataset.art, w = cv.width, h = cv.height, d = 2; if (!cv._p) { cv.width = w * d; cv.height = h * d; cv.style.width = w + "px"; cv.style.height = h + "px"; cv._p = 1; cv._w = w; cv._h = h; }
     const g = cv.getContext("2d"), W2 = cv._w, H2 = cv._h; g.setTransform(d, 0, 0, d, 0, 0); g.clearRect(0, 0, W2, H2);
     const gr = g.createLinearGradient(0, 0, 0, H2); gr.addColorStop(0, "#22384a"); gr.addColorStop(1, "#16283a"); g.fillStyle = gr; g.fillRect(0, 0, W2, H2);
-    const sc = Math.min(W2 / 190, H2 / 120) * 1.05; g.save(); g.translate(W2 / 2, H2 * 0.32); g.scale(sc, sc);
+    const veh = look.startsWith("v_"), sc = veh ? Math.min(W2 / 190, H2 / 120) * 1.05 : Math.min((H2 - 4) / 160, (W2 - 4) / 150); g.save(); if (veh) g.translate(W2 / 2, H2 * 0.32); else g.translate(W2 / 2, 2 + 98 * sc); g.scale(sc, sc);
     if (look.startsWith("v_")) { const v = look.slice(2); g.translate(0, 40); if (v === "tren") train(g, 0.7, -0.3, 4, 0); else if (v === "gemi") ship(g, -0.1, -0.5, 0); else if (v === "ucak") plane(g, 0, -10, 1.8); else { g.scale(2.4, 2.4); truck(g, 0, 0, 1, v === "tir" ? "#c94a3a" : v === "agir" ? "#e0a83a" : "#3f7fa8", "#c9d3dc", v !== "kamyon"); } }
-    else { g.fillStyle = "#5d6b62"; g.beginPath(); [iso(0, 0), iso(1, 0), iso(1, 1), iso(0, 1)].forEach((p, i) => (i ? g.lineTo(p[0], p[1] - 40) : g.moveTo(p[0], p[1] - 40))); g.closePath(); g.fill(); g.translate(0, -40);
-      (BUILD[look] || BUILD.shed)({ g, x: 0, y: 0, t: performance.now() / 1000, run: cv.dataset.run === "1", night: false, lvl: +(cv.dataset.lvl || 1), m: 1, snow: false, seed: 3 }); }
+    else { g.translate(0, -40); const gr2 = g.createLinearGradient(0, 0, 0, 80); gr2.addColorStop(0, "#6f7f74"); gr2.addColorStop(1, "#4d5b52"); g.fillStyle = gr2; g.beginPath(); [iso(-0.05, -0.05), iso(1.05, -0.05), iso(1.05, 1.05), iso(-0.05, 1.05)].forEach((p, i) => (i ? g.lineTo(...p) : g.moveTo(...p))); g.closePath(); g.fill();
+      const ctx = gg => ({ g: gg, x: 0, y: 0, t: performance.now() / 1000, run: cv.dataset.run === "1", night: false, lvl: +(cv.dataset.lvl || 1), m: 1, snow: false, seed: 3 }), fn = BUILD[look] || BUILD.shed;
+      shadowPass(g, ng => fn(ctx(ng))); fn(ctx(g)); }
     g.restore();
   }
 }
