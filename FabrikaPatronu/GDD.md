@@ -61,7 +61,7 @@ Her adım 250 bin ₺ ödül verir. En ucuz fabrikalar ilk gün kurulabilir: mob
   - Test, her reçetenin marjını %3–200 aralığında tutar.
   - Fabrikanın günlük kârı kendi satışının fiyatı itmesiyle azalır; bu yüzden tek ürüne yığılmak cezalandırılır.
 - **Kredili hesap:** hammadde, enerji ve bakım gibi işletme giderleri şirket değerinin %15'ine kadar eksi bakiyeyle ödenebilir. Yatırımlar için nakit gerekir.
-- **Simülasyon sonucu:** bot oyuncu 2 oyun yılında (seed 11) şirket değerini 10 Mn ₺'den yaklaşık 240 Mn ₺'ye çıkarır. Negatif stok, sınır dışı fiyat, iflas ya da kilitlenen fabrika görülmez.
+- **Simülasyon sonucu:** bot oyuncu 2 oyun yılında şirket değerini 10 Mn ₺'den yaklaşık 530 Mn ₺'ye çıkarır (iki farklı tohumla denendi). Negatif stok, sınır dışı fiyat, iflas ya da kilitlenen fabrika görülmez.
 
 ## Depolar
 
