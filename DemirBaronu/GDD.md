@@ -155,14 +155,23 @@ Liman şehirleri (10): İstanbul, Tekirdağ, Kocaeli, İzmir, Antalya, Zonguldak
 
 ### Harita
 
-Trakya ve Anadolu ayrı çizilir; Marmara ve boğazlar, Van, Tuz, Beyşehir ve Eğirdir gölleri, Kuzey Anadolu dağları ve Toroslar, deniz adları görünür. Kıyılar hafif parlar. Simgeler:
+Türkiye'nin **81 ili** sınırlarıyla çizilir; göller (Van, Tuz, Beyşehir, Eğirdir…) il şekillerinde boşluk olarak görünür, kıyılar hafif parlar, deniz adları yazılıdır. Bir **ile dokununca** o il turuncu çerçeveyle seçilir ve kartın altında açılır:
+
+- plaka numarası ve il adı
+- ilin başlıca sanayileri (çelik, döküm ve hadde etiketleri turuncu)
+- il oyundaki 30 sanayi şehrinden biriyse o şehrin bilgisi: OSB, sektörler, üretim tesisleri, tesislerin, rakipler, kategori fiyat farkları; yeni tesis şehri de o olur
+- değilse "tesis açılamaz" ve en yakın sanayi şehri ile yaklaşık yol mesafesi, tek dokunuşla o şehre geçiş düğmesi
+
+Simgeler:
 
 - çelik üretim merkezleri baca simgesiyle
 - liman şehirleri mavi, senin tesislerin turuncu
 - rakip şubeleri renkli noktalarla
 - merkezinden diğer tesislerine akan sevkiyat rotaları
 
-**Görünümler:** "Sanayi" ve 6 ürün kategorisinin "fiyat" görünümü. Fiyat görünümünde şehirler o ürünün en ucuz (yeşil) ile en pahalı (kırmızı) şehri arasında renklenir. **Büyüt** ile harita iki kat büyür, bütün şehir adları görünür ve yana kaydırılabilir.
+İl sınırları turkey-map-react 2.3.0 paketinin verisinden alınmıştır (MIT Lisansı, © 2020 Erdi Gökçe); kaynak kodda belirtilir.
+
+**Görünümler:** "Sanayi" ve 6 ürün kategorisinin "fiyat" görünümü. Fiyat görünümünde her il, en yakın sanayi şehrinin fiyatına göre en ucuz (yeşil) ile en pahalı (kırmızı) arasında boyanır; sanayi şehri olan iller daha koyu renklidir. **Büyüt** ile harita 2,6 kat büyür, seçilen ile kayar, 81 ilin ve bütün şehirlerin adları görünür.
 
 ### Tesis türleri
 
@@ -412,8 +421,16 @@ Görsel dosya kullanılmaz. Her şey kodla çizilir (canvas ve SVG); bu yüzden 
 - **Araçlar:** Kamyonet, kamyon ve TIR ayrı çizilir (ızgara, far, ayna; TIR'da dorse). Filodaki araçlar ana tesiste park eder. Forkliftte koruma kafesi ve baretli sürücü vardır. Tavan vinci ve rıhtım vinci kafes kirişlidir. Liman gemisinde renkli konteynerler bulunur.
 - **Mevsim havası:** Kışın çatılarda, yığınlarda ve zeminde kar olur, kar yağar. Sonbaharda yağmur, yazın sıcak hava dalgası vardır.
 - **Ana menü:** gün batımı gökyüzü, iki katmanlı fabrika silueti ve ışıklı pencereler, tüten bacalar, parlayan fırın ağzı, kafes kirişli rıhtım vinci. Yolda iki yönde TIR, kamyon ve kamyonet geçer; kaynak kıvılcımları saçılır.
-- **Harita:** dalgalı deniz, gradyanlı kara, merkezden diğer tesislere akan hareketli sevkiyat rotaları.
-- **Arayüz:** fiyat grafiklerinin altı dolgulu, sipariş kartlarında ürün kesit ikonu.
+- **Harita:** 81 il sınırı, dalgalı deniz, gradyanlı kara, seçilen il vurgusu, merkezden diğer tesislere sevkiyat rotaları.
+- **Her şeyin kendi resmi:**
+  - **Filo:** kamyonet (profil yüklü), kamyon (boru yüklü) ve TIR (dorseli) ayrı küçük resimlerle.
+  - **Atölye:** 6 makinenin her biri ayrı çizilir ve kuruluysa çalışır: giyotin makasın bıçağı iner, şerit testerenin kasnakları döner ve kıvılcım saçar, demir bükme tablası etriye büker, abkant koçu iner, fiber lazer kafası sac üstünde gezer, dilme hattı bobini çözüp şeritlere ayırır.
+  - **Ekipman:** forklift sac taşır, tavan vinci yük kaldırır.
+  - **Personel:** her görevin kendi portresi ve aleti: satış elemanı (telefon, kravat), muhasebeci (gözlük, hesap makinesi), gece bekçisi (kasket, fener), hukuk müşaviri (cübbe, terazi), iş güvenliği uzmanı (baret, reflektörlü yelek), tezgâhtar (önlük).
+  - **Tesis kademeleri:** "Yeni tesis aç" kartında seçilen türün bütün kademeleri resimli şerit olarak görünür; "Büyüt" satırında bir sonraki kademenin resmi vardır.
+  - **Ürünler:** 48 ürünün her biri kendi kesitiyle üç boyutlu çizilir (kutu, dikdörtgen, köşebent, lama, U, I, H, T, boru, mil, kare, trapez, delikli, bobin, filmaşin, hasır, nervürlü) ve malzemenin gerçek rengini (siyah sac, DKP, galvaniz, paslanmaz, alüminyum…) taşır. Köşede ürünün ana ölçüsü yazar.
+  - **Mağaza ve şirket:** her satın alma paketinin, sigortaların ve bankanın kendi çizimi vardır.
+- **Arayüz:** fiyat grafiklerinin altı dolgulu, sipariş ve piyasa satırlarında ürünün üç boyutlu kesit resmi.
 - **Mevsim efekti (üst bar):** kışın kar, sonbaharda yaprak, ilkbaharda polen, yazın sıcak hava zerreleri. Sahnelerin gökyüzü rengi de mevsime göre değişir.
 - **Ekran efektleri:**
   - Teslimatta yüklü bir kamyon ekranı geçer ve "+kâr" yazısı yükselir.
