@@ -1,0 +1,15 @@
+{
+  "name": "fabrika-patronu",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "FABRİKA PATRONU — Hammadde İmparatorluğu. 2D sanayi, hammadde ticareti ve şirket yönetimi simülasyonu (iOS).",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "sim": "node scripts/sim.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.27.4"
+  }
+}

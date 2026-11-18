@@ -1,0 +1,4 @@
+node_modules
+dist
+app/www
+app/ios/App/App/public
