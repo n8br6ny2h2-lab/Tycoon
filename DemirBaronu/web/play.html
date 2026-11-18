@@ -247,6 +247,9 @@ svg.nw { width: 100%; height: 90px; display: block; }
 svg.map { width: 100%; height: auto; display: block; }
 svg.map text { font-family: var(--body); paint-order: stroke; stroke: #0f2233; stroke-width: 2.5px; }
 svg.map .route { animation: route 1.6s linear infinite; opacity: .85; }
+.mapwrap { overflow-x: auto; border-radius: 8px; scrollbar-width: none; }
+.mapwrap::-webkit-scrollbar { display: none; }
+.mapwrap.zoom svg.map { width: 210%; max-width: none; }
 @keyframes route { to { stroke-dashoffset: -14; } }
 @media (prefers-reduced-motion: reduce) { svg.map .route { animation: none; } }
 .steps { display: flex; gap: 3px; }
@@ -385,24 +388,75 @@ const PRODUCTS = [
 ].map(([id, name, cat, spec, w, base, lvl, pop]) => ({ id, name, cat, spec, w, base, lvl, pop }));
 const P = Object.fromEntries(PRODUCTS.map(p => [p.id, p]));
 
+// Industry profile of a city: which products its factories order more of
+const INDUSTRIES = {
+  oto: { name: "Otomotiv", demand: { sac: 1.8, dolu: 1.4 } },
+  beyaz: { name: "Beyaz eşya", demand: { sac: 1.9 } },
+  insaat: { name: "İnşaat", demand: { insaat: 1.7, profil: 1.3 } },
+  makina: { name: "Makine imalatı", demand: { dolu: 1.8, profil: 1.3, sac: 1.2 } },
+  tarim: { name: "Tarım makineleri", demand: { profil: 1.5, boru: 1.4, dolu: 1.3 } },
+  enerji: { name: "Enerji ve doğalgaz", demand: { boru: 1.9 } },
+  tersane: { name: "Tersane", demand: { sac: 1.7 } },
+  mobilya: { name: "Mobilya ve raf", demand: { profil: 1.7, ozel: 1.2 } },
+  savunma: { name: "Savunma", demand: { ozel: 1.6, sac: 1.3, dolu: 1.3 } },
+  gida: { name: "Gıda ekipmanı", demand: { ozel: 1.8 } },
+  tekstil: { name: "Tekstil", demand: { profil: 1.2 } },
+  celik: { name: "Çelik üretimi", demand: {} },
+};
 const CITIES = [
-  ["ist", "İstanbul", "İkitelli", 41.07, 28.80, 1.6, true],
-  ["koc", "Kocaeli", "Dilovası", 40.78, 29.53, 1.0, true],
-  ["bur", "Bursa", "Demirtaş OSB", 40.26, 29.08, 1.1, false],
-  ["sak", "Sakarya", "Hendek OSB", 40.80, 30.40, 0.5, false],
-  ["esk", "Eskişehir", "Eskişehir OSB", 39.78, 30.52, 0.6, false],
-  ["ank", "Ankara", "Ostim", 39.97, 32.75, 1.3, false],
-  ["izm", "İzmir", "Çiğli AOSB", 38.48, 27.05, 1.2, true],
-  ["man", "Manisa", "Manisa OSB", 38.61, 27.43, 0.6, false],
-  ["ant", "Antalya", "Antalya OSB", 36.95, 30.65, 0.7, true],
-  ["kon", "Konya", "Büsan", 37.92, 32.52, 0.9, false],
-  ["kay", "Kayseri", "Kayseri OSB", 38.72, 35.48, 0.7, false],
-  ["ada", "Adana", "Hacı Sabancı OSB", 37.02, 35.32, 0.8, false],
-  ["mer", "Mersin", "Mersin Limanı", 36.80, 34.64, 0.7, true],
-  ["gaz", "Gaziantep", "Başpınar OSB", 37.17, 37.42, 0.9, false],
-  ["sam", "Samsun", "Tekkeköy", 41.21, 36.45, 0.6, true],
-].map(([id, name, osb, lat, lon, size, port]) => ({ id, name, osb, lat, lon, size, port }));
+  ["ist", "İstanbul", "İkitelli", 41.07, 28.80, 1.6, true, ["makina", "insaat", "oto"]],
+  ["tek", "Tekirdağ", "Çorlu OSB", 41.16, 27.80, 0.6, true, ["tekstil", "gida"]],
+  ["koc", "Kocaeli", "Dilovası", 40.78, 29.53, 1.0, true, ["oto", "tersane", "celik"]],
+  ["sak", "Sakarya", "Hendek OSB", 40.80, 30.40, 0.5, false, ["oto"]],
+  ["bur", "Bursa", "Demirtaş OSB", 40.26, 29.08, 1.1, false, ["oto", "tekstil"]],
+  ["bal", "Balıkesir", "Balıkesir OSB", 39.65, 27.88, 0.4, false, ["gida", "makina"]],
+  ["esk", "Eskişehir", "Eskişehir OSB", 39.78, 30.52, 0.6, false, ["beyaz", "makina"]],
+  ["izm", "İzmir", "Çiğli AOSB", 38.48, 27.10, 1.2, true, ["celik", "makina", "gida"]],
+  ["man", "Manisa", "Manisa OSB", 38.61, 27.43, 0.6, false, ["beyaz"]],
+  ["den", "Denizli", "Denizli OSB", 37.78, 29.09, 0.5, false, ["tekstil", "makina"]],
+  ["ant", "Antalya", "Antalya OSB", 36.95, 30.65, 0.7, true, ["insaat", "gida"]],
+  ["kon", "Konya", "Büsan", 37.92, 32.52, 0.9, false, ["tarim", "makina"]],
+  ["ank", "Ankara", "Ostim", 39.97, 32.75, 1.3, false, ["savunma", "makina", "insaat"]],
+  ["kir", "Kırıkkale", "Kırıkkale OSB", 39.85, 33.51, 0.3, false, ["savunma", "celik"]],
+  ["kar", "Karabük", "Karabük OSB", 41.20, 32.62, 0.3, false, ["celik"]],
+  ["zon", "Zonguldak", "Ereğli", 41.28, 31.42, 0.4, true, ["celik", "tersane"]],
+  ["cor", "Çorum", "Çorum OSB", 40.55, 34.95, 0.3, false, ["makina", "tarim"]],
+  ["sam", "Samsun", "Tekkeköy", 41.21, 36.45, 0.6, true, ["tarim", "insaat"]],
+  ["tra", "Trabzon", "Arsin OSB", 40.95, 39.93, 0.5, true, ["insaat", "tersane"]],
+  ["siv", "Sivas", "Sivas OSB", 39.75, 37.02, 0.3, false, ["makina", "enerji"]],
+  ["kay", "Kayseri", "Kayseri OSB", 38.72, 35.48, 0.7, false, ["mobilya", "makina"]],
+  ["erz", "Erzurum", "Erzurum OSB", 39.90, 41.27, 0.3, false, ["insaat"]],
+  ["mal", "Malatya", "Malatya OSB", 38.35, 38.31, 0.4, false, ["insaat"]],
+  ["kah", "Kahramanmaraş", "Kahramanmaraş OSB", 37.58, 36.93, 0.5, false, ["tekstil", "insaat"]],
+  ["diy", "Diyarbakır", "Diyarbakır OSB", 37.91, 40.24, 0.5, false, ["insaat", "enerji"]],
+  ["gaz", "Gaziantep", "Başpınar OSB", 37.17, 37.42, 0.9, false, ["makina", "tekstil"]],
+  ["osm", "Osmaniye", "Osmaniye OSB", 37.07, 36.25, 0.3, false, ["celik", "insaat"]],
+  ["isk", "Hatay", "İskenderun", 36.59, 36.17, 0.6, true, ["celik", "enerji"]],
+  ["ada", "Adana", "Hacı Sabancı OSB", 37.02, 35.32, 0.8, false, ["tarim", "gida"]],
+  ["mer", "Mersin", "Mersin Limanı", 36.80, 34.64, 0.7, true, ["insaat", "enerji"]],
+].map(([id, name, osb, lat, lon, size, port, ind]) => ({ id, name, osb, lat, lon, size, port, ind }));
 const C = Object.fromEntries(CITIES.map(c => [c.id, c]));
+// Steel and pipe production centres. Prices are lowest near them; mill orders arrive faster from close by.
+const MILLS = [
+  { city: "zon", name: "Ereğli yassı çelik", cats: ["sac"] },
+  { city: "isk", name: "İskenderun entegre çelik", cats: ["sac", "profil", "insaat"] },
+  { city: "kar", name: "Karabük haddehanesi", cats: ["profil", "insaat", "dolu"] },
+  { city: "izm", name: "Aliağa ark ocakları", cats: ["insaat", "dolu", "profil"] },
+  { city: "koc", name: "Dilovası çelik ve boru", cats: ["boru", "sac", "profil"] },
+  { city: "osm", name: "Osmaniye haddehaneleri", cats: ["insaat"] },
+  { city: "kir", name: "Kırıkkale dövme çelik", cats: ["dolu"] },
+  { city: "ist", name: "İstanbul boru fabrikaları", cats: ["boru"] },
+  { city: "bur", name: "Bursa paslanmaz servis merkezi", cats: ["ozel"] },
+];
+const cityDemand = (cityId, cat) => (C[cityId].ind || []).reduce((m, k) => Math.max(m, (INDUSTRIES[k].demand[cat] || 1)), 1);
+function nearestMill(cat, cityId) { let best = null; for (const m of MILLS) if (m.cats.includes(cat)) { const d = km(m.city, cityId); if (!best || d < best.d) best = { ...m, d }; } return best; }
+const millDays = (pid, cityId) => { const m = nearestMill(P[pid].cat, cityId); return m ? 1 + Math.min(4, Math.ceil(m.d / 350)) : SUPPLY.mill.days; };
+// Long-run price level of a city: about −3% next to a mill, rising with distance (+3.5% at most)
+const rawTarget = (cityId, cat) => { const m = nearestMill(cat, cityId); return m ? Math.max(-0.03, Math.min(0.035, -0.03 + m.d * 0.00004)) : 0; };
+const OFF_MEAN = {};
+// centred so the size-weighted average city sits at the national price
+const offTarget = (cityId, cat) => { if (OFF_MEAN[cat] === undefined) { let t = 0, w = 0; for (const c of CITIES) { t += rawTarget(c.id, cat) * c.size; w += c.size; } OFF_MEAN[cat] = t / w; }
+  return rawTarget(cityId, cat) - OFF_MEAN[cat]; };
 
 const LEVELS = [
   { name: "Komisyoncu", tons: 0, worth: 0, qty: [0.5, 2.5], loan: 0, max: 3, locs: 1, perk: "Aracılıkla başla" },
@@ -635,7 +689,8 @@ function migrate(s) {
     slitUsed: 0, credIns: false, scen: null, legacy: 0, fxShock: 0 };
   for (const k in d) if (s[k] === undefined) s[k] = d[k];
   if (!s.rivals) s.rivals = RIVAL_DEFS.map(mkRival);
-  if (!s.cityOff) { s.cityOff = {}; for (const c of CITIES) { s.cityOff[c.id] = {}; for (const k in CATS) s.cityOff[c.id][k] = Math.round(rnd(-0.04, 0.04) * 1e4) / 1e4; } }
+  if (!s.cityOff) s.cityOff = {};
+  for (const c of CITIES) { if (!s.cityOff[c.id]) s.cityOff[c.id] = {}; for (const k in CATS) if (s.cityOff[c.id][k] === undefined) s.cityOff[c.id][k] = Math.round((offTarget(c.id, k) + rnd(-0.02, 0.02)) * 1e4) / 1e4; }
   for (const k of ["tenders", "tendersWon", "rivalsTaken", "fairs", "bids", "credit", "recovered", "legalCost", "scrap", "acquired", "suitsWon"]) if (s.stats[k] === undefined) s.stats[k] = 0;
   for (const r of s.recv) { if (!r.status) r.status = "normal"; if (r.delays === undefined) r.delays = 0; }
   return s;
@@ -736,7 +791,7 @@ function stepMarket(silent) {
   if (S.fxShock > 0) S.fxShock--;
   S.fxPrev = S.fx; S.fx = Math.round(S.fx * Math.exp(fxd) * 100) / 100;
   S.g = S.g * 0.985 + catDrift("__global") + gauss() * 0.004 + fxd * 0.5;
-  for (const c in S.cityOff) for (const k in S.cityOff[c]) S.cityOff[c][k] = Math.round(Math.max(-0.07, Math.min(0.07, S.cityOff[c][k] * 0.97 + gauss() * 0.004)) * 1e4) / 1e4;
+  for (const c in S.cityOff) { if (!C[c]) continue; for (const k in S.cityOff[c]) S.cityOff[c][k] = Math.round(Math.max(-0.07, Math.min(0.07, S.cityOff[c][k] * 0.97 + offTarget(c, k) * 0.03 + gauss() * 0.004)) * 1e4) / 1e4; }
   for (const p of PRODUCTS) {
     const m = S.market[p.id];
     m.d = Math.max(-0.35, Math.min(0.35, m.d * 0.96 + catDrift(p.cat) + gauss() * CATS[p.cat].vol));
@@ -759,9 +814,9 @@ function genOffer() {
   const L = LEVELS[level()], lv = level();
   const prods = unlocked();
   const sea = season();
-  const quake = S.scen && S.scen.id === "quake" && !S.scen.done;
-  const prod = wpick(prods, prods.map(p => p.pop * (catDrift(p.cat) > 0 ? 2 : 1) * (sea.demand[p.cat] || 1) * (quake && p.cat === "insaat" ? 3 : 1)));
-  const city = wpick(CITIES, CITIES.map(c => c.size * (c.id === S.home ? 3 : S.locs.some(l => l.city === c.id) ? 2 : 1) * (fairOn() && S.event.city === c.id ? 3 : 1) * (quake && ["gaz", "ada", "kay", "mer"].includes(c.id) ? 2 : 1)));
+  const quake = S.scen && S.scen.id === "quake" && !S.scen.done, QUAKE = ["gaz", "ada", "kay", "mer", "kah", "mal", "isk", "osm", "diy"];
+  const city = wpick(CITIES, CITIES.map(c => c.size * (c.id === S.home ? 3 : S.locs.some(l => l.city === c.id) ? 2 : 1) * (fairOn() && S.event.city === c.id ? 3 : 1) * (quake && QUAKE.includes(c.id) ? 2 : 1)));
+  const prod = wpick(prods, prods.map(p => p.pop * (catDrift(p.cat) > 0 ? 2 : 1) * (sea.demand[p.cat] || 1) * cityDemand(city.id, p.cat) * (quake && p.cat === "insaat" && QUAKE.includes(city.id) ? 3 : 1)));
   let qty = Math.max(0.5, Math.round(rnd(L.qty[0], L.qty[1]) * (1 + 0.08 * S.staff.sales) * 2) / 2);
   if (prod.base > 100000) qty = Math.max(0.5, Math.round(qty / 4 * 2) / 2);
   const firm = pick(FIRMS), loyal = (S.rel[firm] || 0) >= 3, black = !!S.black[firm];
@@ -913,8 +968,9 @@ function buy(id, q, mode = "spot", locId = UI.loc) {
   if (S.cash < cost) return toast("Nakit yetersiz. Bankadan kredi çekebilirsin.", true);
   S.cash -= cost;
   if (mode === "spot") { addStock(l, id, q, unit); toast(`${ton(q)} ${P[id].name} ${C[l.city].name} tesisine girdi: ${tl(cost)}`); }
-  else { S.incoming.push({ pid: id, q, unit, loc: l.id, arrive: S.day + SUPPLY[mode].days, mode });
-    toast(`${SUPPLY[mode].name}: ${ton(q)} ${P[id].name} sipariş edildi, ${SUPPLY[mode].days} gün sonra gelir.`); }
+  else { const days = millDays(id, l.city), mill = nearestMill(P[id].cat, l.city);
+    S.incoming.push({ pid: id, q, unit, loc: l.id, arrive: S.day + days, mode });
+    toast(`${mill ? mill.name : "Fabrika"}: ${ton(q)} ${P[id].name} sipariş edildi, ${days} gün sonra gelir.`); }
   checkAch(); save(); render();
 }
 function sellBack(id, q, locId) {
@@ -1510,6 +1566,8 @@ const ACT = {
   skip7: () => { for (let i = 0; i < 7 && !S.over; i++) { endDay(); if (!document.getElementById("modal").hidden) break; } },
   hedge: () => { UI.hedge = !UI.hedge; render(); },
   mapCity: v => { UI.newCity = v; render(); },
+  mapCat: v => { UI.mapCat = v || ""; render(); },
+  mapZoom: () => { UI.mapZoom = !UI.mapZoom; render(); },
   // pick the city nearest to where the map was tapped
   mapTap: (v, e) => { const svg = e.target.closest("svg"); if (!svg || !svg.getScreenCTM) return;
     const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const p = pt.matrixTransform(svg.getScreenCTM().inverse());
@@ -1591,39 +1649,70 @@ const SHAPE_OF = { hrp3: "sheet", dkp1: "sheet", dkp2: "sheet", hrp10: "plate", 
   yuv50: "rod", kare20: "sq", c45: "rod", pas304: "sheet", alu: "sheet", pas316: "sheet", pasboru: "pipe", aluprof: "box" };
 const CAT_COLOR = { sac: "#8fb6d8", profil: "#ffb02e", boru: "#4cd893", insaat: "#ff8a4c", dolu: "#c08cff", ozel: "#dfe7ee" };
 const icon = p => `<span class="pic" style="color:${CAT_COLOR[p.cat]}" aria-hidden="true"><svg viewBox="0 0 24 24">${SHAPES[SHAPE_OF[p.id]] || SHAPES.sheet}</svg></span>`;
-// Rough outline of Turkey (lon, lat) for a schematic map
-const TR_OUTLINE = [[26.0, 41.8], [28.0, 41.95], [29.1, 41.25], [31.3, 41.15], [33.3, 42.0], [35.1, 42.05], [36.9, 41.35], [38.4, 40.95], [40.1, 41.0], [41.5, 41.5],
-  [43.4, 41.15], [44.8, 39.75], [44.3, 38.9], [44.3, 37.2], [42.5, 37.1], [40.3, 37.1], [38.1, 36.8], [36.7, 36.9], [36.1, 35.85], [35.8, 36.35], [34.7, 36.8],
-  [33.3, 36.1], [32.0, 36.55], [30.6, 36.85], [29.7, 36.2], [28.2, 36.7], [27.3, 37.0], [26.4, 38.3], [26.7, 39.3], [26.1, 39.9], [26.6, 40.4], [26.0, 40.7]];
+// Turkey (lon, lat): Thrace and Anatolia as two shapes so the Marmara Sea and the straits show
+const TR_THRACE = [[26.03, 40.73], [26.36, 40.95], [26.6, 41.33], [26.32, 41.72], [26.6, 41.97], [27.2, 42.08], [28.0, 41.98], [28.55, 41.5], [29.05, 41.25], [29.0, 41.05],
+  [28.6, 40.97], [28.0, 40.98], [27.5, 40.97], [27.0, 40.65], [26.68, 40.43], [26.2, 40.04], [26.4, 40.35], [26.05, 40.6]];
+const TR_ANATOLIA = [[29.12, 41.22], [30.0, 41.15], [30.4, 41.2], [31.2, 41.1], [31.8, 41.45], [32.4, 41.75], [33.3, 41.98], [34.0, 42.0], [35.0, 42.1], [35.6, 41.65],
+  [36.3, 41.3], [37.0, 41.2], [37.7, 41.05], [38.4, 40.95], [39.7, 41.0], [40.5, 41.05], [41.5, 41.52], [42.5, 41.4], [43.4, 41.15], [43.6, 40.6], [43.7, 40.1],
+  [44.4, 39.9], [44.8, 39.65], [44.3, 39.4], [44.0, 38.4], [44.3, 37.9], [44.8, 37.3], [44.2, 37.15], [42.8, 37.35], [42.2, 37.1], [41.2, 37.07], [40.2, 36.95],
+  [39.2, 36.68], [38.2, 36.85], [37.2, 36.65], [36.7, 36.85], [36.6, 36.2], [36.15, 35.85], [35.85, 35.95], [35.9, 36.45], [36.2, 36.6], [36.05, 36.92],
+  [35.8, 36.75], [35.4, 36.55], [34.6, 36.78], [34.2, 36.55], [33.9, 36.3], [32.8, 36.02], [32.0, 36.53], [30.7, 36.85], [30.55, 36.6], [30.15, 36.3],
+  [29.6, 36.2], [29.1, 36.6], [28.8, 36.75], [28.25, 36.8], [27.4, 36.7], [27.4, 37.03], [27.25, 37.4], [27.25, 37.85], [26.3, 38.3], [26.45, 38.65],
+  [26.7, 38.45], [27.05, 38.45], [26.85, 38.75], [26.95, 38.8], [26.85, 39.07], [26.65, 39.3], [27.0, 39.55], [26.2, 39.5], [26.4, 40.15], [26.7, 40.4],
+  [27.3, 40.4], [27.9, 40.35], [28.5, 40.4], [29.0, 40.37], [28.95, 40.6], [29.5, 40.7], [29.95, 40.75], [29.4, 40.8], [29.1, 40.98]];
+const RIDGES = [[[31.5, 41.0], [33, 41.2], [35, 41.0], [37, 40.7], [39, 40.5], [41, 40.6], [42.5, 40.9]],
+  [[29.3, 37.1], [30.8, 37.4], [32.5, 37.0], [34, 37.2], [35.5, 37.7], [37, 38.05], [38.5, 38.25], [40, 38.45], [42, 38.25], [43.5, 38.0]]];
+const LAKES = [[42.95, 38.65, 0.55, 0.22, -12], [33.4, 38.75, 0.28, 0.22, 0], [31.5, 37.72, 0.16, 0.12, 0], [30.85, 38.02, 0.08, 0.2, 20]];
 const MX = lon => (lon - 25.6) * 18.4, MY = lat => (42.4 - lat) * 23.7;
+const ptsOf = arr => arr.map(([lo, la]) => `${MX(lo).toFixed(1)},${MY(la).toFixed(1)}`).join(" ");
+// green (cheap) → amber → red (expensive)
+const heat = t => { t = Math.max(-1, Math.min(1, t)); return t < 0 ? `hsl(${48 + -t * 82} ${70 - -t * 10}% ${52 - -t * 6}%)` : `hsl(${48 - t * 44} 85% 52%)`; };
+// position of a city's price between the cheapest (−1) and the dearest (+1) city for a category
+const heatPos = (cityId, cat) => { const v = CITIES.map(c => cityOff(c.id, cat)), lo = Math.min(...v), hi = Math.max(...v); return hi - lo < 1e-6 ? 0 : (cityOff(cityId, cat) - lo) / (hi - lo) * 2 - 1; };
 function mapSvg() {
-  const pts = TR_OUTLINE.map(([lo, la]) => `${MX(lo).toFixed(1)},${MY(la).toFixed(1)}`).join(" ");
-  const sel = UI.newCity || S.home;
-  let h = `<svg class="map" viewBox="0 0 362 166" data-act="mapTap" style="cursor:pointer" role="img" aria-label="Türkiye haritası: turuncu noktalar senin tesislerin, küçük renkli noktalar rakip şubeleri">
-    <defs><linearGradient id="sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#16324a"/><stop offset="1" stop-color="#0f2233"/></linearGradient>
-    <linearGradient id="land" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2f3b46"/><stop offset="1" stop-color="#232c35"/></linearGradient></defs>
-    <rect x="0" y="0" width="362" height="166" rx="6" fill="url(#sea)"/>
-    <g stroke="rgba(160,210,255,.12)" fill="none">${[30, 60, 90, 120, 150].map(y => `<path d="M0 ${y}q45 -4 90 0t90 0t90 0t92 0"/>`).join("")}</g>
-    <polygon points="${pts}" fill="url(#land)" stroke="#55677a" stroke-width="1.2" stroke-linejoin="round"/>`;
+  const sel = UI.newCity || S.home, cat = UI.mapCat || "";
+  let h = `<svg class="map" viewBox="0 0 362 166" data-act="mapTap" style="cursor:pointer" role="img" aria-label="Türkiye sanayi haritası: tesislerin, çelik üretim merkezleri, rakip şubeleri${cat ? " ve " + CATS[cat].name + " fiyatları" : ""}">
+    <defs><linearGradient id="sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#173852"/><stop offset="1" stop-color="#0d2132"/></linearGradient>
+    <linearGradient id="land" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#3a4a3c"/><stop offset=".55" stop-color="#3b4038"/><stop offset="1" stop-color="#4a4434"/></linearGradient>
+    <filter id="coast" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="2.2"/></filter>
+    <clipPath id="trclip"><polygon points="${ptsOf(TR_THRACE)}"/><polygon points="${ptsOf(TR_ANATOLIA)}"/></clipPath></defs>
+    <rect x="0" y="0" width="362" height="166" rx="8" fill="url(#sea)"/>
+    <g stroke="rgba(160,210,255,.1)" fill="none">${[22, 48, 140, 156].map(y => `<path d="M0 ${y}q45 -4 90 0t90 0t90 0t92 0"/>`).join("")}</g>
+    <g fill="none" stroke="rgba(140,200,255,.35)" stroke-width="5" filter="url(#coast)"><polygon points="${ptsOf(TR_THRACE)}"/><polygon points="${ptsOf(TR_ANATOLIA)}"/></g>
+    <g fill="url(#land)" stroke="#7d8f80" stroke-width=".9" stroke-linejoin="round"><polygon points="${ptsOf(TR_THRACE)}"/><polygon points="${ptsOf(TR_ANATOLIA)}"/></g>
+    <g clip-path="url(#trclip)" stroke="rgba(255,240,210,.16)" stroke-width="1" fill="none">${RIDGES.map(r => { let d = ""; for (let i = 0; i < r.length - 1; i++) for (let k = 0; k < 1; k += 0.2) {
+      const lo = r[i][0] + (r[i + 1][0] - r[i][0]) * k, la = r[i][1] + (r[i + 1][1] - r[i][1]) * k, x = MX(lo), y = MY(la); d += `M${(x - 3).toFixed(1)} ${(y + 2).toFixed(1)}l3 -3.5l3 3.5`; } return `<path d="${d}"/>`; }).join("")}</g>
+    ${LAKES.map(([lo, la, rx, ry, rot]) => `<ellipse cx="${MX(lo).toFixed(1)}" cy="${MY(la).toFixed(1)}" rx="${(rx * 18.4).toFixed(1)}" ry="${(ry * 23.7).toFixed(1)}" transform="rotate(${rot} ${MX(lo).toFixed(1)} ${MY(la).toFixed(1)})" fill="#1c4563" stroke="rgba(140,200,255,.3)" stroke-width=".6"/>`).join("")}
+    <g class="seas" font-size="7.5" font-style="italic" fill="rgba(170,205,235,.55)" letter-spacing="1.5"><text x="${MX(32.2)}" y="${MY(42.12)}">KARADENİZ</text><text x="${MX(31.2)}" y="${MY(35.9)}">AKDENİZ</text>
+      <text x="${MX(25.68)}" y="${MY(37.6)}" font-size="6.5">EGE</text><text x="${MX(27.6)}" y="${MY(40.72)}" font-size="5.5" letter-spacing=".5">MARMARA</text></g>`;
   const homeLoc = S.locs.find(l => l.city === S.home) || S.locs[0];
   if (homeLoc) for (const c of [...new Set(S.locs.map(l => l.city))].filter(c => c !== homeLoc.city)) {
     const a = C[homeLoc.city], b = C[c], mx = (MX(a.lon) + MX(b.lon)) / 2, my = (MY(a.lat) + MY(b.lat)) / 2 - 14;
     h += `<path class="route" d="M${MX(a.lon).toFixed(1)} ${MY(a.lat).toFixed(1)}Q${mx.toFixed(1)} ${my.toFixed(1)} ${MX(b.lon).toFixed(1)} ${MY(b.lat).toFixed(1)}" fill="none" stroke="var(--hot)" stroke-width="1.4" stroke-dasharray="3 4"/>`;
   }
+  for (const m of MILLS) { if (cat && !m.cats.includes(cat)) continue; const c = C[m.city], x = MX(c.lon) - 6, y = MY(c.lat) - 9;
+    h += `<g aria-hidden="true" transform="translate(${x.toFixed(1)} ${y.toFixed(1)})"><path d="M0 7V3l2.2 1.4V3l2.2 1.4V0h1.6v7z" fill="#c9d3dc" stroke="#0d2132" stroke-width=".5"/><circle cx="5.3" cy="-1.4" r="1.2" fill="rgba(220,225,230,.45)"/></g>`; }
+  const big = new Set(["ist", "ank", "izm"]);
   for (const c of CITIES) {
     const x = MX(c.lon), y = MY(c.lat), mine = S.locs.some(l => l.city === c.id), rv = S.rivals.filter(r => r.alive && r.cities.includes(c.id));
     h += `<g data-city="${c.id}">`;
-    rv.forEach((r, i) => { const a = i / rv.length * Math.PI * 2 - Math.PI / 2; h += `<circle cx="${(x + Math.cos(a) * 7.5).toFixed(1)}" cy="${(y + Math.sin(a) * 7.5).toFixed(1)}" r="2.1" fill="${r.color}"/>`; });
-    if (c.id === sel) h += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="9" fill="none" stroke="var(--fg)" stroke-dasharray="2 2"/>`;
-    h += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${mine ? 5 : 3.2}" fill="${mine ? "var(--hot)" : "var(--muted)"}" stroke="var(--bg)"/>`;
-    if (mine || c.id === sel || ["ist", "ank", "izm"].includes(c.id)) h += `<text x="${(x + 7).toFixed(1)}" y="${(y - 6).toFixed(1)}" font-size="9" fill="${mine || c.id === sel ? "var(--fg)" : "var(--muted)"}">${c.name}</text>`;
+    if (!cat) rv.forEach((r, i) => { const a = i / rv.length * Math.PI * 2 - Math.PI / 2; h += `<circle cx="${(x + Math.cos(a) * 6.5).toFixed(1)}" cy="${(y + Math.sin(a) * 6.5).toFixed(1)}" r="1.8" fill="${r.color}"/>`; });
+    if (c.id === sel) h += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="8.5" fill="none" stroke="var(--fg)" stroke-width="1.1" stroke-dasharray="2 2"/>`;
+    const fill = cat ? heat(heatPos(c.id, cat)) : mine ? "var(--hot)" : c.port ? "#8fc6ef" : "#c9d3dc";
+    h += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${cat ? 4 : mine ? 4.6 : 2.6}" fill="${fill}" stroke="#0d2132" stroke-width="1"/>`;
+    if (mine && cat) h += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6" fill="none" stroke="var(--hot)" stroke-width="1.4"/>`;
+    if (UI.mapZoom || mine || c.id === sel || big.has(c.id)) h += `<text x="${(x + 6).toFixed(1)}" y="${(y - 5).toFixed(1)}" font-size="${UI.mapZoom && !(mine || c.id === sel || big.has(c.id)) ? 6 : 8.5}" font-weight="${c.id === sel ? 700 : 500}" fill="${mine || c.id === sel ? "#fff" : "rgba(233,238,242,.75)"}">${c.name}${cat && c.id === sel ? " " + pct(cityOff(c.id, cat)) : ""}</text>`;
     h += `</g>`;
   }
   return h + `</svg>`;
 }
 function cityInfo(id) {
-  const c = C[id], mine = S.locs.filter(l => l.city === id), rv = S.rivals.filter(r => r.alive && r.cities.includes(id));
+  const c = C[id], mine = S.locs.filter(l => l.city === id), rv = S.rivals.filter(r => r.alive && r.cities.includes(id)), mills = MILLS.filter(m => m.city === id);
+  const want = Object.keys(CATS).filter(k => cityDemand(id, k) > 1.25).map(k => CATS[k].name);
   return `<div class="line2"><span><b style="font-family:var(--body)">${c.name} · ${c.osb}</b>${c.port ? " · liman" : ""}</span><b>${km(S.home, id) ? nf0.format(km(S.home, id)) + " km" : "merkez"}</b></div>
+    <div class="chips">${(c.ind || []).map(k => `<span class="chip ${k === "celik" ? "hot" : "st"}">${INDUSTRIES[k].name}</span>`).join("")}</div>
+    ${mills.length ? `<div class="muted">Üretim: ${mills.map(m => `<b style="color:var(--fg)">${m.name}</b> (${m.cats.map(k => CATS[k].name).join(", ")})`).join(" · ")}</div>` : ""}
+    ${want.length ? `<div class="muted">Çok istenen: ${want.join(", ")}</div>` : ""}
     <div class="muted">${mine.length ? `Tesislerin: ${mine.map(l => LOC_TYPES[l.type].name).join(", ")}` : "Burada tesisin yok"} · ${rv.length ? `Rakipler: ${rv.map(r => esc(r.name)).join(", ")}` : "Rakip yok"}</div>
     <div class="chips">${Object.keys(CATS).map(k => { const o = cityOff(id, k); return `<span class="chip ${o < -0.01 ? "g" : o > 0.01 ? "b" : ""}">${CATS[k].name} ${pct(o)}</span>`; }).join("")}</div>`;
 }
@@ -1742,7 +1831,7 @@ function tradePanel(p) {
   const hist = S.market[p.id].hist.slice(-30), lo = Math.min(...hist), hi = Math.max(...hist);
   const byCity = CITIES.map(c => [c, priceAt(p.id, c.id)]).sort((a, b) => a[1] - b[1]), cheap = byCity[0], dear = byCity[byCity.length - 1];
   const sup = mode => { const b = supplyBlock(mode, q, l), s = SUPPLY[mode], c = buyCost(p.id, q, mode, l.city);
-    const sub = b || (mode === "imp" ? `peşinat ${tl(c * 0.3 * (UI.hedge ? 1.015 : 1))} · 20 gün` : tl(c) + (s.days ? " · " + s.days + " gün" : " · hemen"));
+    const sub = b || (mode === "imp" ? `peşinat ${tl(c * 0.3 * (UI.hedge ? 1.015 : 1))} · 20 gün` : mode === "mill" ? `${tl(c)} · ${millDays(p.id, l.city)} gün` : tl(c) + " · hemen");
     return `<button class="btn ${mode === "spot" ? "hot" : "st"}" data-act="buy" data-v="${p.id}:${mode}" ${b || q <= 0 ? "disabled" : ""}>${s.name}${s.disc ? " −%" + Math.round(s.disc * 100) : ""}<small>${sub}</small></button>`; };
   return `<div class="trade">
     <canvas class="pscene" data-scene="prod" data-id="${p.id}" data-anim="0" role="img" aria-label="${esc(p.name)} yığını"></canvas>
@@ -1753,6 +1842,7 @@ function tradePanel(p) {
     <div class="line2"><span>${locName(l)} · boş yer</span><b>${ton(locFree(l))}</b></div>
     <div class="line2"><span>${C[l.city].name} fiyatı</span><b>${nf0.format(m)} ₺/t</b></div>
     <div class="line2"><span>En ucuz ${cheap[0].name} <b>${nf0.format(cheap[1])}</b></span><span>en pahalı ${dear[0].name} <b>${nf0.format(dear[1])}</b></span></div>
+    ${(() => { const m = nearestMill(p.cat, l.city); return m ? `<div class="line2"><span>En yakın üretici: ${m.name}</span><b>${m.d ? nf0.format(m.d) + " km" : "aynı şehir"}</b></div>` : ""; })()}
     ${level() >= SUPPLY.imp.lvl ? `<div class="filter"><button aria-pressed="${!!UI.hedge}" data-act="hedge">İthalatta kuru sabitle (+%1,5)</button></div>` : ""}
     ${discount(q) ? `<div class="line2"><span>Toplu alım indirimi</span><b>−%${Math.round(discount(q) * 100)}</b></div>` : ""}
     <div class="btns">${sup("spot")}${sup("mill")}${sup("imp")}</div>
@@ -1800,8 +1890,13 @@ function locCard(l) {
   return h + `</div>`;
 }
 function renderStock() {
-  let h = `<section class="sec"><div class="sechead"><h2>Harita</h2><span class="muted">şehre dokun · fiyat farkları</span></div><div class="card">${mapSvg()}${cityInfo(UI.newCity || S.home)}
-    <div class="legend"><span><i style="background:var(--hot)"></i>Senin tesisin</span><span><i style="background:var(--muted)"></i>Şehir</span><span>Küçük renkli noktalar: rakip şubeleri</span></div></div></section>`;
+  const mc = UI.mapCat || "";
+  let h = `<section class="sec"><div class="sechead"><h2>Sanayi haritası</h2><button class="btn ghost sm" data-act="mapZoom" aria-pressed="${!!UI.mapZoom}">${UI.mapZoom ? "Küçült" : "Büyüt"}</button></div><div class="card">
+    <div class="filter">${[["", "Sanayi"], ...Object.keys(CATS).map(k => [k, CATS[k].name.split(" ")[0]])].map(([k, n]) => `<button aria-pressed="${mc === k}" data-act="mapCat" data-v="${k}">${k ? n + " fiyatı" : n}</button>`).join("")}</div>
+    <div class="mapwrap ${UI.mapZoom ? "zoom" : ""}">${mapSvg()}</div>
+    <div class="legend">${mc ? `<span><i style="background:${heat(-1)}"></i>En ucuz</span><span><i style="background:${heat(0)}"></i>Orta</span><span><i style="background:${heat(1)}"></i>En pahalı</span><span>⌂ ${CATS[mc].name} üreticisi</span>`
+      : `<span><i style="background:var(--hot)"></i>Senin tesisin</span><span><i style="background:#c9d3dc"></i>Sanayi şehri</span><span><i style="background:#8fc6ef"></i>Liman</span><span>⌂ Çelik üretimi</span><span>Renkli nokta: rakip</span>`}</div>
+    ${cityInfo(UI.newCity || S.home)}</div></section>`;
   h += `<section class="sec"><div class="sechead"><h2>Tesisler</h2><span class="muted">${S.locs.length}/${maxLocs()} · ${nf1.format(stockTotal())}/${nf0.format(capTotal())} t</span></div>`;
   if (!S.locs.length) h += `<canvas class="scene" data-scene="empty" data-anim="0" role="img" aria-label="Boş arsa: kiralık depo"></canvas>`;
   if (!S.locs.length) h += `<div class="hint">Henüz tesisin yok. <b>Depo</b> ucuzdur ve stok tutar. <b>Dükkan</b> pahalıdır ama her gün kapıdan perakende müşteri gelir ve stoğunu %8–16 kârla satar.</div>`;
@@ -2537,6 +2632,7 @@ function render() {
   const m = document.getElementById("main"), top = m.scrollTop;
   m.innerHTML = UI.tab === "orders" ? renderOrders() : UI.tab === "market" ? renderMarket() : UI.tab === "stock" ? renderStock() : UI.tab === "rival" ? renderRival() : renderCompany();
   m.scrollTop = top;
+  const mw = m.querySelector(".mapwrap.zoom"); if (mw) { const c = C[UI.newCity || S.home]; mw.scrollLeft = MX(c.lon) / 362 * mw.scrollWidth - mw.clientWidth / 2; }
   document.getElementById("endDay").disabled = S.over;
   visMount();
 }

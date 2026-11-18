@@ -120,11 +120,49 @@ Aynı firmaya 3 kez teslimat yapılınca firma sadık müşteri olur. Sonraki te
 
 ## 8. Tesisler, lojistik ve tedarik
 
-### Şehirler (15)
+### Şehirler (30) ve sanayi profilleri
 
-İstanbul (İkitelli), Kocaeli (Dilovası), Bursa (Demirtaş OSB), Sakarya (Hendek), Eskişehir, Ankara (Ostim), İzmir (Çiğli AOSB), Manisa, Antalya, Konya (Büsan), Kayseri, Adana (Hacı Sabancı OSB), Mersin (Liman), Gaziantep (Başpınar), Samsun (Tekkeköy). Her şehrin bir talep büyüklüğü vardır (İstanbul 1,6, Sakarya 0,5). Altı şehir **liman** şehridir: İstanbul, Kocaeli, İzmir, Antalya, Mersin, Samsun.
+Her şehrin bir talep büyüklüğü, liman bilgisi ve sanayi profili vardır. Profil o şehirden gelen siparişlerin ürün dağılımını belirler. Örneğin otomotiv şehrinden sac ×1,8 ve dolu mil ×1,4 daha sık istenir.
 
-Mesafe koordinatlardan hesaplanır (kuş uçuşu × 1,25 yol katsayısı). Örnek: İstanbul–Ankara ≈ 440 km.
+| Bölge | Şehir (OSB) · sanayi |
+|---|---|
+| Marmara | İstanbul (İkitelli) makine, inşaat, otomotiv · Tekirdağ (Çorlu) tekstil, gıda · Kocaeli (Dilovası) otomotiv, tersane, çelik · Sakarya (Hendek) otomotiv · Bursa (Demirtaş) otomotiv, tekstil · Balıkesir gıda, makine |
+| İç Anadolu | Eskişehir beyaz eşya, makine · Ankara (Ostim) savunma, makine, inşaat · Kırıkkale savunma, çelik · Konya (Büsan) tarım makineleri · Kayseri mobilya, makine · Sivas makine, enerji · Çorum makine, tarım |
+| Ege | İzmir (Çiğli) çelik, makine, gıda · Manisa beyaz eşya · Denizli tekstil, makine |
+| Karadeniz | Karabük çelik · Zonguldak (Ereğli) çelik, tersane · Samsun (Tekkeköy) tarım, inşaat · Trabzon (Arsin) inşaat, tersane |
+| Akdeniz | Antalya inşaat, gıda · Mersin (Liman) inşaat, enerji · Adana (Hacı Sabancı) tarım, gıda · Osmaniye çelik, inşaat · Hatay (İskenderun) çelik, enerji |
+| Doğu ve Güneydoğu | Gaziantep (Başpınar) makine, tekstil · Kahramanmaraş tekstil, inşaat · Malatya inşaat · Diyarbakır inşaat, enerji · Erzurum inşaat |
+
+Liman şehirleri (10): İstanbul, Tekirdağ, Kocaeli, İzmir, Antalya, Zonguldak, Samsun, Trabzon, Hatay, Mersin.
+
+### Çelik üretim merkezleri
+
+| Merkez | Şehir | Ürünler |
+|---|---|---|
+| Ereğli yassı çelik | Zonguldak | Sac |
+| İskenderun entegre çelik | Hatay | Sac, profil, inşaat demiri |
+| Karabük haddehanesi | Karabük | Profil, inşaat demiri, dolu mil |
+| Aliağa ark ocakları | İzmir | İnşaat demiri, dolu mil, profil |
+| Dilovası çelik ve boru | Kocaeli | Boru, sac, profil |
+| Osmaniye haddehaneleri | Osmaniye | İnşaat demiri |
+| Kırıkkale dövme çelik | Kırıkkale | Dolu mil |
+| İstanbul boru fabrikaları | İstanbul | Boru |
+| Bursa paslanmaz servis merkezi | Bursa | Paslanmaz ve alüminyum |
+
+- **Fiyat:** Her şehrin fiyatı o ürünün en yakın üreticisine olan mesafeye doğru çekilir: üreticinin yanında yaklaşık −%3, uzaklaştıkça artar (en fazla +%3,5). Ortalama şehir ulusal fiyattadır. Bunun üstüne günlük dalgalanma eklenir.
+- **Fabrikadan alım:** Teslim süresi en yakın üreticiye olan mesafeye göre 1–5 gündür (her 350 km +1 gün). Al-sat panelinde en yakın üretici ve uzaklığı yazar.
+- **Deprem Bölgesi senaryosu:** Gaziantep, Adana, Kayseri, Mersin, Kahramanmaraş, Malatya, Hatay, Osmaniye ve Diyarbakır'da inşaat demiri talebi üç kattır.
+
+### Harita
+
+Trakya ve Anadolu ayrı çizilir; Marmara ve boğazlar, Van, Tuz, Beyşehir ve Eğirdir gölleri, Kuzey Anadolu dağları ve Toroslar, deniz adları görünür. Kıyılar hafif parlar. Simgeler:
+
+- çelik üretim merkezleri baca simgesiyle
+- liman şehirleri mavi, senin tesislerin turuncu
+- rakip şubeleri renkli noktalarla
+- merkezinden diğer tesislerine akan sevkiyat rotaları
+
+**Görünümler:** "Sanayi" ve 6 ürün kategorisinin "fiyat" görünümü. Fiyat görünümünde şehirler o ürünün en ucuz (yeşil) ile en pahalı (kırmızı) şehri arasında renklenir. **Büyüt** ile harita iki kat büyür, bütün şehir adları görünür ve yana kaydırılabilir.
 
 ### Tesis türleri
 
