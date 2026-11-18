@@ -5,6 +5,7 @@ import { BAL } from "../data/balance.js";
 import { spend, earn, factoryValue, canSpendOperating } from "./finance.js";
 import { level, uid, note, has } from "./util.js";
 import { questEvent } from "./quests.js";
+import { allocation } from "./warehouse.js";
 import { addXp } from "./progress.js";
 
 export const plotCost = (s, region) => RG[region].plotPrice * (1 + 0.15 * s.regions[region].plots.filter(p => p.owned).length);
@@ -98,6 +99,8 @@ export function demolish(s, id) {
 export function sellWarehouse(s, id, WT) {
   const b = s.buildings[id]; if (!b || b.kind !== "warehouse") return { ok: false };
   if (Object.values(s.buildings).filter(x => x.kind === "warehouse").length <= 1) return { ok: false, msg: "Son deponu satamazsın" };
+  delete s.buildings[id]; const over = allocation(s, b.region).overflow; s.buildings[id] = b;
+  if (over > 0.5) return { ok: false, msg: `Önce ${Math.ceil(over)} hacim malı sat ya da taşı; kalan depolara sığmıyor` };
   const v = WT[b.type].cost * 0.5; earn(s, v, "Varlık satışı");
   s.regions[b.region].plots[b.plot].b = null; delete s.buildings[id]; return { ok: true, value: v };
 }

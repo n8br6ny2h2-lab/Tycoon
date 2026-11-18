@@ -5,7 +5,7 @@ import { FT } from "../data/factories.js";
 import { WT } from "../data/warehouses.js";
 import { RG } from "../data/regions.js";
 import { newGame } from "../core/state.js";
-import { tickReal, applyOffline, touchReal } from "../core/game.js";
+import { tickReal, applyOffline, touchReal, advance } from "../core/game.js";
 import { saveGame, loadGame } from "../core/save.js";
 import * as M from "../core/market.js";
 import * as F from "../core/factory.js";
@@ -26,7 +26,7 @@ import { iconSvg } from "./icons.js";
 
 const $ = s => document.querySelector(s);
 let S = null; const V = { tab: "map", region: "anadolu", mapMode: "region", msel: "kereste", qty: 10, side: "buy", otype: "market", sup: "standart", treg: "anadolu", dreg: "anadolu", vreg: "anadolu", co: null, sheet: null, notes: false };
-let map, storage, lastHourSeen = -1, dirty = true, lastSave = 0, menuOpen = true;
+let map, storage, lastHourSeen = -1, dirty = true, lastSave = 0, menuOpen = true, pressUntil = 0;
 
 // ---------- depolama (iOS: Capacitor Preferences, tarayıcı: localStorage) ----------
 function makeStorage() {
@@ -45,26 +45,39 @@ const result = (r, okText) => { if (r && r.ok) { if (okText) toast(okText, "good
 // ---------- üst bar ve alt menü ----------
 const TABS = [["map", "Harita", '<path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/>'], ["market", "Piyasa", '<path d="M3 17l5-6 4 3 6-8 3 3"/><path d="M3 21h18"/>'], ["factories", "Fabrikalar", '<path d="M3 21V10l5 3v-3l5 3v-3l5 3V4h3v17z"/>'], ["depots", "Depolar", '<path d="M3 10l9-6 9 6v11H3z"/><path d="M7 21v-6h10v6M7 18h10"/>'], ["logistics", "Lojistik", '<path d="M2 16V7h11v9M13 10h4l3 3v3h-7"/><circle cx="6" cy="17.5" r="1.8"/><circle cx="16.5" cy="17.5" r="1.8"/>'], ["company", "Şirket", '<path d="M4 21V5h10v16M14 9h6v12"/><path d="M7 9h4M7 13h4M7 17h4"/>']];
 function renderTop() {
+  const top = $("#top");
+  if (!top._built) { top._built = true;
+    top.innerHTML = `<div class="tco"><b id="tName"></b><span class="tlv"><i id="tLvN"></i><span id="tLv"></span><span class="xp"><i id="tXp"></i></span></span></div>
+    <div class="cash" id="tCashBox"><span class="coin">₺</span><b id="tCash"></b></div>
+    <div class="tstat" title="İtibar"><span>İtibar</span><b id="tRep"></b></div>
+    <div class="speed">${BAL.speeds.map((v, i) => `<button data-a="speed" data-v="${i}" aria-label="Hız ${v}">${i === 0 ? "❚❚" : "×" + v}</button>`).join("")}</div>
+    <div class="tdate"><b id="tDay"></b><span id="tDate"></span></div>
+    <button class="tb" data-a="notes" aria-label="Bildirimler">🔔<i class="bd" id="tBd" hidden></i></button>
+    <button class="tb" data-a="menu" aria-label="Menü">☰</button>`; }
   const lv = level(S), x0 = BAL.xpLevels[lv - 1], x1 = BAL.xpLevels[lv] || x0 * 2, d = dateTxt(S.time.min), unread = S.notes.filter(n => !n.read).length, se = season(S);
-  $("#top").innerHTML = `<div class="tco"><b>${esc(S.company.name)}</b><span class="tlv"><i>${lv}</i>${BAL.levelNames[lv - 1]}<span class="xp"><i style="width:${Math.min(100, (S.company.xp - x0) / (x1 - x0) * 100)}%"></i></span></span></div>
-    <div class="cash ${S.company.cash < 0 ? "neg" : ""}"><span class="coin">₺</span><b>${tlFull(S.company.cash)}</b></div>
-    <div class="tstat" title="İtibar"><span>İtibar</span><b class="${S.company.rep < 30 ? "bad" : ""}">${n0(S.company.rep)}</b></div>
-    <div class="speed">${BAL.speeds.map((v, i) => `<button data-a="speed" data-v="${i}" class="${S.time.speed === i ? "on" : ""}" aria-label="Hız ${v}">${i === 0 ? "❚❚" : "×" + v}</button>`).join("")}</div>
-    <div class="tdate"><b>Gün ${d.day}</b><span>${d.date} · ${d.clock} · ${SEASON_NAME[se]}</span></div>
-    <button class="tb" data-a="notes" aria-label="Bildirimler">🔔${unread ? `<i class="bd">${Math.min(99, unread)}</i>` : ""}</button>
-    <button class="tb" data-a="menu" aria-label="Menü">☰</button>`;
+  const set = (id, t) => { const el = document.getElementById(id); if (el.textContent !== t) el.textContent = t; };
+  set("tName", S.company.name); set("tLvN", String(lv)); set("tLv", BAL.levelNames[lv - 1]); set("tCash", tlFull(S.company.cash)); set("tRep", n0(S.company.rep));
+  set("tDay", `Gün ${d.day}`); set("tDate", `${d.date} · ${d.clock} · ${SEASON_NAME[se]}`);
+  $("#tXp").style.width = Math.min(100, (S.company.xp - x0) / (x1 - x0) * 100) + "%";
+  $("#tCashBox").classList.toggle("neg", S.company.cash < 0); $("#tRep").classList.toggle("bad", S.company.rep < 30);
+  top.querySelectorAll(".speed button").forEach((b, i) => b.classList.toggle("on", S.time.speed === i));
+  const bd = $("#tBd"); bd.hidden = !unread; if (unread) set("tBd", String(Math.min(99, unread)));
 }
-function renderBottom() { $("#bottom").innerHTML = TABS.map(([k, l, ic]) => `<button data-a="tab" data-v="${k}" class="${V.tab === k ? "on" : ""}"><svg viewBox="0 0 24 24" aria-hidden="true">${ic}</svg><span>${l}</span></button>`).join(""); }
+function renderBottom() { const html = TABS.map(([k, l, ic]) => `<button data-a="tab" data-v="${k}" class="${V.tab === k ? "on" : ""}"><svg viewBox="0 0 24 24" aria-hidden="true">${ic}</svg><span>${l}</span></button>`).join(""); const el = $("#bottom"); if (el._html !== html) { el.innerHTML = html; el._html = html; } }
 function renderView() {
   const v = $("#view"), keep = v.querySelector(".pane.right")?.scrollTop, keepL = v.querySelector(".pane.left")?.scrollTop, keepV = v.scrollTop;
   $("#app").dataset.tab = V.tab;
-  if (V.tab === "map") { $("#overlay").innerHTML = SC.mapOverlay(S, V); v.innerHTML = ""; }
-  else { $("#overlay").innerHTML = ""; v.innerHTML = V.tab === "market" ? SC.marketView(S, V) : V.tab === "factories" ? SC.factoriesView(S, V) : V.tab === "depots" ? SC.depotsView(S, V) : V.tab === "logistics" ? SC.logisticsView(S, V) : SC.companyView(S, V); }
+  // Yalnızca içerik değiştiyse DOM yenilenir (dokunulan düğme boşuna yeniden yaratılmaz).
+  const setHTML = (el, html) => { if (el._html !== html) { el.innerHTML = html; el._html = html; return true; } return false; };
+  let changed;
+  if (V.tab === "map") { changed = setHTML($("#overlay"), SC.mapOverlay(S, V)); setHTML(v, ""); }
+  else { setHTML($("#overlay"), ""); changed = setHTML(v, V.tab === "market" ? SC.marketView(S, V) : V.tab === "factories" ? SC.factoriesView(S, V) : V.tab === "depots" ? SC.depotsView(S, V) : V.tab === "logistics" ? SC.logisticsView(S, V) : SC.companyView(S, V)); }
+  if (!changed) { renderSheet(); return; }
   const r = v.querySelector(".pane.right"), l = v.querySelector(".pane.left"); if (r && keep) r.scrollTop = keep; if (l && keepL) l.scrollTop = keepL; v.scrollTop = keepV;
   renderSheet(); paintArts();
 }
 function renderSheet() {
-  const sh = $("#sheet"); if (!V.sheet) { sh.hidden = true; sh.innerHTML = ""; return; }
+  const sh = $("#sheet"); if (!V.sheet) { sh.hidden = true; sh.innerHTML = ""; sh._html = ""; return; }
   const [kind, a, b] = V.sheet.split(":"); let html = "";
   if (kind === "b") { const bd = S.buildings[a]; if (!bd) { V.sheet = null; sh.hidden = true; return; } html = bd.kind === "warehouse" ? SC.warehouseSheet(S, bd) : SC.factorySheet(S, bd); }
   else if (kind === "build") html = SC.buildCatalog(S, V, a || V.region, b !== undefined && b !== "" ? +b : undefined);
@@ -74,7 +87,8 @@ function renderSheet() {
   else if (kind === "sell") html = SC.sellSheet(S, V, a, b);
   else if (kind === "move") html = SC.moveSheet(S, V, a, b);
   else if (kind === "auto") html = SC.autoSheet(S, V, a, b);
-  sh.innerHTML = `<div class="shbar"><button class="close" data-a="closeSheet" aria-label="Kapat">✕</button></div>${html}`; sh.hidden = false;
+  const full = `<div class="shbar"><button class="close" data-a="closeSheet" aria-label="Kapat">✕</button></div>${html}`;
+  if (sh._html !== full) { const top = sh.scrollTop; sh.innerHTML = full; sh._html = full; sh.scrollTop = top; paintArts(sh); } sh.hidden = false;
 }
 // Küçük bina/araç çizimleri (data-art canvas).
 function paintArts(root = document) {
@@ -92,6 +106,8 @@ function paintArts(root = document) {
 }
 
 // ---------- eylemler ----------
+// Türkçe klavye: "12,5" ve "1.250,75" gibi değerler doğru okunur.
+export function num(v) { let t = String(v ?? "").trim().replace(/\s/g, ""); if (t.includes(",")) t = t.replace(/\./g, "").replace(",", "."); const x = parseFloat(t); return isFinite(x) ? x : NaN; }
 const val = f => { const el = document.querySelector(`[data-f="${f}"]`); return el ? el.value : undefined; };
 const A = {
   tab: v => { V.tab = v; V.co = null; V.sheet = null; if (v === "map") setTimeout(() => map.fit(), 0); },
@@ -101,7 +117,7 @@ const A = {
   notes: () => { V.notes = !V.notes; renderNotes(); },
   menu: () => showMenu(),
   closeSheet: () => { V.sheet = null; map.sel = null; },
-  sheet: v => { V.sheet = v; },
+  sheet: v => { V.sheet = v; V.sq = null; V.mq = null; V.mto = null; },
   mapRegion: v => { V.region = v; V.mapMode = "region"; map.region = v; map.mode = "region"; map.fit(); },
   mapRegionGo: v => { V.tab = "map"; V.co = null; A.mapRegion(v); },
   mapWorld: () => { V.mapMode = "world"; map.mode = "world"; map.fit(); },
@@ -109,9 +125,9 @@ const A = {
   // piyasa
   mcat: v => { V.mcat = v; }, msel: v => { V.msel = v; V.limit = null; }, mwin: v => { V.mwin = v; }, side: v => { V.side = v; if (v === "sell" && V.otype === "bulk") V.otype = "market"; }, otype: v => { V.otype = v; V.limit = null; },
   qty: v => { V.qty = +v; }, qtyMul: v => { V.qty = Math.max(0.1, Math.round(V.qty * +v * 10) / 10); }, qtyAll: v => { V.qty = +v; }, sup: v => { V.sup = v; },
-  trade: () => { const id = V.msel, q = +V.qty, reg = V.treg;
+  trade: () => { const id = V.msel, q = +V.qty, reg = V.treg; if (!(q > 0)) return result({ ok: false, msg: "Miktar gir" });
     if (V.otype === "market") return result(V.side === "buy" ? M.buy(S, id, q, reg, V.sup) : M.sell(S, id, q, reg), V.side === "buy" ? `${qtyTxt(id, q)} ${RES[id].name} alındı. Teslim sevkiyatlarda.` : `${qtyTxt(id, q)} ${RES[id].name} satıldı.`);
-    if (V.otype === "limit") return result(M.placeLimit(S, id, V.side, q, +(V.limit || val("limit")), reg, V.sup), "Limit emri verildi.");
+    if (V.otype === "limit") return result(M.placeLimit(S, id, V.side, q, V.limit || num(val("limit")), reg, V.sup), "Limit emri verildi.");
     return result(M.placeBulk(S, id, q, +(V.bdays || 5), reg, V.sup), "Toplu sipariş başladı. İlk parti yarın."); },
   cancelOrder: v => { M.cancelLimit(S, +v); toast("Emir iptal edildi."); },
   // fabrika ve depo
@@ -130,17 +146,18 @@ const A = {
   sq: v => { V.sq = +v; },
   doSell: v => { const [reg, id, q] = v.split(":"); const r = result(M.sell(S, id, +q, reg), `${RES[id].name} satıldı.`); if (r.ok) { V.sheet = null; V.sq = null; beep("cash"); } },
   doMove: v => { const [reg, id, to, mode, q] = v.split(":"); const r = result(L.dispatch(S, { from: reg, to, items: [{ res: id, q: +q }], mode }), `Sevkiyat yola çıktı (${RG[to].short}).`); if (r.ok) V.sheet = null; },
-  setAuto: v => { const [reg, id] = v.split(":"); W.setAutoStock(S, reg, id, +val("amin") || 0, +val("amax") || 0); toast("Otomatik stok kaydedildi.", "good"); V.sheet = null; },
+  setAuto: v => { const [reg, id] = v.split(":"); const mn = num(val("amin")) || 0, mx = num(val("amax")) || 0; if (mx && mn > mx) return toast("Alt sınır üst sınırdan büyük olamaz.", "bad"); W.setAutoStock(S, reg, id, mn, mx); toast("Otomatik stok kaydedildi.", "good"); V.sheet = null; },
   // lojistik
   buyV: v => { const [t, home] = v.split(":"); result(L.buyVehicle(S, t, home), "Araç filoya katıldı."); },
   sellV: v => result(L.sellVehicle(S, +v), "Araç satıldı."),
-  addRoute: () => { const rf = V.rf || {}; const regs = Object.keys(S.regions).filter(r => S.regions[r].owned); const r = { from: rf.from || regs[0], to: rf.to || regs[1], res: rf.res || "kereste", q: +(rf.q || 20), every: +(rf.every || 1), keep: +(rf.keep || 0), mode: rf.mode || "nakliyeci" };
+  addRoute: () => { const rf = V.rf || {}; const regs = Object.keys(S.regions).filter(r => S.regions[r].owned); const r = { from: rf.from || regs[0], to: rf.to || regs[1], res: rf.res || "kereste", q: num(rf.q ?? 20), every: +(rf.every || 1), keep: num(rf.keep ?? 0) || 0, mode: rf.mode || "nakliyeci" };
+    if (!(r.q > 0)) return toast("Miktar geçersiz.", "bad");
     if (r.from === r.to) return toast("Başlangıç ve varış aynı olamaz.", "bad"); result(L.addRoute(S, r), "Rota eklendi."); },
   delRoute: v => L.removeRoute(S, +v),
   // şirket
   accept: v => result(K.accept(S, +v), "Sözleşme kabul edildi. Teslim tarihine dikkat."),
   decline: v => K.decline(S, +v),
-  bid: v => result(K.bid(S, +v, +val("bid." + v)), "İhale teklifin verildi."),
+  bid: v => result(K.bid(S, +v, num(val("bid." + v))), "İhale teklifin verildi."),
   deliver: v => { const reg = val("dr" + v) || V["dr" + v] || "anadolu"; result(K.deliver(S, +v, reg), "Teslimat yola çıktı."); },
   autoC: v => { const c = S.contracts.find(x => x.id === +v); c.auto = !c.auto; },
   loanAmt: v => { const [id, a] = v.split(":"); V["la" + id] = +a; },
@@ -154,7 +171,7 @@ const A = {
   claim: v => { const r = claim(S, v); if (r.ok) { toast(`Ödül: ${tl(r.reward)}`, "good"); beep("cash"); } },
   setting: v => { S.settings[v] = !S.settings[v]; },
   saveNow: async () => { await persist(); toast("Kaydedildi.", "good"); },
-  confirm: v => { const [what, arg] = v.split(":"); const text = { demolish: "Fabrika satılsın mı? Değerinin %60'ı geri gelir.", sellW: "Depo satılsın mı? İçindeki mallar başka depoya sığmazsa zarar görür.", newGame: "Yeni oyuna başlanacak; mevcut şirket silinecek. Emin misin?" }[what];
+  confirm: v => { const [what, arg] = v.split(":"); const text = { demolish: "Fabrika satılsın mı? Değerinin %60'ı geri gelir.", sellW: "Depo satılsın mı? Değerinin yarısı geri gelir. İçindeki mallar bölgedeki diğer depolara sığmalı.", newGame: "Yeni oyuna başlanacak; mevcut şirket silinecek. Emin misin?" }[what];
     modal(`<h3>Emin misin?</h3><p>${text}</p><div class="row end"><button class="b ghost" data-a="modalClose">Vazgeç</button><button class="b danger" data-a="do_${what}" data-v="${arg}">Evet</button></div>`); },
   do_demolish: v => { result(F.demolish(S, v), "Fabrika satıldı."); V.sheet = null; closeModal(); },
   do_sellW: v => { result(F.sellWarehouse(S, v, WT), "Depo satıldı."); V.sheet = null; closeModal(); },
@@ -231,7 +248,7 @@ function loop(now) {
     if (now - lastSave > 20000) persist();
   }
   if (S && (now - (loop.topT || 0) > 400)) { loop.topT = now; renderTop(); }
-  if (dirty && S) { dirty = false; renderBottom(); renderView(); }
+  if (dirty && S && now > pressUntil) { dirty = false; renderBottom(); renderView(); }
   if (S && V.tab === "map" && !menuOpen) { map.clamp(); map.draw(now / 1000); }
   if (S && V.tab !== "map" && now - (loop.artT || 0) > 100) { loop.artT = now; for (const cv of document.querySelectorAll("canvas[data-art][data-run='1']")) paintArts(cv.parentElement); }
   requestAnimationFrame(loop);
@@ -243,9 +260,12 @@ export async function boot() {
     if (hit.region) { V.region = hit.region; if (S.regions[hit.region].owned) { V.mapMode = "region"; map.mode = "region"; map.region = hit.region; map.fit(); } else V.sheet = `plot:${hit.region}:0`; dirty = true; return; }
     const p = S.regions[map.region].plots[hit.plot]; map.sel = hit; V.sheet = p.b ? "b:" + p.b : p.owned ? `build:${map.region}:${hit.plot}` : `plot:${map.region}:${hit.plot}`; dirty = true; haptic();
   });
+  // Dokunma sürerken (en fazla 0,7 sn) yeniden çizim bekletilir; parmak kalkınca 60 ms sonra devam eder.
+  document.addEventListener("pointerdown", () => { pressUntil = performance.now() + 700; }, true);
+  const release = () => { pressUntil = performance.now() + 60; }; document.addEventListener("pointerup", release, true); document.addEventListener("pointercancel", release, true);
   document.addEventListener("click", e => { const b = e.target.closest("[data-a]"); if (!b || b.disabled) return; const f = A[b.dataset.a]; if (!f) return; const r = f(b.dataset.v, e); if (r && r.then) r.then(() => { dirty = true; }); dirty = true; });
   document.addEventListener("change", e => { const f = e.target.dataset && e.target.dataset.f; if (!f) return; const v = e.target.value;
-    if (f.startsWith("rf.")) { V.rf = V.rf || {}; V.rf[f.slice(3)] = v; } else if (f === "qty") V.qty = Math.max(0, +v || 0); else if (f === "sq") V.sq = +v; else if (f === "mq") V.mq = +v; else if (f === "limit") V.limit = +v; else if (f === "bdays") V.bdays = +v;
+    if (f.startsWith("rf.")) { V.rf = V.rf || {}; V.rf[f.slice(3)] = v; } else if (f === "qty") V.qty = Math.max(0, num(v) || 0); else if (f === "sq") V.sq = Math.max(0, num(v) || 0); else if (f === "mq") V.mq = Math.max(0, num(v) || 0); else if (f === "limit") V.limit = num(v) || 0; else if (f === "bdays") V.bdays = +v;
     else if (f === "breg") V.sheet = "build:" + v; else V[f] = v; dirty = true; });
   document.addEventListener("visibilitychange", () => { if (document.hidden) persist(); else if (S) { offlineReport(applyOffline(S, Date.now())); dirty = true; } });
   window.addEventListener("pagehide", () => persist());
@@ -254,5 +274,5 @@ export async function boot() {
   if (r.state) { S = r.state; if (r.from === "backup") toast("Ana kayıt bozuktu; yedekten kurtarıldı.", "warn"); const o = applyOffline(S, Date.now()); showMenu(); if (o) setTimeout(() => offlineReport(o), 50); }
   else { showMenu(); if (r.from === "corrupt") toast("Kayıt okunamadı. Yeni oyun başlatabilirsin.", "bad"); }
   requestAnimationFrame(loop);
-  window.__fp = { get S() { return S; }, V, A, persist, map };
+  window.__fp = { get S() { return S; }, V, A, persist, map, adv: h => { advance(S, h * 60); dirty = true; } };
 }

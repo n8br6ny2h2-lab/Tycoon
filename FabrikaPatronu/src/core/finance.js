@@ -55,7 +55,9 @@ export function repayLoan(s, id) {
 }
 // Gün sonu: defter kapanışı, eksi bakiye faizi, iflas takibi.
 export function financeDay(s) {
-  const t = s.ledger.today, rev = Object.entries(t).filter(([k, v]) => v > 0 && k !== "Kredi").reduce((a, [, v]) => a + v, 0);
+  // Kredi girişi ve varlık satışı faaliyet kârı sayılmaz (vergilendirilmez); yatırım ve anapara da gider sayılmaz.
+  const NON_OP = new Set(["Kredi", "Varlık satışı"]);
+  const t = s.ledger.today, rev = Object.entries(t).filter(([k, v]) => v > 0 && !NON_OP.has(k)).reduce((a, [, v]) => a + v, 0);
   const cost = Object.entries(t).filter(([k, v]) => v < 0 && k !== "Kredi anapara" && k !== "Yatırım").reduce((a, [, v]) => a - v, 0);
   s.ledger.days.push({ day: day(s), rev, cost, net: rev - cost, cats: t }); if (s.ledger.days.length > 90) s.ledger.days.shift();
   for (const [k, v] of Object.entries(t)) s.ledger.month[k] = (s.ledger.month[k] || 0) + v;

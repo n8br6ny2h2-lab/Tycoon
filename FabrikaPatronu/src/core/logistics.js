@@ -72,14 +72,14 @@ export function fleetDay(s) { const m = s.fleet.reduce((a, f) => a + VH[f.type].
 export function addRoute(s, r) { const route = { id: uid(s), from: r.from, to: r.to, res: r.res, q: r.q, every: Math.max(1, r.every | 0), mode: r.mode || "nakliyeci", keep: r.keep || 0, last: -99 }; s.routes.push(route); return { ok: true, route }; }
 export function removeRoute(s, id) { s.routes = s.routes.filter(r => r.id !== id); }
 export function routesTick(s) {
-  const d = day(s), out = [];
+  const d = day(s), out = [], half = has(s, "lojistik_opt") ? 0.5 : 1;
   for (const r of s.routes) {
-    if (d - r.last < r.every) continue;
+    if ((s.time.min - (r.lastMin ?? -1e9)) < r.every * 1440 * half - 1) continue;
     const have = qty(s, r.from, r.res) - r.keep, q = Math.min(r.q, Math.max(0, have), freeFor(s, r.to, r.res) / Math.max(RES[r.res].vol, 1e-6));
     if (q < 0.1) { r.lastMsg = have < 0.1 ? "Kaynakta stok yok" : "Hedefte yer yok"; continue; }
     const res = dispatch(s, { from: r.from, to: r.to, items: [{ res: r.res, q: Math.floor(q * 10) / 10 }], mode: r.mode });
-    if (!res.ok && r.mode !== "nakliyeci") { const alt = dispatch(s, { from: r.from, to: r.to, items: [{ res: r.res, q: Math.floor(q * 10) / 10 }], mode: "nakliyeci" }); r.lastMsg = alt.ok ? "Filo meşgul, nakliyeciyle gitti" : alt.msg; if (alt.ok) r.last = d; }
-    else { r.lastMsg = res.ok ? "Gönderildi" : res.msg; if (res.ok) r.last = d; }
+    if (!res.ok && r.mode !== "nakliyeci") { const alt = dispatch(s, { from: r.from, to: r.to, items: [{ res: r.res, q: Math.floor(q * 10) / 10 }], mode: "nakliyeci" }); r.lastMsg = alt.ok ? "Filo meşgul, nakliyeciyle gitti" : alt.msg; if (alt.ok) { r.last = d; r.lastMin = s.time.min; } }
+    else { r.lastMsg = res.ok ? "Gönderildi" : res.msg; if (res.ok) { r.last = d; r.lastMin = s.time.min; } }
     out.push(r);
   }
   return out;

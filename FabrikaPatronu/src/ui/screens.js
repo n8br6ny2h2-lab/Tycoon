@@ -96,10 +96,10 @@ function tradePanel(s, V, r) {
     <div class="seg">${btn("otype", "market", "Piyasa emri", ot === "market" ? "on" : "")}${btn("otype", "limit", "Limit emir", ot === "limit" ? "on" : "")}${side === "buy" ? btn("otype", "bulk", "Toplu sipariş", ot === "bulk" ? "on" : "") : ""}</div>
     <label>Depo ${regionSelect(s, "treg", reg)}</label></div>
     <div class="row">${presets.map(v => btn("qty", v, n0(v) + " " + r.unit, v === q ? "on" : "")).join("")}${btn("qtyMul", "0.5", "÷2", "ghost")}${btn("qtyMul", "2", "×2", "ghost")}
-      <input data-f="qty" type="number" inputmode="decimal" min="0" step="any" value="${q}" aria-label="Miktar"><span class="muted small">${side === "buy" ? `boş yer ${qtyTxt(r.id, Math.max(0, free))}` : `stok ${qtyTxt(r.id, have)}`}</span>
+      <input data-f="qty" type="text" inputmode="decimal" min="0" step="any" value="${q}" aria-label="Miktar"><span class="muted small">${side === "buy" ? `boş yer ${qtyTxt(r.id, Math.max(0, free))}` : `stok ${qtyTxt(r.id, have)}`}</span>
       ${side === "sell" && have > 0 ? btn("qtyAll", have, "Tümü", "ghost") : ""}${side === "buy" && free > 0 ? btn("qtyAll", Math.floor(Math.min(free, 1e7) * 10) / 10, "Depoyu doldur", "ghost") : ""}</div>`;
   if (side === "buy") h += `<div class="row sups">${SUPPLIERS.map(x => btn("sup", x.id, `<b>${x.name}</b><small>${x.desc}</small>`, x.id === sup ? "on" : "")).join("")}</div>`;
-  if (ot === "limit") h += `<div class="row"><label>Birim fiyat sınırı (₺, tüm giderler dahil) <input data-f="limit" type="number" inputmode="decimal" value="${V.limit || Math.round(qt.perUnit * (side === "buy" ? 0.97 : 1.03))}"></label><span class="muted small">Fiyat ${side === "buy" ? "bu değere inince alınır" : "bu değere çıkınca satılır"}. Emir 7 gün geçerli.</span></div>`;
+  if (ot === "limit") h += `<div class="row"><label>Birim fiyat sınırı (₺, tüm giderler dahil) <input data-f="limit" type="text" inputmode="decimal" value="${V.limit || Math.round(qt.perUnit * (side === "buy" ? 0.97 : 1.03))}"></label><span class="muted small">Fiyat ${side === "buy" ? "bu değere inince alınır" : "bu değere çıkınca satılır"}. Emir 7 gün geçerli.</span></div>`;
   if (ot === "bulk") h += `<div class="row"><label>Gün sayısı <select data-f="bdays">${[3, 5, 7, 14, 30].map(d => `<option ${d === (V.bdays || 5) ? "selected" : ""}>${d}</option>`).join("")}</select></label><span class="muted small">Bugünkü fiyattan %2 indirimle her gün ${qtyTxt(r.id, q)} gelir. Bedel her partide ödenir.</span></div>`;
   const cost = side === "buy" ? item(s, reg, r.id).cost : item(s, reg, r.id).cost, pl = side === "sell" && have > 0 ? qt.total - cost * Math.min(q, have) : null;
   h += `<div class="quote"><div><span>Birim (kayma dahil)</span><b>${n0(qt.unit)} ₺</b></div><div><span>Tutar</span><b>${tl(qt.gross)}</b></div><div><span>Komisyon</span><b>${tl(qt.commission)}</b></div><div><span>Vergi</span><b>${tl(qt.tax)}</b></div><div><span>Nakliye</span><b>${tl(qt.fee)}</b></div>
@@ -194,7 +194,7 @@ export function warehouseSheet(s, b) {
 export function sellSheet(s, V, reg, id) {
   const it = item(s, reg, id), q = Math.min(V.sq ?? it.q, it.q), qt = q > 0 ? M.quote(s, id, q, "sell", reg) : null;
   return `<div class="shead">${iconSvg(id, 40)}<div><h3>${RES[id].name} sat</h3><span class="muted small">${RG[reg].short} · stok ${qtyTxt(id, it.q)} · ort. maliyet ${n0(it.cost)} ₺</span></div></div>
-    <div class="row">${[0.25, 0.5, 1].map(f => btn("sq", Math.floor(it.q * f * 10) / 10, f === 1 ? "Tümü" : "%" + f * 100, "")).join("")}<input data-f="sq" type="number" step="any" value="${n2(q).replace(/\./g, "").replace(",", ".")}"></div>
+    <div class="row">${[0.25, 0.5, 1].map(f => btn("sq", Math.floor(it.q * f * 10) / 10, f === 1 ? "Tümü" : "%" + f * 100, "")).join("")}<input data-f="sq" type="text" inputmode="decimal" step="any" value="${n2(q).replace(/\./g, "").replace(",", ".")}"></div>
     ${qt ? `<div class="quote"><div><span>Birim</span><b>${n0(qt.unit)} ₺</b></div><div><span>Komisyon+vergi</span><b>${tl(qt.commission + qt.tax)}</b></div><div><span>Nakliye</span><b>${tl(qt.fee)}</b></div><div class="tot"><span>Net</span><b>${tlFull(qt.total)}</b></div><div><span>Kâr/zarar</span><b class="${qt.total - it.cost * q >= 0 ? "good" : "bad"}">${tl(qt.total - it.cost * q)}</b></div></div>` : ""}
     ${btn("doSell", `${reg}:${id}:${q}`, "Sat", "sellb big", !(q > 0))}`;
 }
@@ -202,13 +202,13 @@ export function moveSheet(s, V, reg, id) {
   const it = item(s, reg, id), to = V.mto && V.mto !== reg && s.regions[V.mto].owned ? V.mto : ownedRegions(s).find(r => r.id !== reg)?.id, q = Math.min(V.mq ?? it.q, it.q);
   const modes = to ? L.modesFor(s, reg, to, RES[id].vol * q) : [];
   return `<div class="shead">${iconSvg(id, 40)}<div><h3>${RES[id].name} taşı</h3><span class="muted small">${RG[reg].short} → ${to ? RG[to].short : "—"} · ${to ? n0(L.km(reg, to)) + " km" : ""}</span></div></div>
-    <div class="row"><label>Hedef ${`<select data-f="mto">${ownedRegions(s).filter(r => r.id !== reg).map(r => `<option value="${r.id}" ${r.id === to ? "selected" : ""}>${r.short}</option>`).join("")}</select>`}</label><input data-f="mq" type="number" step="any" value="${Math.round(q * 10) / 10}"> <span class="muted small">en fazla ${qtyTxt(id, it.q)}</span></div>
+    <div class="row"><label>Hedef ${`<select data-f="mto">${ownedRegions(s).filter(r => r.id !== reg).map(r => `<option value="${r.id}" ${r.id === to ? "selected" : ""}>${r.short}</option>`).join("")}</select>`}</label><input data-f="mq" type="text" inputmode="decimal" step="any" value="${Math.round(q * 10) / 10}"> <span class="muted small">en fazla ${qtyTxt(id, it.q)}</span></div>
     <div class="modes">${modes.map(m => `<button class="mode ${m.ok ? "" : "dis"}" data-a="doMove" data-v="${reg}:${id}:${to}:${m.mode}:${q}" ${m.ok ? "" : "disabled"}><b>${m.name}</b><small>${tl(m.cost)} · ${n1(m.hours)} sa${m.mode !== "nakliyeci" ? ` · ${m.n} araç (${m.idle} boşta)` : ""}</small></button>`).join("")}</div>`;
 }
 export function autoSheet(s, V, reg, id) {
   const a = s.autoStock.find(x => x.region === reg && x.res === id) || { min: 0, max: 0 };
   return `<div class="shead">${iconSvg(id, 40)}<div><h3>Otomatik stok · ${RES[id].name}</h3><span class="muted small">${RG[reg].short}. Her gün kontrol edilir: alt sınırın altına inince alınır, üst sınırı aşınca satılır. 0 = kapalı.</span></div></div>
-    <div class="row"><label>Alt sınır <input data-f="amin" type="number" step="any" value="${a.min}"></label><label>Üst sınır <input data-f="amax" type="number" step="any" value="${a.max}"></label></div>
+    <div class="row"><label>Alt sınır <input data-f="amin" type="text" inputmode="decimal" step="any" value="${a.min}"></label><label>Üst sınır <input data-f="amax" type="text" inputmode="decimal" step="any" value="${a.max}"></label></div>
     ${btn("setAuto", `${reg}:${id}`, "Kaydet", "gold")}`;
 }
 
@@ -235,7 +235,7 @@ export function logisticsView(s, V) {
   if (regs.length > 1) { const rf = V.rf || {};
     h += `<div class="card"><b>Yeni rota</b><div class="row"><label>Nereden <select data-f="rf.from">${regs.map(r => `<option value="${r.id}" ${r.id === (rf.from || regs[0].id) ? "selected" : ""}>${r.short}</option>`).join("")}</select></label><label>Nereye <select data-f="rf.to">${regs.map(r => `<option value="${r.id}" ${r.id === (rf.to || regs[1].id) ? "selected" : ""}>${r.short}</option>`).join("")}</select></label></div>
       <div class="row"><label>Ürün <select data-f="rf.res">${RESOURCES.filter(M.tradeable).map(r => `<option value="${r.id}" ${r.id === (rf.res || "kereste") ? "selected" : ""}>${r.name}</option>`).join("")}</select></label></div>
-      <div class="row"><label>Miktar <input data-f="rf.q" type="number" value="${rf.q || 20}"></label><label>Her <select data-f="rf.every">${[1, 2, 3, 7].map(d => `<option value="${d}" ${+(rf.every || 1) === d ? "selected" : ""}>${d} gün</option>`).join("")}</select></label><label>Bırak <input data-f="rf.keep" type="number" value="${rf.keep || 0}"></label></div>
+      <div class="row"><label>Miktar <input data-f="rf.q" type="text" inputmode="decimal" value="${rf.q || 20}"></label><label>Her <select data-f="rf.every">${[1, 2, 3, 7].map(d => `<option value="${d}" ${+(rf.every || 1) === d ? "selected" : ""}>${d} gün</option>`).join("")}</select></label><label>Bırak <input data-f="rf.keep" type="text" inputmode="decimal" value="${rf.keep || 0}"></label></div>
       <div class="row"><label>Araç <select data-f="rf.mode"><option value="nakliyeci">Kiralık nakliyeci</option>${VEHICLES.map(v => `<option value="${v.id}" ${rf.mode === v.id ? "selected" : ""}>${v.name}</option>`).join("")}</select></label>${btn("addRoute", "", "Rotayı ekle", "gold sm")}</div></div>`; }
   else h += `<div class="hint">Rota kurmak için ikinci bir bölge aç (Şirket › Bölgeler).</div>`;
   return h + `</div></div>`;
@@ -255,7 +255,7 @@ function ordersView(s, V) {
   for (const o of s.offers) { const K = CONTRACT_KINDS[o.kind], have = ownedRegions(s).reduce((a, r) => a + qty(s, r.id, o.res), 0), val = o.price * o.q * o.deliveries, mp = s.market[o.res].price;
     h += `<div class="offer ${o.big ? "big" : ""}"><div class="oh">${iconSvg(o.res, 30)}<span><b>${esc(o.cust)}</b><small>${CT[o.type].name} · ${K.name} · ${CITY[o.city].name}</small></span><span class="ov"><b>${tl(val)}</b><small class="${o.price >= mp ? "good" : "bad"}">${n0(o.price)} ₺/${RES[o.res].unit} · piyasa ${pct(o.price / mp - 1)}</small></span></div>
       <div class="chips">${chip(qtyTxt(o.res, o.q) + (o.deliveries > 1 ? ` × ${o.deliveries} teslimat` : ""))}${chip("kalite ≥ " + o.minQ, "s")}${chip(o.leadDays + " gün süre")}${o.export ? chip("İhracat", "p") : ""}${chip(have >= o.q ? "Stokta var" : "Stok: " + qtyTxt(o.res, have), have >= o.q ? "g" : "w")}${o.kind === "ihale" ? chip(`İhale ${o.tenderDay - day(s)} gün sonra · tavan ${n0(o.price)} ₺`, "w") : chip("teklif " + Math.max(0, o.expires - day(s)) + " gün geçerli")}</div>
-      <div class="row end">${o.kind === "ihale" ? (o.myBid ? chip(`Teklifin: ${n0(o.myBid)} ₺`, "g") : `<input data-f="bid.${o.id}" type="number" value="${Math.round(mp * 1.02)}" aria-label="Birim teklif">${btn("bid", o.id, "Teklif ver (%2 teminat)", "gold sm")}`) : btn("accept", o.id, "Kabul et", "gold sm")}${btn("decline", o.id, "Reddet", "ghost sm")}</div></div>`; }
+      <div class="row end">${o.kind === "ihale" ? (o.myBid ? chip(`Teklifin: ${n0(o.myBid)} ₺`, "g") : `<input data-f="bid.${o.id}" type="text" inputmode="decimal" value="${Math.round(mp * 1.02)}" aria-label="Birim teklif">${btn("bid", o.id, "Teklif ver (%2 teminat)", "gold sm")}`) : btn("accept", o.id, "Kabul et", "gold sm")}${btn("decline", o.id, "Reddet", "ghost sm")}</div></div>`; }
   if (!s.offers.length) h += `<div class="hint">Şu an teklif yok. Her gün yeni teklifler gelir; satış uzmanı ve itibar teklif sayısını artırır.</div>`;
   h += `</div><div class="pane right"><div class="lbl">SÖZLEŞMELER</div>`;
   const act = s.contracts.filter(c => c.status === "active");

@@ -6,13 +6,16 @@ import { pick, rnd } from "./rng.js";
 import { day, level, note } from "./util.js";
 import { earn } from "./finance.js";
 import { addXp } from "./progress.js";
+import { freeFor } from "./warehouse.js";
 
 function makeQuest(s, tpl, scope) {
   const l = level(s), q = { id: tpl.id + ":" + scope + ":" + day(s), tpl: tpl.id, scope, kind: tpl.kind, n: tpl.n(l), reward: tpl.reward(l), prog: 0, done: false, claimed: false };
   if (tpl.pick) {
     const produced = Object.values(s.buildings).filter(b => b.recipe).flatMap(b => Object.keys(RECIPE[b.recipe].out));
-    const pool = tpl.pick === "raw" ? RESOURCES.filter(r => ["metal", "enerji", "endustriyel", "orman"].includes(r.cat) && r.storage !== "enerji" && r.base < 120000)
-      : tpl.pick === "produced" ? produced.filter(id => id !== "elektrik").map(id => RES[id]) : RESOURCES.filter(r => r.storage !== "enerji" && r.base < 120000);
+    const storable = r => Object.keys(s.regions).some(g => s.regions[g].owned && freeFor(s, g, r.id) > 5);
+    const held = Object.keys(s.regions).flatMap(g => Object.keys(s.inventory[g] || {})).map(id => RES[id]).filter(r => r && r.storage !== "enerji");
+    const pool = tpl.pick === "raw" ? RESOURCES.filter(r => ["metal", "enerji", "endustriyel", "orman"].includes(r.cat) && r.storage !== "enerji" && r.base < 120000 && storable(r))
+      : tpl.pick === "produced" ? produced.filter(id => id !== "elektrik").map(id => RES[id]) : (held.length ? held : RESOURCES.filter(r => r.storage !== "enerji" && r.base < 120000 && storable(r)));
     const r = pool.length ? pick(s, pool) : RES.kereste; q.res = r.id;
     if (r.vol < 0.1) q.n = Math.round(q.n * 20);
   }
