@@ -447,6 +447,18 @@ Görsel dosya kullanılmaz. Her şey kodla çizilir (canvas ve SVG); bu yüzden 
 
 ## 12. Ekranlar
 
+**Yatay ekran.** Oyun yalnızca yatay oynanır (iPhone'da sola ve sağa çevrilebilir).
+
+- **Oyun ekranı:** solda şirket paneli, sağda seçili sekmenin içeriği. Panelde yukarıdan aşağı şunlar var:
+  - şirket adı, tarih, kasa, unvan, net değer, stok, itibar, sıra ve haber satırı
+  - ana tesisin canlı sahnesi (tesis yoksa sanayi bölgesi)
+  - 5 sekme ve en altta **Günü bitir** düğmesi
+- **İçerik:** en fazla 760 px genişliğinde ortalanır. Bildirimler içerik alanının altında, pencereler ekranın ortasında açılır.
+- **Ana menü:** solda logo ve fabrika sahnesi, sağda fiyat bandı, devam et / yeni oyun ve dört kutu.
+- **Yeni oyun:** solda form (ad, şehir, oyun türü, zorluk), sağda sahne, açıklama ve başla düğmesi.
+- **Nasıl oynanır:** iki sütun. Mağaza kutuları ekran genişliğine göre 3–4 sütuna yayılır.
+- **Tarayıcıda dik tutulan telefonda** "Telefonu yan çevir" ekranı çıkar ("Yine de devam et" ile geçilebilir).
+
 1. **Ana menü ve yeni oyun:** devam et, yeni oyun (ad, şehir, zorluk), nasıl oynanır, rekorlar, ayarlar. Karar kartları ve yıl sonu ödülü pencereleri
 2. **Siparişler:** aktif siparişler ve yeni teklifler. Her teklifte şehir, en yakın tesise mesafe, aracılık kârı, stoktan kâr ve hangi tesisten gideceği yazar
 3. **Piyasa:** 6 kategori filtresi, "stoktakiler" filtresi, ürün satırı (fiyat, günlük değişim, 30 günlük grafik, ağırlık, toplam stok). Al/sat paneli: tesis seçimi, miktar, 3 tedarik yolu

@@ -69,7 +69,7 @@ Depo → **Settings → Secrets and variables → Actions**
 
 App Store Connect → uygulaman → **1.0 Hazırlanıyor**:
 
-1. **Ekran görüntüleri:** `appstore/screenshots/` klasöründeki 6 görseli **iPhone 6,9"** alanına sürükle (1290×2796, Apple kabul eder). Uygulama yalnızca iPhone olduğu için iPad görseli gerekmez.
+1. **Ekran görüntüleri:** `appstore/screenshots/` klasöründeki 6 görseli **iPhone 6,9"** alanına sürükle (yatay 2796×1290, Apple kabul eder). Uygulama yalnızca iPhone olduğu için iPad görseli gerekmez.
 2. **Metinler:** aşağıdaki tabloları kopyala.
 3. **Yapı:** "Yapı" bölümünde + ile TestFlight'a yüklenen yapıyı seç.
 4. **Uygulama Gizliliği:**
@@ -272,7 +272,7 @@ Yalnızca TestFlight'ta denemek için version'ı aynı bırakabilirsin. Yapı nu
   - Kalıcı ürünler ve abonelik her açılışta `Transaction.currentEntitlements`'tan okunur.
   - Ebeveyn onayı ve yenilemeler `Transaction.updates` ile gelir.
   - Aynı işlem iki kez eklenmez (işlem kimliği tutulur).
-- **Cihaz ve sürüm:** Yalnızca iPhone, dikey ekran, karanlık tema. En düşük iOS sürümü 15.
+- **Cihaz ve sürüm:** Yalnızca iPhone, yatay ekran (sola ve sağa çevrilebilir), karanlık tema. En düşük iOS sürümü 15.
 - **Şifreleme:** `ITSAppUsesNonExemptEncryption = false` olduğu için her yüklemede şifreleme sorusu çıkmaz.
 - **Yerelde web kısmını derlemek:** `cd DemirBaronu/app && npm ci && npm run sync`
 - **İkon ve açılış ekranını yeniden üretmek:** `resources/icon.png` (1024×1024, saydamlıksız) ve `resources/splash.png` dosyalarını değiştirip `npm run assets`.
