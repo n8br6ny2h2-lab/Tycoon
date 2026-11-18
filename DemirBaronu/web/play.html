@@ -317,16 +317,16 @@ svg.ava { width: 28px; height: 28px; display: block; }
 .ncols { display: flex; flex-direction: column; gap: 12px; } .ncol { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 canvas.nscene { display: none; width: 100%; height: 120px; border-radius: 10px; }
 #sidescene { display: none; }
-@media (orientation: portrait) and (max-width: 600px) {
-  :root:not(.noRotate) #rotate { display: flex; position: fixed; inset: 0; z-index: 60; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; padding: 24px; }
+@media (orientation: portrait) and (pointer: coarse) {
+  #rotate { display: flex; position: fixed; inset: 0; z-index: 60; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; padding: 24px; }
   #rotate svg { width: 96px; height: 96px; fill: none; stroke: var(--hot); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; animation: turn 2.4s ease-in-out infinite; }
   #rotate b { font-family: var(--display); font-size: 22px; } #rotate span { color: var(--muted); }
-  #rotate button { margin-top: 14px; color: var(--muted); text-decoration: underline; padding: 8px; }
+  #rotate small { margin-top: 10px; color: var(--muted); font-size: 12.5px; max-width: 30ch; }
 }
 @keyframes turn { 0%, 30% { transform: rotate(0); } 55%, 100% { transform: rotate(-90deg); } }
 @media (prefers-reduced-motion: reduce) { #rotate svg { animation: none; } }
-@media (orientation: landscape) and (max-height: 330px) { #hud canvas#sidescene { display: none !important; } }
-@media (orientation: landscape) {
+@media (max-height: 330px) { #hud canvas#sidescene { display: none !important; } }
+@media (orientation: landscape), (pointer: fine) {
   #app { max-width: 1240px; display: grid; grid-template-columns: clamp(232px, 27vw, 290px) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
   #hud { grid-column: 1; grid-row: 1; border-bottom: 0; border-right: 1px solid var(--line); padding: max(8px, env(safe-area-inset-top, 0px)) 12px 6px max(12px, env(safe-area-inset-left, 0px));
     display: flex; flex-direction: column; gap: 5px; min-height: 0; overflow: hidden; }
@@ -393,7 +393,7 @@ canvas.nscene { display: none; width: 100%; height: 120px; border-radius: 10px; 
 </div>
 <div id="menu" hidden></div>
 <div id="rotate" role="dialog" aria-label="Telefonu yan çevir"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="22" y="8" width="20" height="36" rx="3"/><path d="M30 39h4"/><path d="M12 50a22 22 0 0 0 30 6" /><path d="M40 52l3 4-5 1"/></svg>
-  <b>Telefonu yan çevir</b><span>Demir Baronu yatay ekranda oynanır.</span><button data-act="rotateSkip">Yine de devam et</button></div>
+  <b>Telefonu yan çevir</b><span>Demir Baronu yalnızca yatay ekranda oynanır.</span><small>Dönmüyorsa telefonun ekran döndürme kilidini kapat.</small></div>
 <div id="toast" aria-live="polite"></div>
 <div id="fx" aria-hidden="true"></div>
 <div id="modal" hidden></div>
@@ -1644,7 +1644,6 @@ const ACT = {
     toast(n ? `Operasyon Müdürü ${n} siparişi teslim etti. Kâr ${tl(profit)}.` : "Şu an kârlı teslim edilecek sipariş yok."); save(); render(); },
   skip7: () => { for (let i = 0; i < 7 && !S.over; i++) { endDay(); if (!document.getElementById("modal").hidden) break; } },
   hedge: () => { UI.hedge = !UI.hedge; render(); },
-  rotateSkip: () => { document.documentElement.classList.add("noRotate"); },
   mapCity: v => { UI.newCity = v; UI.prov = null; render(); },
   mapCat: v => { UI.mapCat = v || ""; render(); },
   mapZoom: () => { UI.mapZoom = !UI.mapZoom; render(); },

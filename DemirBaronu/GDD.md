@@ -457,7 +457,7 @@ Görsel dosya kullanılmaz. Her şey kodla çizilir (canvas ve SVG); bu yüzden 
 - **Ana menü:** solda logo ve fabrika sahnesi, sağda fiyat bandı, devam et / yeni oyun ve dört kutu.
 - **Yeni oyun:** solda form (ad, şehir, oyun türü, zorluk), sağda sahne, açıklama ve başla düğmesi.
 - **Nasıl oynanır:** iki sütun. Mağaza kutuları ekran genişliğine göre 3–4 sütuna yayılır.
-- **Tarayıcıda dik tutulan telefonda** "Telefonu yan çevir" ekranı çıkar ("Yine de devam et" ile geçilebilir).
+- **Dik oynanmaz.** iPhone uygulaması yatay ekrana kilitlidir. Tarayıcıda dokunmatik cihaz dik tutulursa oyunun yerine yalnızca "Telefonu yan çevir" ekranı çıkar, geçilemez. Masaüstünde pencere dar ve uzun olsa da yatay düzen kullanılır.
 
 1. **Ana menü ve yeni oyun:** devam et, yeni oyun (ad, şehir, zorluk), nasıl oynanır, rekorlar, ayarlar. Karar kartları ve yıl sonu ödülü pencereleri
 2. **Siparişler:** aktif siparişler ve yeni teklifler. Her teklifte şehir, en yakın tesise mesafe, aracılık kârı, stoktan kâr ve hangi tesisten gideceği yazar
