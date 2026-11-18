@@ -447,16 +447,20 @@ Görsel dosya kullanılmaz. Her şey kodla çizilir (canvas ve SVG); bu yüzden 
 
 ## 12. Ekranlar
 
-**Yatay ekran.** Oyun yalnızca yatay oynanır (iPhone'da sola ve sağa çevrilebilir).
+**Yatay ekran.** Oyun yalnızca yatay oynanır (iPhone'da sola ve sağa çevrilebilir). Görünüm: koyu lacivert paneller, para işlemleri için altın sarısı, servet için turkuaz-yeşil, iri ve yuvarlak yazı (Nunito).
 
-- **Oyun ekranı:** solda şirket paneli, sağda seçili sekmenin içeriği. Panelde yukarıdan aşağı şunlar var:
-  - şirket adı, tarih, kasa, unvan, net değer, stok, itibar, sıra ve haber satırı
-  - ana tesisin canlı sahnesi (tesis yoksa sanayi bölgesi)
-  - 5 sekme ve en altta **Günü bitir** düğmesi
-- **İçerik:** en fazla 760 px genişliğinde ortalanır. Bildirimler içerik alanının altında, pencereler ekranın ortasında açılır.
-- **Ana menü:** solda logo ve fabrika sahnesi, sağda fiyat bandı, devam et / yeni oyun ve dört kutu.
-- **Yeni oyun:** solda form (ad, şehir, oyun türü, zorluk), sağda sahne, açıklama ve başla düğmesi.
-- **Nasıl oynanır:** iki sütun. Mağaza kutuları ekran genişliğine göre 3–4 sütuna yayılır.
+- **Üst çubuk:** şirket adı ve altında yeşil noktalı satır (unvan · itibar · sıra · son haber), kasa (altın para simgesi ve sermaye paketine giden yeşil +), başarımlar kupası, sarı **Mağaza** düğmesi, ? (nasıl oynanır), ayarlar/menü ve takvim (gün, yıl; altında ay sonuna kalan süre çubuğu).
+- **Alt çubuk:** 6 sekme (Ana ekran, Siparişler, Piyasa, Tesisler, Rekabet, Şirket; seçili olanın üstünde sarı çizgi) ve sağda sarı **Günü bitir** düğmesi.
+- **Ana ekran:**
+  - **Kasa kartı:** büyük kasa rakamı, net değer, net değer grafiği, piyasa durumu ya da etkinlik etiketi; altta borç, alacak, aylık kira ve aylık maaş.
+  - **Tesislerim:** her tesis kendi canlı resmiyle kart olarak (DEPO/DÜKKAN etiketi, doluluk çubuğu) ve kesik çizgili "Yeni tesis" kartı.
+  - **Bugün:** dolar kuru ve sıradaki eğitim adımı ya da günlük görevler.
+  - **Kısayol kutuları:** Teklifler, İhaleler, Piyasa, Banka, Personel, Alacaklar, Filo, Atölye.
+  - Altın renkli **Türkiye haritası · 81 il** düğmesi.
+- **Şirket:** bütün bölümler (Unvan, Net değer, Filo, Atölye, Personel, Sigorta, Banka, Alacaklar, Ay sonu, Sadık müşteriler, Başarımlar, İstatistik, Haberler, Şirketi sat) simgeli kutular hâlinde. Kutuya dokununca bölüm açılır, "‹ Şirket" ile geri dönülür. Takipteki alacak varsa kutunun alt yazısı kırmızıdır.
+- **Diğer sekmeler:** teklifler, ürünler ve tesisler genişliğe göre 2–3 sütuna dizilir. Haritanın yanında il bilgisi durur, Rekabet bölümleri yan yana gelir.
+- **Ana menü:** solda logo ve fabrika sahnesi, sağda fiyat bandı, Devam et / Yeni oyun ve simgeli dört kutu.
+- **Yeni oyun:** solda form, sağda sahne, açıklama ve başla düğmesi. "Nasıl oynanır" iki sütundur, mağaza kutuları 3–4 sütuna yayılır.
 - **Dik oynanmaz.** iPhone uygulaması yatay ekrana kilitlidir. Tarayıcıda dokunmatik cihaz dik tutulursa oyunun yerine yalnızca "Telefonu yan çevir" ekranı çıkar, geçilemez. Masaüstünde pencere dar ve uzun olsa da yatay düzen kullanılır.
 
 1. **Ana menü ve yeni oyun:** devam et, yeni oyun (ad, şehir, zorluk), nasıl oynanır, rekorlar, ayarlar. Karar kartları ve yıl sonu ödülü pencereleri

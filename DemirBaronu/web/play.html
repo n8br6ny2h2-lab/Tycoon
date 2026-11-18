@@ -2,18 +2,18 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="theme-color" content="#101418">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=Saira+Condensed:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700&family=Nunito:wght@600;700;800;900&family=Saira+Condensed:wght@700&display=swap">
 <style>
 /* Layout: one-screen phone trading desk. Ledger HUD on top, scrolling tab content, big "end day" bar + tab bar at the bottom.
    Single deliberate dark look: mill-scale blue-grey steel with a hot-rolled orange for money actions. */
 :root {
   color-scheme: dark;
-  --bg: #101418; --panel: #182027; --panel2: #212b34; --line: #2e3a45;
-  --fg: #e9eef2; --muted: #8e9ba7; --hot: #ff7b2c; --hot-ink: #1e0d00;
-  --steel: #8fb6d8; --good: #4cd893; --bad: #ff5d52; --warn: #ffc94a;
-  --display: "Chakra Petch", "Arial Black", system-ui, sans-serif;
-  --body: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
-  --num: "Saira Condensed", "Arial Narrow", system-ui, sans-serif;
+  --bg: #0d1720; --panel: #142331; --panel2: #1b2e3f; --line: #243b4e;
+  --fg: #f2f6f9; --muted: #8ea4b6; --hot: #f7c548; --hot-ink: #2b1d00;
+  --steel: #a7c8e0; --good: #3ddc97; --bad: #ff6b5e; --warn: #ffcf4a; --teal: #1d5258;
+  --display: "Nunito", "Arial Rounded MT Bold", system-ui, sans-serif;
+  --body: "Nunito", system-ui, -apple-system, sans-serif;
+  --num: "Nunito", system-ui, sans-serif;
 }
 html, body { height: 100%; }
 [hidden] { display: none !important; }
@@ -59,7 +59,7 @@ h2 { font-family: var(--display); font-size: 15px; letter-spacing: .06em; text-t
 .hint b { color: var(--fg); }
 .chips { display: flex; gap: 6px; flex-wrap: wrap; }
 .chip { font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 3px; background: var(--panel2); color: var(--muted); white-space: nowrap; }
-.chip.hot { background: rgba(255,123,44,.16); color: var(--hot); }
+.chip.hot { background: rgba(247,197,72,.16); color: var(--hot); }
 .chip.st { background: rgba(143,182,216,.14); color: var(--steel); }
 .chip.g { background: rgba(76,216,147,.14); color: var(--good); }
 .chip.b { background: rgba(255,93,82,.15); color: var(--bad); }
@@ -168,7 +168,7 @@ svg.nw { width: 100%; height: 90px; display: block; }
 .skus { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .sku { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 6px; min-width: 0; position: relative; }
 .sku.wide { grid-column: 1 / -1; }
-.sku.hl { border-color: var(--hot); background: linear-gradient(160deg, rgba(255,123,44,.14), var(--panel) 60%); }
+.sku.hl { border-color: var(--hot); background: linear-gradient(160deg, rgba(247,197,72,.14), var(--panel) 60%); }
 .sku b { font-size: 15px; }
 .sku .amt { font-family: var(--num); font-size: 24px; font-weight: 700; color: var(--good); line-height: 1.1; }
 .sku .d { font-size: 12.5px; color: var(--muted); line-height: 1.4; flex: 1; }
@@ -230,7 +230,7 @@ svg.nw { width: 100%; height: 90px; display: block; }
 .legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--muted); }
 .legend span { display: inline-flex; align-items: center; gap: 5px; }
 .legend i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
-.banner { border: 1px solid var(--hot); background: rgba(255,123,44,.08); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+.banner { border: 1px solid var(--hot); background: rgba(247,197,72,.08); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
 .banner .t { font-family: var(--display); color: var(--hot); font-size: 13px; letter-spacing: .05em; text-transform: uppercase; }
 .banner p { margin: 0; font-size: 13px; line-height: 1.45; }
 .bids { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
@@ -311,84 +311,227 @@ svg.ava { width: 28px; height: 28px; display: block; }
 @media (prefers-reduced-motion: reduce) { .fxtruck, .fxmoney, #cash.shake { animation: none; } }
 @media (prefers-reduced-motion: reduce) { #toast div { animation: none; } .tape div { animation: none; } }
 
-/* ---------- Landscape: the game is played sideways ----------
-   Left column: company ledger, tabs, end-day button. Right column: the tab's content. */
+/* ---------- Landscape game shell (the only layout) ----------
+   Top bar: company, cash, store, help, menu, day. Middle: the tab. Bottom: tabs and the gold "end day" button.
+   Look: deep navy panels, gold for money actions, teal for wealth, big rounded type. */
 #rotate { display: none; }
 .ncols { display: flex; flex-direction: column; gap: 12px; } .ncol { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-canvas.nscene { display: none; width: 100%; height: 120px; border-radius: 10px; }
-#sidescene { display: none; }
+canvas.nscene { display: none; width: 100%; height: 120px; border-radius: 14px; }
 @media (orientation: portrait) and (pointer: coarse) {
   #rotate { display: flex; position: fixed; inset: 0; z-index: 60; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; padding: 24px; }
   #rotate svg { width: 96px; height: 96px; fill: none; stroke: var(--hot); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; animation: turn 2.4s ease-in-out infinite; }
-  #rotate b { font-family: var(--display); font-size: 22px; } #rotate span { color: var(--muted); }
+  #rotate b { font-family: var(--display); font-weight: 900; font-size: 24px; } #rotate span { color: var(--muted); font-weight: 700; }
   #rotate small { margin-top: 10px; color: var(--muted); font-size: 12.5px; max-width: 30ch; }
 }
 @keyframes turn { 0%, 30% { transform: rotate(0); } 55%, 100% { transform: rotate(-90deg); } }
 @media (prefers-reduced-motion: reduce) { #rotate svg { animation: none; } }
-@media (max-height: 330px) { #hud canvas#sidescene { display: none !important; } }
-@media (orientation: landscape), (pointer: fine) {
-  #app { max-width: 1240px; display: grid; grid-template-columns: clamp(232px, 27vw, 290px) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
-  #hud { grid-column: 1; grid-row: 1; border-bottom: 0; border-right: 1px solid var(--line); padding: max(8px, env(safe-area-inset-top, 0px)) 12px 6px max(12px, env(safe-area-inset-left, 0px));
-    display: flex; flex-direction: column; gap: 5px; min-height: 0; overflow: hidden; }
-  #hud .hrow:first-of-type { flex-wrap: wrap; row-gap: 4px; }
-  .hleft { min-width: 0; } #dayChip { font-size: 14px; }
-  #cash { font-size: 30px; } #titleChip { font-size: 11px; }
-  .stats { gap: 2px 10px; font-size: 11.5px; } .stats b { font-size: 14px; }
-  #ticker { margin-top: 2px; font-size: 11.5px; }
-  #bottom { grid-column: 1; grid-row: 2; border-top: 0; border-right: 1px solid var(--line); background: linear-gradient(180deg, var(--bg), var(--panel));
-    padding: 4px 12px max(8px, env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px)); gap: 6px; flex-direction: column-reverse; }
-  #endDay { padding: 10px; font-size: 16px; }
-  #tabs { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 2px; }
-  #tabs button { padding: 5px 0 4px; font-size: 9.5px; letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  #tabs svg { width: 19px; height: 19px; margin-bottom: 1px; }
-  .badge { top: 0; right: calc(50% - 20px); }
-  #main { grid-column: 2; grid-row: 1 / span 2; padding: max(12px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) 16px; }
-  #main > * { width: 100%; max-width: 760px; margin-inline: auto; box-sizing: border-box; }
-  .strip { margin-inline: -16px; padding-inline: 16px; }
-  #main > .strip { max-width: none; width: auto; margin-inline: -16px; }
-  canvas.scene { height: 150px; }
-  #toast { left: calc(clamp(232px, 27vw, 290px) + (100% - clamp(232px, 27vw, 290px)) / 2); bottom: max(14px, env(safe-area-inset-bottom, 0px)); width: min(460px, calc(100% - clamp(232px, 27vw, 290px) - 40px)); }
-  .fxtruck { bottom: max(18px, env(safe-area-inset-bottom, 0px)); }
-  #modal { align-items: center; padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(10px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
-  #modal .box { max-width: 560px; max-height: 100%; box-sizing: border-box; }
-  /* menu: logo and the factory scene on the left, actions on the right */
-  #menu .inner { max-width: 1080px; padding-block: max(14px, env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-bottom, 0px)); }
-  #menu .inner.home { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; height: 100%; min-height: 0; }
-  #menu .inner.home .mcol { display: flex; flex-direction: column; gap: 9px; min-height: 0; }
-  #menu .inner.home .ma { justify-content: flex-start; }
-  #menu .inner.home .mb { justify-content: center; overflow-y: auto; }
-  #menu .inner.home .logo { font-size: clamp(34px, 6.4vw, 58px); margin-top: 0; }
-  #menu .inner.home .tagline { display: block; }
-  #menu .inner.home canvas.mscene { flex: 1 1 auto; height: auto; min-height: 90px; width: 100%; margin: 0; border-radius: 12px; }
-  #menu .inner.home .mfoot { text-align: left; }
-  #menu .inner.home .mbtn { padding: 10px 14px; }
-  #menu .inner.home .tile { padding: 9px 10px; }
-  #menu .inner.sub { max-width: 820px; }
-  #menu .inner.v-help .help { display: block; columns: 2 300px; column-gap: 22px; }
-  #menu .inner.v-help .help h3 { break-after: avoid; } #menu .inner.v-help .help p { break-inside: avoid; margin-bottom: 8px; }
-  .ncols { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 14px; align-items: start; }
-  canvas.nscene { display: block; }
-  #hud canvas#sidescene { display: block; flex: 1 1 0; min-height: 0; max-height: 210px; width: 100%; border-radius: 8px; margin-top: 4px; }
-  .skus { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+
+body { font-weight: 600; background: radial-gradient(120% 90% at 50% -10%, #15283a 0%, var(--bg) 55%); }
+#app { max-width: none; }
+h2 { font-family: var(--display); font-weight: 900; font-size: 18px; letter-spacing: 0; text-transform: none; color: var(--fg); }
+h2 .muted { font-weight: 700; }
+.muted { font-weight: 600; }
+.lbl { font-size: 12px; font-weight: 900; letter-spacing: .2em; color: var(--muted); }
+.card { border-radius: 18px; padding: 14px; background: linear-gradient(180deg, var(--panel), #112030); box-shadow: 0 6px 18px rgba(0,0,0,.22); }
+.hint { border-radius: 16px; }
+.btn { border-radius: 12px; font-weight: 800; padding: 11px 12px; }
+.btn.hot { background: linear-gradient(180deg, #ffd96a, #f2b631); box-shadow: 0 3px 0 #b07d16; }
+.btn.st { background: #2b4a63; color: var(--fg); }
+.btn small { font-weight: 800; }
+.chip { border-radius: 8px; font-weight: 800; padding: 3px 8px; }
+.filter button, .pill { font-weight: 800; border-radius: 22px; padding: 7px 14px; }
+.filter button[aria-pressed="true"] { background: var(--hot); color: var(--hot-ink); border-color: var(--hot); }
+.prow { border-radius: 16px; padding: 11px 13px; background: linear-gradient(180deg, var(--panel), #112030); }
+.pname, .ocust { font-weight: 800; }
+.oamt span.num { font-weight: 900; }
+.bar { height: 7px; border-radius: 4px; background: rgba(255,255,255,.08); } .bar i { background: var(--good); }
+.acc > .acch, .sku, .tile, .mbtn { border-radius: 16px; }
+.sku { background: linear-gradient(180deg, var(--panel), #112030); }
+.sku .amt { font-weight: 900; }
+.pic { border-radius: 10px; }
+canvas.scene { border-radius: 14px; height: 150px; }
+
+/* top bar */
+#hud { display: flex; align-items: center; gap: 12px; padding: max(6px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 7px max(16px, env(safe-area-inset-left, 0px));
+  border-bottom: 1px solid var(--line); background: linear-gradient(180deg, #10202e, rgba(13,23,32,.92)); position: relative; overflow: hidden; }
+.hco { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+#coName { font-family: var(--display); font-weight: 900; font-size: 20px; letter-spacing: .02em; text-transform: uppercase; color: var(--fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hsub { display: flex; align-items: center; gap: 6px; min-width: 0; font-size: 12.5px; font-weight: 800; color: var(--good); white-space: nowrap; overflow: hidden; }
+.hsub .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--good); flex: none; box-shadow: 0 0 8px rgba(61,220,151,.7); }
+#titleChip { flex: none; } #hudStats { display: flex; gap: 6px; flex: none; color: var(--muted); } #hudStats span::before { content: "· "; }
+#news { color: var(--muted); font-weight: 700; overflow: hidden; text-overflow: ellipsis; min-width: 0; } #news::before { content: "· "; }
+#news.bad { color: var(--bad); } #news.flash { color: var(--fg); }
+.hbtns { display: flex; align-items: center; gap: 8px; flex: none; }
+.hb { width: 40px; height: 40px; border-radius: 50%; background: var(--panel2); border: 1px solid var(--line); display: grid; place-items: center; flex: none; box-shadow: 0 3px 0 rgba(0,0,0,.3); }
+.hb svg { width: 21px; height: 21px; stroke: var(--fg); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.hb b { font-size: 19px; font-weight: 900; }
+#cashPill { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 5px 0 5px; border-radius: 22px; background: #13202c; border: 2px solid #e0a23a; box-shadow: 0 3px 0 rgba(0,0,0,.3); }
+#cashPill .coin { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(180deg, #ffe07a, #e9a924); color: #5a3a00; font-weight: 900; font-size: 16px; flex: none; }
+#cash { font-family: var(--num); font-weight: 900; font-size: 19px; line-height: 1; white-space: nowrap; }
+#cashPill .plus { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--good); color: #05301e; font-weight: 900; font-size: 20px; line-height: 1; flex: none; }
+.shopPill { height: 40px; padding: 0 16px 0 13px; border-radius: 22px; display: flex; align-items: center; gap: 7px; font-weight: 900; font-size: 16px; color: var(--hot-ink);
+  background: linear-gradient(180deg, #ffd96a, #f2b631); box-shadow: 0 3px 0 #b07d16; }
+.shopPill svg { width: 21px; height: 21px; fill: none; stroke: var(--hot-ink); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+#dayChip { position: relative; height: 40px; padding: 0 14px; border-radius: 22px; background: var(--panel2); border: 1px solid var(--line); display: flex; align-items: center; gap: 7px; font-weight: 800; font-size: 15px; white-space: nowrap; color: var(--fg); }
+#dayChip svg { width: 19px; height: 19px; stroke: var(--hot); fill: none; stroke-width: 2; }
+#dayChip b { color: var(--fg); font-weight: 900; } #dayChip .yr { color: var(--muted); }
+#dayChip .mp { position: absolute; left: 14px; right: 14px; bottom: 3px; height: 3px; border-radius: 2px; background: rgba(255,255,255,.08); }
+#dayChip .mp i { display: block; height: 100%; border-radius: 2px; background: var(--hot); }
+#hudfx { opacity: .3; }
+
+/* middle */
+#main { padding: 12px max(16px, env(safe-area-inset-right, 0px)) 16px max(16px, env(safe-area-inset-left, 0px)); gap: 14px; }
+#main > * { width: 100%; max-width: 1240px; margin-inline: auto; box-sizing: border-box; }
+#main > .strip { margin-inline: auto; padding-inline: 0; }
+.strip { margin-inline: 0; padding-inline: 0; }
+
+/* bottom */
+#bottom { flex-direction: row; align-items: center; gap: 12px; border-top: 1px solid var(--line); background: #0a131b;
+  padding: 7px max(16px, env(safe-area-inset-right, 0px)) max(7px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+#tabs { flex: 1; min-width: 0; display: flex; gap: 4px; }
+#tabs button { flex: 1 1 0; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 4px; border-radius: 14px;
+  font-size: 14.5px; font-weight: 800; color: #c3d1dc; position: relative; white-space: nowrap; }
+#tabs .tl { overflow: hidden; text-overflow: ellipsis; min-width: 0; } #tabs .tic { position: relative; display: grid; flex: none; }
+#tabs svg { width: 22px; height: 22px; margin: 0; flex: none; stroke-width: 2; }
+#tabs button[aria-selected="true"] { background: rgba(247,197,72,.14); color: var(--fg); }
+#tabs button[aria-selected="true"] svg { stroke: var(--hot); }
+#tabs button[aria-selected="true"]::before { content: ""; position: absolute; top: -8px; left: 28%; right: 28%; height: 4px; border-radius: 3px; background: var(--hot); }
+#tabs .badge { position: absolute; top: -7px; right: -11px; left: auto; background: var(--bad); color: #fff; }
+#endDay { width: auto; flex: none; padding: 11px 16px; border-radius: 16px; font-family: var(--display); font-weight: 900; font-size: 17px; letter-spacing: .02em;
+  background: linear-gradient(180deg, #ffd96a, #f2b631); box-shadow: 0 3px 0 #b07d16; color: var(--hot-ink); }
+#endDay small { font-family: var(--num); font-weight: 800; }
+#toast { bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
+.fxtruck { bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
+#modal { align-items: center; padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(10px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+#modal .box { max-width: 580px; max-height: 100%; box-sizing: border-box; border-radius: 22px; }
+#modal h3 { font-weight: 900; }
+
+/* home dashboard */
+.home { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.home .hl, .home .hr { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.hero { position: relative; overflow: hidden; border-radius: 22px; padding: 16px 20px 14px; border: 1px solid rgba(110,220,200,.28);
+  background: radial-gradient(130% 160% at 0% 0%, #1f5a5f 0%, #17414a 40%, #13293a 100%); box-shadow: 0 10px 26px rgba(0,0,0,.3); }
+.hero .hrow1 { display: flex; align-items: center; gap: 10px; position: relative; z-index: 1; }
+.hchip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 12px; background: rgba(61,220,151,.14); color: var(--good); font-size: 12.5px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.hchip i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex: none; }
+.hchip.warn { background: rgba(255,207,74,.15); color: var(--warn); }
+.hero .big { position: relative; z-index: 1; font-weight: 900; font-size: clamp(30px, 4.4vw, 56px); line-height: 1.05; margin-top: 4px; letter-spacing: -.01em; }
+.hero .nwl { position: relative; z-index: 1; font-size: 16px; font-weight: 800; color: #b8c9d6; }
+svg.hspark { position: absolute; right: 16px; top: 14px; width: 34%; height: 84px; opacity: .9; }
+.hstats { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.1); }
+.hstats span { display: block; font-size: 11px; font-weight: 900; letter-spacing: .14em; color: #9fb4c3; white-space: nowrap; }
+.hstats b { display: block; font-size: clamp(15px, 2vw, 22px); font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lnk { color: var(--hot); font-weight: 900; font-size: 16px; padding: 2px 4px; }
+.facrow { display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; }
+.facrow::-webkit-scrollbar { display: none; }
+.fac { flex: 0 0 clamp(190px, 24vw, 270px); display: flex; flex-direction: column; text-align: left; border-radius: 20px; overflow: hidden; background: linear-gradient(180deg, var(--panel), #112030); border: 1px solid var(--line); box-shadow: 0 6px 16px rgba(0,0,0,.25); }
+.fac .fimg { position: relative; display: block; }
+.fac canvas.fscene { display: block; width: 100%; height: clamp(92px, 15vw, 130px); }
+.fbadge { position: absolute; left: 10px; top: 10px; padding: 4px 10px; border-radius: 10px; background: rgba(9,16,24,.82); color: var(--good); font-size: 11px; font-weight: 900; letter-spacing: .14em; }
+.fbadge.shop { color: var(--hot); }
+.fac .fb { display: flex; flex-direction: column; gap: 4px; padding: 10px 13px 12px; }
+.fac .fb b { font-size: 16px; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fac .fb small { color: var(--muted); font-weight: 700; font-size: 12.5px; }
+.fac .frow { display: flex; justify-content: space-between; gap: 6px; font-size: 13px; font-weight: 800; } .fac .frow b { font-size: 13px; }
+.fac.new { flex-basis: 150px; align-items: center; justify-content: center; gap: 6px; background: transparent; border: 2px dashed #34506a; box-shadow: none; min-height: 200px; }
+.fac.new .plusc { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; background: var(--panel2); color: var(--hot); font-size: 30px; font-weight: 900; }
+.fac.new b { font-size: 17px; font-weight: 900; } .fac.new small { color: var(--muted); }
+.today { border-radius: 20px; padding: 12px; background: linear-gradient(180deg, var(--panel), #112030); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 9px; }
+.today .lbl { padding-left: 4px; }
+.tgrid2, .tgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: 10px; }
+.mtile { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 18px; text-align: left; min-width: 0; background: linear-gradient(180deg, #172a3a, #13222f); border: 1px solid var(--line); box-shadow: 0 4px 0 rgba(0,0,0,.25); }
+.mtile:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,.25); }
+.mtile .ic { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; flex: none; }
+.mtile .ic svg { width: 26px; height: 26px; fill: none; stroke: var(--icc); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.mtile .mt { min-width: 0; display: flex; flex-direction: column; }
+.mtile b { font-size: 16.5px; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mtile small { font-size: 13px; font-weight: 700; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mtile small.bad { color: var(--bad); }
+.mtile.on { border: 2px solid #8a6cff; background: linear-gradient(135deg, rgba(138,108,255,.28), #1a2440); }
+.today .mtile { background: #0f1c28; }
+.cta { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; padding: 12px 14px 12px 18px; border-radius: 20px; text-align: left; color: var(--hot-ink);
+  background: linear-gradient(180deg, #ffd96a, #f2b631); box-shadow: 0 4px 0 #b07d16; }
+.cta small { display: block; font-size: 11.5px; font-weight: 900; letter-spacing: .16em; opacity: .75; }
+.cta b { display: block; font-size: clamp(18px, 2.4vw, 24px); font-weight: 900; }
+.cta .go { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; background: rgba(0,0,0,.12); font-size: 26px; font-weight: 900; flex: none; }
+
+/* company: tile grid, one section open at a time */
+.cogrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
+.cohead { display: flex; align-items: center; gap: 12px; } .cohead h2 { font-size: 22px; } .cohead .muted { margin-left: auto; text-align: right; }
+.cohead .ic { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; flex: none; } .cohead .ic svg { width: 23px; height: 23px; fill: none; stroke: var(--icc); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.cobody { display: flex; flex-direction: column; gap: 10px; max-width: 900px; width: 100%; }
+.cobody > .card { border-top: 1px solid var(--line) !important; border-radius: 18px !important; }
+
+/* other tabs: use the width */
+.ogrid, .pgrid, .lgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr)); gap: 12px; align-items: start; }
+.pgrid > h2, .pgrid > .prow.open { grid-column: 1 / -1; }
+.sgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr)); gap: 14px; align-items: start; }
+.mapgrid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(220px, 1fr); gap: 14px; align-items: start; }
+.mapL, .mapR { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.skus { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+
+/* main menu */
+#menu { background: radial-gradient(120% 90% at 30% 0%, #1c3446 0%, var(--bg) 60%); }
+.logo { font-weight: 900; }
+.mbtn { font-weight: 800; } .mbtn.hot { background: linear-gradient(180deg, #ffd96a, #f2b631); box-shadow: 0 4px 0 #b07d16; border-color: transparent; }
+.tile { background: linear-gradient(180deg, #172a3a, #13222f); box-shadow: 0 4px 0 rgba(0,0,0,.25); grid-template-columns: 44px minmax(0, 1fr); }
+.tile svg { width: 44px; height: 44px; padding: 10px; box-sizing: border-box; border-radius: 13px; background: #3e3216; stroke: var(--hot); }
+.tile b { font-weight: 900; font-size: 15.5px; }
+#menu .inner { max-width: 1080px; padding-block: max(14px, env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-bottom, 0px)); }
+#menu .inner.home { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; height: 100%; min-height: 0; }
+#menu .inner.home .mcol { display: flex; flex-direction: column; gap: 9px; min-height: 0; }
+#menu .inner.home .mb { justify-content: center; overflow-y: auto; }
+#menu .inner.home .logo { font-size: clamp(34px, 6.4vw, 60px); margin-top: 0; }
+#menu .inner.home .tagline { display: block; }
+#menu .inner.home canvas.mscene { flex: 1 1 auto; height: auto; min-height: 90px; width: 100%; margin: 0; border-radius: 16px; }
+#menu .inner.home .mfoot { text-align: left; }
+#menu .inner.home .mbtn { padding: 11px 15px; }
+#menu .inner.home .tile { padding: 9px 10px; }
+#menu .inner.sub { max-width: 860px; }
+#menu .inner.v-help .help { display: block; columns: 2 300px; column-gap: 22px; }
+#menu .inner.v-help .help h3 { break-after: avoid; } #menu .inner.v-help .help p { break-inside: avoid; margin-bottom: 8px; }
+.ncols { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+canvas.nscene { display: block; }
+
+#menuBtn.hb { width: 40px; height: 40px; border-radius: 50%; }
+/* narrow phones (iPhone SE / mini sideways) */
+@media (max-width: 1000px) { #endDay small { display: none; } }
+@media (max-width: 900px) {
+  #tabs button { flex-direction: column; gap: 2px; padding: 5px 2px 4px; font-size: 11.5px; }
+  #tabs svg { width: 21px; height: 21px; }
+  #tabs button[aria-selected="true"]::before { top: -7px; }
+  #endDay { padding: 10px 14px; font-size: 15px; }
+  .shopPill span { display: none; } .shopPill { padding: 0 10px; }
 }
+@media (max-width: 760px) {
+  .hide-n { display: none; }
+  #coName { font-size: 16px; } .hsub { font-size: 11.5px; } #hudStats { display: none; }
+  #dayChip .yr { display: none; } #dayChip { padding: 0 11px; font-size: 14px; }
+  #cash { font-size: 17px; }
+  .home { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 12px; }
+  .hstats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mapgrid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-height: 400px) { #hud { padding-bottom: 5px; } .hb, #menuBtn.hb, #cashPill, .shopPill, #dayChip { height: 36px; } .hb, #menuBtn.hb { width: 36px; } #cashPill .coin, #cashPill .plus { width: 25px; height: 25px; } }
 </style>
 
 <div id="app">
-  <header id="hud" class="gut">
+  <header id="hud">
     <canvas id="hudfx" data-scene="hud" aria-hidden="true"></canvas>
-    <div class="hrow"><div class="hleft"><button id="menuBtn" data-act="pause" aria-label="Menü"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><button id="shopBtn" class="menuBtn2" data-act="shop" aria-label="Mağaza"><svg viewBox="0 0 24 24"><path d="M4 9h16l-1.5 10h-13z"/><path d="M8 9V7a4 4 0 0 1 8 0v2"/></svg></button><span id="coName"></span></div><span id="dayChip"></span></div>
-    <div class="hrow" style="align-items:flex-end">
-      <div id="cash" class="num"></div>
-      <span id="titleChip" class="title"></span>
+    <div class="hco"><b id="coName"></b><span class="hsub"><i class="dot"></i><span id="titleChip"></span><span id="hudStats"></span><span id="news"></span></span></div>
+    <div class="hbtns">
+      <button id="cashPill" data-act="shop" data-v="cash" aria-label="Kasa · sermaye paketi al"><span class="coin">₺</span><span id="cash" class="num"></span><span class="plus" aria-hidden="true">+</span></button>
+      <button class="hb hide-n" data-act="coGo" data-v="ach" aria-label="Başarımlar"><svg viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 20h8"/></svg></button>
+      <button id="shopBtn" class="shopPill" data-act="shop" aria-label="Mağaza"><svg viewBox="0 0 24 24"><path d="M4 9h16l-1.5 11h-13z"/><path d="M8 9V7a4 4 0 0 1 8 0v2"/></svg><span>Mağaza</span></button>
+      <button class="hb hide-n" data-act="help" aria-label="Nasıl oynanır"><b>?</b></button>
+      <button id="menuBtn" class="hb" data-act="pause" aria-label="Menü ve ayarlar"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M4.6 4.6l2.1 2.1M17.3 17.3l2.1 2.1M2.5 12h3M18.5 12h3M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1"/></svg></button>
+      <div id="dayChip"></div>
     </div>
-    <div class="stats" id="hudStats"></div>
-    <div id="ticker"><span class="tag">HABER</span><span id="news"></span></div>
-    <canvas id="sidescene" data-scene="menu" role="img" aria-label="Sanayi bölgesi"></canvas>
   </header>
-  <main id="main" class="gut"></main>
-  <footer id="bottom" class="gut">
-    <button id="endDay" data-act="endDay">Günü bitir <small id="endSub"></small></button>
+  <main id="main"></main>
+  <footer id="bottom">
     <nav id="tabs" role="tablist"></nav>
+    <button id="endDay" data-act="endDay">Günü bitir <small id="endSub"></small></button>
   </footer>
 </div>
 <div id="menu" hidden></div>
@@ -755,7 +898,7 @@ const shipRate = (a, b, own) => { const d = km(a, b); return own ? 40 + d * 0.45
 // =====================================================================
 // STATE
 // =====================================================================
-let S, UI = { acc: {}, locOpen: {}, tab: "orders", cat: "all", open: null, qty: 1, loc: null, onlyStock: false, move: null, newCity: null, newType: "depot" };
+let S, UI = { acc: {}, locOpen: {}, tab: "home", cat: "all", open: null, qty: 1, loc: null, onlyStock: false, move: null, newCity: null, newType: "depot" };
 function mkRival([id, name, home, style, cat, nw, cap, color]) {
   return { id, name, home, style, cat, nw: nw * rnd(0.85, 1.15), cap, color, cities: [home], tons: 0, hist: [], alive: true };
 }
@@ -1563,7 +1706,14 @@ function endDay() {
 const factorRate = r => (S.staff.acc ? 0.015 : 0.03) * Math.max(1, Math.ceil((r.due - S.day) / 30));
 const ACT = {
   endDay,
-  tab: v => { UI.tab = v; UI.open = null; UI.move = null; render(); document.getElementById("main").scrollTop = 0; },
+  tab: v => { if (v === "company" && UI.tab === "company") UI.coSec = null; UI.tab = v; UI.open = null; UI.move = null; render(); document.getElementById("main").scrollTop = 0; },
+  coGo: v => { UI.tab = "company"; UI.coSec = v; hideMenu(); render(); document.getElementById("main").scrollTop = 0; },
+  coSec: v => { UI.coSec = v || null; render(); document.getElementById("main").scrollTop = 0; },
+  homeGo: v => { const [t, a] = v.split(":"); UI.tab = t; if (a) UI.acc["o_" + a] = true; render(); document.getElementById("main").scrollTop = 0; },
+  facGo: v => { UI.tab = "stock"; if (v !== "new") UI.locOpen[+v] = true; render(); const m = document.getElementById("main");
+    const el = v === "new" ? m.querySelector("#newCity") : m.querySelector(`[data-act=locOpen][data-v="${v}"]`); const card = el && (el.closest(".card") || el);
+    m.scrollTop = card ? card.getBoundingClientRect().top - m.getBoundingClientRect().top + m.scrollTop - 10 : 0; },
+  help: () => { UI.subFrom = "game"; showMenu("help"); },
   cat: v => { UI.cat = v; render(); },
   onlyStock: () => { UI.onlyStock = !UI.onlyStock; render(); },
   open: v => { UI.open = UI.open === v ? null : v; UI.qty = 1;
@@ -1618,8 +1768,8 @@ const ACT = {
     const dep = tenderValue(t, +m) * 0.03; if (S.cash < dep) return toast("Teminat için " + tl(dep) + " gerekiyor.", true);
     S.cash -= dep; t.bid = +m; t.deposit = dep; S.stats.bids++; checkTasks(); toast(`${t.proj} ihalesine %${nf1.format(m * 100)} kârla teklif verdin. Teminat ${tl(dep)}.`); save(); render(); },
   card: v => { resolveCard(+v); closeModal(); render(); },
-  pause: () => showMenu("main"),
-  menuGo: v => { UI.confirmWipe = false; if (v === "continue") { hideMenu(); render(); if (S.cards.length) showModal("card"); return; } showMenu(v); },
+  pause: () => { UI.subFrom = null; showMenu("main"); },
+  menuGo: v => { UI.confirmWipe = false; if (v === "main" || v === "continue") UI.subFrom = null; if (v === "continue") { hideMenu(); render(); if (S.cards.length) showModal("card"); return; } showMenu(v); },
   setDiff: v => { UI.newDiff = v; showMenu("new"); },
   acc: v => { const [id, cur] = v.split(":"); UI.acc[id] = cur !== "1"; render(); },
   pill: v => { const k = "o_" + v; UI.acc[k] = !(UI.acc[k] === undefined ? (v === "tut" && S.day <= 3) : UI.acc[k]); render(); },
@@ -1680,7 +1830,7 @@ const ACT = {
   sellCoYes: () => { const pts = legacyGain(); addRecord(`Şirket satıldı (+${pts} miras)`); LEG.points += pts; saveLeg(); closeModal(); UI.newScen = "free"; showMenu("new"); },
   startNew: () => {
     newGame((UI.newName || "").trim().slice(0, 28) || "Demir Ticaret", UI.newHome || "ist", UI.newDiff || "normal", UI.newScen || "free");
-    S.seen.intro = true; UI.tab = "orders"; UI.newCity = S.home; UI.prov = null; UI.open = null; save(); hideMenu(); render();
+    S.seen.intro = true; UI.tab = "home"; UI.newCity = S.home; UI.prov = null; UI.open = null; save(); hideMenu(); render();
     toast(`${S.name} kuruldu. İlk teklife Aracılık'la başla.`); },
   toggleSet: k => { SET[k] = !SET[k]; saveSet(); showMenu("settings"); if (k === "anim") visMount(); },
   wipe: () => { if (!UI.confirmWipe) { UI.confirmWipe = true; return showMenu("settings"); }
@@ -1691,6 +1841,7 @@ const ACT = {
 // RENDER
 // =====================================================================
 const ICONS = {
+  home: '<svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5h4v5"/></svg>',
   market: '<svg viewBox="0 0 24 24"><path d="M3 17l5-6 4 3 6-8 3 3"/><path d="M3 21h18"/></svg>',
   orders: '<svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>',
   stock: '<svg viewBox="0 0 24 24"><path d="M3 10l9-6 9 6v10H3z"/><path d="M7 20v-6h10v6M7 17h10"/></svg>',
@@ -1779,7 +1930,7 @@ function mapSvg() {
     if (!cat && gc) h += `<path d="${p.d}" fill="rgba(255,240,210,.07)" pointer-events="none"/>`;
   }
   h += `</g>`;
-  if (sp && PROV[sp]) h += `<path d="${PROV[sp].d}" fill="rgba(255,123,44,.22)" stroke="var(--hot)" stroke-width="3.2" stroke-linejoin="round" pointer-events="none"/>`;
+  if (sp && PROV[sp]) h += `<path d="${PROV[sp].d}" fill="rgba(247,197,72,.22)" stroke="var(--hot)" stroke-width="3.2" stroke-linejoin="round" pointer-events="none"/>`;
   h += `<g class="seas" font-size="22" font-style="italic" fill="rgba(170,205,235,.55)" letter-spacing="5" pointer-events="none"><text x="420" y="170">KARADENİZ</text><text x="300" y="585">AKDENİZ</text>
       <text x="24" y="470" font-size="18">EGE</text><text x="130" y="262" font-size="13" letter-spacing="1.5">MARMARA</text></g>`;
   if (z) h += `<g font-size="9.5" fill="rgba(233,238,242,.5)" text-anchor="middle" pointer-events="none">${PROVS.filter(p => !PROV_OF[p.id]).map(p => `<text x="${p.cx}" y="${p.cy + 3}">${p.name}</text>`).join("")}</g>`;
@@ -1835,22 +1986,18 @@ function spark(hist) {
 }
 function renderHud() {
   document.getElementById("coName").textContent = S.name;
-  document.getElementById("dayChip").innerHTML = `<b>${dateStr()}</b> · Yıl ${yearOf()} · ${season().name}`;
+  const mp = ((S.day - 1) % 30) / 30;
+  document.getElementById("dayChip").innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><b>${dateStr()}</b><span class="yr">· Yıl ${yearOf()}</span><i class="mp" title="Ay sonuna ${30 - ((S.day - 1) % 30)} gün"><i style="width:${mp * 100}%"></i></i>`;
   setCash(S.cash);
   document.getElementById("titleChip").textContent = LEVELS[level()].name + (clubOn() ? " ★" : "");
-  document.getElementById("hudStats").innerHTML =
-    `<span>Net değer <b>${tl(netWorth())}</b></span><span>Stok <b>${nf1.format(stockTotal())}/${nf0.format(capTotal())} t</b></span><span>İtibar <b class="${S.rep < 35 ? "bad" : ""}">${Math.round(S.rep)}</b></span><span>Sıra <b>${myRank()}/${aliveCount()}</b></span>` +
-    (S.loan ? `<span>Kredi <b>${tl(S.loan)}</b></span>` : "");
+  document.getElementById("hudStats").innerHTML = `<span>İtibar ${Math.round(S.rep)}</span><span>Sıra ${myRank()}/${aliveCount()}</span>`;
   const n = S.news[0], ne = document.getElementById("news");
   if (UI.flash && Date.now() < UI.flashUntil) { ne.textContent = UI.flash; ne.className = "flash"; }
   else { ne.textContent = n ? n.text : ""; ne.className = n && n.bad ? "bad" : ""; }
   document.getElementById("endSub").textContent = `→ Gün ${S.day + 1}`;
-  { const sc = document.getElementById("sidescene"), L = S.locs.find(l => l.city === S.home) || S.locs[0];
-    if (L) { sc.dataset.scene = "loc"; sc.dataset.id = L.id; sc.setAttribute("aria-label", locName(L)); } else { sc.dataset.scene = "menu"; delete sc.dataset.id; sc.setAttribute("aria-label", "Sanayi bölgesi"); }
-    const key = sc.dataset.scene + (sc.dataset.id || ""); if (sc._key !== key) { sc._key = key; if (sc._mounted) drawScene(sc, performance.now() / 1000); } }
-  const tabs = [["orders", "Sipariş", ICONS.orders, S.offers.length + S.active.length], ["market", "Piyasa", ICONS.market, 0], ["stock", "Tesisler", ICONS.stock, 0], ["rival", "Rekabet", ICONS.rival, S.tenders.filter(t => t.bid === null).length], ["company", "Şirket", ICONS.company, 0]];
+  const tabs = [["home", "Ana ekran", ICONS.home, 0], ["orders", "Siparişler", ICONS.orders, S.offers.length + S.active.length], ["market", "Piyasa", ICONS.market, 0], ["stock", "Tesisler", ICONS.stock, 0], ["rival", "Rekabet", ICONS.rival, S.tenders.filter(t => t.bid === null).length], ["company", "Şirket", ICONS.company, 0]];
   document.getElementById("tabs").innerHTML = tabs.map(([k, l, ic, b]) =>
-    `<button role="tab" aria-selected="${UI.tab === k}" data-act="tab" data-v="${k}">${ic}${l}${b ? `<span class="badge">${b}</span>` : ""}</button>`).join("");
+    `<button role="tab" aria-selected="${UI.tab === k}" data-act="tab" data-v="${k}"><span class="tic">${ic}${b ? `<span class="badge">${b}</span>` : ""}</span><span class="tl">${l}</span></button>`).join("");
 }
 const payChip = o => o.pay ? `<span class="chip w">${o.pay} gün vade</span>` : `<span class="chip g">Peşin</span>`;
 const riskChip = o => `<span class="chip ${o.risk === "A" ? "st" : o.risk === "B" ? "w" : "b"}">Risk ${o.risk}</span>`;
@@ -1880,6 +2027,85 @@ function orderCard(o, active) {
       ${active ? `<button class="btn ghost" data-act="cancel" data-v="${o.id}" aria-label="Siparişi iptal et">İptal</button>` : ""}
     </div></div>`;
 }
+
+// ---------- home: the company dashboard ----------
+const money = v => { const t = tlShort(v); return t.endsWith("₺") ? t : t + " ₺"; };
+const TILE_IC = {
+  orders: ["#163f33", "#3ddc97", '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3.5 7l8.5 6 8.5-6"/>'],
+  rival: ["#3e3216", "#f7c548", '<path d="M14 4l6 6-3 3-6-6z"/><path d="M11 7l-7 7 3 3 7-7M4 20h9"/>'],
+  market: ["#17324a", "#7ec3ff", '<path d="M3 17l5-6 4 3 6-8 3 3"/><path d="M3 21h18"/>'],
+  bank: ["#1c2c4a", "#8fb2ff", '<path d="M3 9l9-5 9 5z"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/>'],
+  staff: ["#16393a", "#5fe0c8", '<circle cx="9" cy="8" r="3.2"/><path d="M3 20c.5-4 3-6 6-6s5.5 2 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14c3 0 5 2 5.5 5"/>'],
+  recv: ["#40201f", "#ff8a7e", '<path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4M9 12h7M9 16h5"/>'],
+  fleet: ["#1d3346", "#9fd0ff", '<path d="M2 16V7h11v9M13 10h4l3 3v3h-7"/><circle cx="6" cy="17.5" r="1.8"/><circle cx="16.5" cy="17.5" r="1.8"/>'],
+  mach: ["#40301a", "#ffb35c", '<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>'],
+  title: ["#3e3216", "#f7c548", '<path d="M4 18l2-10 4 4 2-6 2 6 4-4 2 10z"/><path d="M4 21h16"/>'],
+  nw: ["#163f33", "#3ddc97", '<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>'],
+  ins: ["#163f33", "#3ddc97", '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>'],
+  month: ["#2c2445", "#b9a2ff", '<rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M8 14h3"/>'],
+  loyal: ["#16393a", "#5fe0c8", '<path d="M3 12l4-4 5 3 5-3 4 4-9 8z"/>'],
+  ach: ["#3e3216", "#f7c548", '<path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 20h8"/>'],
+  stats: ["#17324a", "#7ec3ff", '<path d="M5 20V11M10 20V5M15 20v-7M20 20V9"/>'],
+  news: ["#2a3340", "#c9d6e2", '<rect x="3" y="5" width="15" height="15" rx="2"/><path d="M18 9h3v9a2 2 0 0 1-2 2M7 9h7M7 13h7M7 17h4"/>'],
+  sell: ["#40201f", "#ff8a7e", '<path d="M3 12l9-9h7v7l-9 9z"/><circle cx="15.5" cy="8.5" r="1.5"/>'],
+  fx: ["#3e3216", "#f7c548", '<circle cx="12" cy="12" r="8.5"/><path d="M14.5 8.5h-3.5a2 2 0 0 0 0 4h2a2 2 0 0 1 0 4H9.5M12 6.5v11"/>'],
+  task: ["#2c2445", "#b9a2ff", '<path d="M9 5h11M9 12h11M9 19h11"/><path d="M3.5 5l1.5 1.5L7.5 4M3.5 12l1.5 1.5 2.5-2.5M3.5 19l1.5 1.5 2.5-2.5"/>'],
+  stock: ["#1d3346", "#9fd0ff", '<path d="M3 10l9-6 9 6v10H3z"/><path d="M7 20v-6h10v6M7 17h10"/>'],
+};
+const tileIc = k => { const [bg, fg, d] = TILE_IC[k] || TILE_IC.news; return `<span class="ic" style="background:${bg};--icc:${fg}"><svg viewBox="0 0 24 24" aria-hidden="true">${d}</svg></span>`; };
+const mtile = (act, v, k, title, sub, cls = "", subCls = "") => `<button class="mtile ${cls}" data-act="${act}" data-v="${v}">${tileIc(k)}<span class="mt"><b>${title}</b><small class="${subCls}">${sub}</small></span></button>`;
+function heroSpark() {
+  const h = S.nwHist.slice(-60); if (h.length < 2) h.unshift(netWorth(), netWorth());
+  const mn = Math.min(...h), mx = Math.max(...h), sp = mx - mn || 1, W = 200, H = 70;
+  const pts = h.map((v, i) => [(i / (h.length - 1) * (W - 6) + 3).toFixed(1), (H - 6 - (v - mn) / sp * (H - 14)).toFixed(1)]), last = pts[pts.length - 1];
+  return `<svg class="hspark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="hsg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3ddc97" stop-opacity=".35"/><stop offset="1" stop-color="#3ddc97" stop-opacity="0"/></linearGradient></defs>
+    <polygon points="3,${H} ${pts.map(p => p.join(",")).join(" ")} ${W - 3},${H}" fill="url(#hsg)"/><polyline points="${pts.map(p => p.join(",")).join(" ")}" fill="none" stroke="#3ddc97" stroke-width="2.6" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+    <circle cx="${last[0]}" cy="${last[1]}" r="4" fill="#3ddc97" stroke="#0d1720" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg>`;
+}
+function facCard(l) {
+  const t = tierOf(l), used = locStock(l), cap = locCap(l), p = Math.min(1, used / cap);
+  return `<button class="fac" data-act="facGo" data-v="${l.id}"><span class="fimg"><canvas class="fscene" data-scene="loc" data-id="${l.id}" role="img" aria-label="${esc(locName(l))}"></canvas>
+    <span class="fbadge ${l.type === "shop" ? "shop" : ""}">${LOC_TYPES[l.type].name.toLocaleUpperCase("tr")}</span></span>
+    <span class="fb"><b>${C[l.city].name} ${LOC_TYPES[l.type].name}</b><small>${t.name}</small>
+    <span class="bar"><i class="${p > 0.9 ? "full" : ""}" style="width:${p * 100}%"></i></span>
+    <span class="frow"><span class="good">%${Math.round(p * 100)} dolu</span><b>${nf1.format(used)} / ${cap} t</b></span></span></button>`;
+}
+function renderHome() {
+  const mc = monthlyCosts(), rent = (mc.find(x => x[0].startsWith("Kira")) || [0, 0])[1];
+  const sal = mc.filter(x => /maaş/i.test(x[0])).reduce((a, x) => a + x[1], 0);
+  const dr = catDrift("__global"), fxc = S.fx / (S.fxPrev || S.fx) - 1;
+  const chip = S.event ? `<span class="hchip warn"><i></i>${esc(S.event.name.split(":")[0])} · ${Math.max(1, S.event.end - S.day + 1)} gün</span>`
+    : `<span class="hchip"><i></i>Piyasa: ${dr > 0.0008 ? "Yükselişte" : dr < -0.0008 ? "Düşüşte" : "Durgun"} · ${season().name}</span>`;
+  const openT = S.tenders.filter(t => t.bid === null).length, nstaff = Object.values(S.staff).reduce((a, b) => a + b, 0);
+  const nlegal = S.recv.filter(r => r.status !== "normal").length, nveh = Object.values(S.vehicles).reduce((a, b) => a + b, 0);
+  const avgCh = PRODUCTS.reduce((a, p) => a + price(p.id) / prevPrice(p.id) - 1, 0) / PRODUCTS.length;
+  let h = `<div class="home"><div class="hl">
+    <section class="hero"><div class="hrow1"><span class="lbl">KASA</span>${chip}</div>
+      <div class="big num ${S.cash < 0 ? "bad" : ""}">${tl(S.cash)}</div><div class="nwl">net değer ${money(netWorth())}</div>${heroSpark()}
+      <div class="hstats"><div><span>BORÇ</span><b>${S.loan ? "−" + money(S.loan) : "—"}</b></div><div><span>ALACAK</span><b class="${recvTotal() ? "good" : ""}">${recvTotal() ? "+" + money(recvTotal()) : "—"}</b></div>
+        <div><span>AYLIK KİRA</span><b>${rent ? "−" + money(rent) : "—"}</b></div><div><span>AYLIK MAAŞ</span><b>${sal ? "−" + money(sal) : "—"}</b></div></div></section>
+    <div class="sechead"><h2>Tesislerim <span class="muted">· ${S.locs.length}</span></h2><button class="lnk" data-act="tab" data-v="stock">Tümü ›</button></div>
+    <div class="facrow">${S.locs.map(facCard).join("")}<button class="fac new" data-act="facGo" data-v="new"><span class="plusc">+</span><b>Yeni tesis</b><small>Şehir seç</small></button></div>
+  </div><div class="hr">
+    <section class="today"><span class="lbl">BUGÜN</span><div class="tgrid2">
+      ${mtile("tab", "market", "fx", "Dolar/TL " + S.fx.toFixed(2).replace(".", ","), `<span class="${fxc > 0 ? "bad" : "good"}">${pct(fxc)}</span> · ₺ ⇄ $`)}
+      ${S.tut < TUT.length ? mtile("homeGo", "orders:tut", "task", `Adım ${S.tut + 1}/${TUT.length}`, TUT[S.tut][0], "on")
+        : S.daily ? mtile("homeGo", "orders:daily", "task", "Günlük görevler", `${S.daily.tasks.filter(t => t.done).length}/3 tamam`, "on") : mtile("coGo", "stats", "stats", "İstatistik", "kâr " + money(S.stats.profit), "on")}
+    </div></section>
+    <div class="tgrid">
+      ${mtile("tab", "orders", "orders", "Teklifler", S.offers.length ? `${S.offers.length} teklif bekliyor` : "yarın yenileri gelir")}
+      ${mtile("tab", "rival", "rival", "İhaleler", level() >= 1 ? (openT ? `${openT} açık · teklif ver` : "şu an ihale yok") : "Esnaf'ta açılır")}
+      ${mtile("tab", "market", "market", "Piyasa", `ortalama ${pct(avgCh)} bugün`)}
+      ${mtile("coGo", "bank", "bank", "Banka", S.loan ? "borç " + money(S.loan) : "Kredi çek, öde")}
+      ${mtile("coGo", "staff", "staff", "Personel", nstaff ? `${nstaff} kişi` : "Kimse yok", "", nstaff ? "" : "bad")}
+      ${mtile("coGo", "recv", "recv", "Alacaklar", nlegal ? `${nlegal} takipte` : S.recv.length ? money(recvTotal()) : "açık alacak yok", "", nlegal ? "bad" : "")}
+      ${mtile("coGo", "fleet", "fleet", "Filo", nveh ? `${nveh} araç · ${ton(fleetCap())}/gün` : "Araç yok")}
+      ${mtile("coGo", "mach", "mach", "Atölye", `${Object.values(S.machines).filter(Boolean).length}/${Object.keys(MACHINES).length} makine`)}
+    </div>
+    <button class="cta" data-act="tab" data-v="stock"><span><small>TÜRKİYE HARİTASI · 81 İL</small><b>Sanayiyi keşfet →</b></span><span class="go">›</span></button>
+  </div></div>`;
+  return h;
+}
 function renderOrders() {
   let h = "";
   if (owns("manager")) h += `<div class="btns"><button class="btn st" data-act="autoDeliver">Kârlı olanları teslim et<small>Operasyon Müdürü</small></button><button class="btn" data-act="skip7">7 gün ilerle<small>olay çıkarsa durur</small></button></div>`;
@@ -1903,9 +2129,9 @@ function renderOrders() {
     ${S.daily.tasks.map(t => `<div class="task ${t.done ? "done" : ""}"><span>${t.done ? "✓ " : ""}${taskText(t)}</span><b>${t.k === "profit" ? tlShort(Math.min(t.n, taskProg(t))) + " / " + tlShort(t.n) : nf1.format(Math.min(t.n, taskProg(t))) + " / " + nf1.format(t.n)}</b></div>`).join("")}</div>`;
   if (S.event && ex("event")) h += eventBanner();
   if (S.priceWar && ex("war")) h += `<div class="hint"><b>Fiyat savaşı:</b> ${esc((rivalById(S.priceWar.rival) || {}).name || "Bir rakip")} ${CATS[S.priceWar.cat].name} fiyatlarını kırdı (${S.priceWar.days} gün). Bu kategoride marjlar düşük ve rakip daha sık araya giriyor.</div>`;
-  if (S.active.length) h += `<section class="sec"><div class="sechead"><h2>Aktif siparişler</h2><span class="muted">${S.active.length}</span></div>${S.active.map(o => orderCard(o, true)).join("")}</section>`;
+  if (S.active.length) h += `<section class="sec"><div class="sechead"><h2>Aktif siparişler</h2><span class="muted">${S.active.length}</span></div><div class="ogrid">${S.active.map(o => orderCard(o, true)).join("")}</div></section>`;
   h += `<section class="sec"><div class="sechead"><h2>Yeni teklifler</h2><span class="muted">Aracılık ${brokerQuota() - S.brokerToday}/${brokerQuota()} · filo ${ton(freeCap())}</span></div>`;
-  h += S.offers.length ? S.offers.map(o => orderCard(o, false)).join("") : `<div class="hint">Şu an açık teklif yok. Günü bitir, yarın yeni teklifler gelir. Satış elemanı tutarsan her gün daha çok teklif gelir.</div>`;
+  h += S.offers.length ? `<div class="ogrid">${S.offers.map(o => orderCard(o, false)).join("")}</div>` : `<div class="hint">Şu an açık teklif yok. Günü bitir, yarın yeni teklifler gelir. Satış elemanı tutarsan her gün daha çok teklif gelir.</div>`;
   return h + `</section>`;
 }
 function renderMarket() {
@@ -1919,7 +2145,7 @@ function renderMarket() {
   if (S.events.length) h += `<div class="chips">${S.events.map(e => `<span class="chip ${e.drift > 0 ? "g" : "b"}">${e.cat === "all" ? "Tüm piyasa" : CATS[e.cat].name} ${e.drift > 0 ? "▲" : "▼"} ${e.days} gün</span>`).join("")}</div>`;
   const list = PRODUCTS.filter(p => (UI.cat === "all" || p.cat === UI.cat) && (!UI.onlyStock || stockQty(p.id) > 0));
   if (!list.length) h += `<div class="hint">Bu filtrede stoğun yok.</div>`;
-  let lastCat = null;
+  let lastCat = null; h += `<div class="pgrid">`;
   for (const p of list) {
     if (UI.cat === "all" && p.cat !== lastCat) { h += `<h2 style="margin-top:6px">${CATS[p.cat].name}</h2>`; lastCat = p.cat; }
     const lock = p.lvl > level(), m = price(p.id), ch = m / prevPrice(p.id) - 1, q = stockQty(p.id), open = UI.open === p.id && !lock;
@@ -1934,7 +2160,7 @@ function renderMarket() {
       ${open ? tradePanel(p) : ""}
     </div>`;
   }
-  return h;
+  return h + `</div>`;
 }
 function tradePanel(p) {
   if (!S.locs.length) return `<div class="trade"><div class="hint">Stok tutmak için önce <b>Tesisler</b> sekmesinden bir depo ya da dükkan aç.</div></div>`;
@@ -2005,14 +2231,14 @@ function renderStock() {
   const mc = UI.mapCat || "";
   let h = `<section class="sec"><div class="sechead"><h2>Sanayi haritası · 81 il</h2><button class="btn ghost sm" data-act="mapZoom" aria-pressed="${!!UI.mapZoom}">${UI.mapZoom ? "Küçült" : "Büyüt"}</button></div><div class="card">
     <div class="filter">${[["", "Sanayi"], ...Object.keys(CATS).map(k => [k, CATS[k].name.split(" ")[0]])].map(([k, n]) => `<button aria-pressed="${mc === k}" data-act="mapCat" data-v="${k}">${k ? n + " fiyatı" : n}</button>`).join("")}</div>
-    <div class="mapwrap ${UI.mapZoom ? "zoom" : ""}">${mapSvg()}</div>
+    <div class="mapgrid"><div class="mapL"><div class="mapwrap ${UI.mapZoom ? "zoom" : ""}">${mapSvg()}</div>
     <div class="legend">${mc ? `<span><i style="background:${heat(-1)}"></i>En ucuz</span><span><i style="background:${heat(0)}"></i>Orta</span><span><i style="background:${heat(1)}"></i>En pahalı</span><span>⌂ ${CATS[mc].name} üreticisi</span>`
       : `<span>İle dokun: sanayisi açılır</span><span><i style="background:var(--hot)"></i>Senin tesisin</span><span><i style="background:#c9d3dc"></i>Sanayi şehri</span><span><i style="background:#8fc6ef"></i>Liman</span><span>⌂ Çelik üretimi</span><span>Renkli nokta: rakip</span>`}</div>
-    ${provInfo()}</div></section>`;
+    </div><div class="mapR">${provInfo()}</div></div></div></section>`;
   h += `<section class="sec"><div class="sechead"><h2>Tesisler</h2><span class="muted">${S.locs.length}/${maxLocs()} · ${nf1.format(stockTotal())}/${nf0.format(capTotal())} t</span></div>`;
   if (!S.locs.length) h += `<canvas class="scene" data-scene="empty" data-anim="0" role="img" aria-label="Boş arsa: kiralık depo"></canvas>`;
   if (!S.locs.length) h += `<div class="hint">Henüz tesisin yok. <b>Depo</b> ucuzdur ve stok tutar. <b>Dükkan</b> pahalıdır ama her gün kapıdan perakende müşteri gelir ve stoğunu %8–16 kârla satar.</div>`;
-  h += S.locs.map(locCard).join("") + `</section>`;
+  h += `<div class="lgrid">${S.locs.map(locCard).join("")}</div></section>`;
   if (S.incoming.length) h += `<section class="sec"><h2>Yoldaki sevkiyatlar</h2><div class="card">${S.incoming.map(i => `<div class="line2"><span>${ton(i.q)} ${P[i.pid].name} → ${C[locById(i.loc).city].name} · ${SUPPLY[i.mode].name}</span><b>Gün ${i.arrive}</b></div>`).join("")}</div></section>`;
   const city = UI.newCity || S.home, t0 = LOC_TYPES[UI.newType].tiers[0];
   h += `<section class="sec"><h2>Yeni tesis aç</h2><div class="card">
@@ -2078,7 +2304,7 @@ function renderRival() {
     ${S.prizes.length ? `<div class="muted">Geçmiş yıllar: ${S.prizes.map(p => `${p.year}. yıl ${p.rank}. sıra`).join(" · ")}</div>` : ""}</div></section>`;
   const rn = S.news.filter(n => n.rival).slice(0, 6);
   if (rn.length) h += `<section class="sec"><h2>Rakip haberleri</h2><div class="card">${rn.map(n => `<div class="line2"><span class="${n.bad ? "bad" : ""}" style="${n.bad ? "" : "color:var(--fg)"}">${esc(n.text)}</span><b>${dateStr(n.day)}</b></div>`).join("")}</div></section>`;
-  return h;
+  return `<div class="sgrid">${h}</div>`;
 }
 // ---------- main menu ----------
 const hasGame = () => S && S.seen.intro;
@@ -2202,7 +2428,7 @@ function storeHtml() {
     <div class="legal">Sermaye ve güçlendiriciler tüketilebilir ürünlerdir; satın alındığı anda oynadığın şirkete eklenir ve geri yüklenmez. Kalıcı ürünler ve Baron Kulübü aynı Apple hesabıyla geri yüklenebilir. Tüm ürünler yalnızca oyun içinde geçerlidir ve gerçek para değeri yoktur.</div>`;
   return h;
 }
-const back = t => `<div class="mhead"><button class="btn ghost sm" data-act="menuGo" data-v="main" aria-label="Geri">‹ Geri</button><h2>${t}</h2></div>`;
+const back = t => `<div class="mhead"><button class="btn ghost sm" data-act="menuGo" data-v="${UI.subFrom === "game" ? "continue" : "main"}" aria-label="Geri">‹ ${UI.subFrom === "game" ? "Oyuna dön" : "Geri"}</button><h2>${t}</h2></div>`;
 function menuHtml(v) {
   if (v === "new") {
     const d = UI.newDiff || "normal";
@@ -2303,11 +2529,14 @@ function nwChart() {
     <polyline points="${pts.join(" ")}" fill="none" stroke="var(--steel)" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>
     <div class="line2"><span>${h.length} gün önce <b>${tl(h[0])}</b></span><span>bugün <b>${tl(h[h.length - 1])}</b></span></div>`;
 }
+let CO_SECS = null;
 function accSec(id, title, sum, body, def) {
+  if (CO_SECS) { CO_SECS.push({ id, title, sum, body, alert: id === "recv" && def }); return ""; }
   const open = UI.acc[id] === undefined ? !!def : UI.acc[id];
   return `<section class="sec acc ${open ? "open" : ""}"><button class="acch" data-act="acc" data-v="${id}:${open ? 1 : 0}" aria-expanded="${open}"><h2>${title}</h2><span class="muted">${sum}</span><span class="chev">${open ? "▾" : "▸"}</span></button>${open ? body : ""}</section>`;
 }
 function renderCompany() {
+  CO_SECS = [];
   const l = level(), L = LEVELS[l], N = LEVELS[l + 1];
   let h = accSec("title", "Unvan", `${L.name}${N ? " → " + N.name : ""}`, `<div class="card">
     <div class="line2"><span>Toplam satılan</span><b>${ton(S.tons)}</b></div>
@@ -2366,7 +2595,11 @@ function renderCompany() {
     h += accSec("sell", "Şirketi sat", `+${pts} miras puanı`, `<div class="card"><div class="muted">Şirketini satıp yeni bir şehirde sıfırdan başlayabilirsin. ${pts} miras puanı kazanırsın. Her puan yeni oyunlarda +10.000 ₺ başlangıç, +2 itibar ve teklif fiyatlarında +%0,2 verir. Şu anki miras: ${LEG.points} puan.</div>
       <button class="btn hot" data-act="sellCo">Şirketi sat · +${pts} miras puanı</button></div>`, true); }
   h += `<button class="btn ghost" style="align-self:flex-start" data-act="reset">Yeni oyun başlat</button>`;
-  return h;
+  const secs = CO_SECS; CO_SECS = null;
+  const cur = secs.find(x => x.id === UI.coSec);
+  if (cur) return `<div class="cohead"><button class="btn ghost sm" data-act="coSec" data-v="">‹ Şirket</button>${tileIc(cur.id)}<h2>${cur.title}</h2><span class="muted">${cur.sum}</span></div><div class="cobody">${cur.body}</div>`;
+  return `<div class="sechead"><h2>${esc(S.name)}</h2><span class="muted">${LEVELS[level()].name} · net değer ${money(netWorth())}</span></div>
+    <div class="cogrid">${secs.map(x => mtile("coSec", x.id, x.id, x.title, x.sum, "", x.alert ? "bad" : "")).join("")}</div>`;
 }
 
 // =====================================================================
@@ -2915,7 +3148,7 @@ const artFor = kind => ART[kind] ? `<div class="art" aria-hidden="true"><svg vie
 function render() {
   renderHud();
   const m = document.getElementById("main"), top = m.scrollTop;
-  m.innerHTML = UI.tab === "orders" ? renderOrders() : UI.tab === "market" ? renderMarket() : UI.tab === "stock" ? renderStock() : UI.tab === "rival" ? renderRival() : renderCompany();
+  m.innerHTML = UI.tab === "home" ? renderHome() : UI.tab === "orders" ? renderOrders() : UI.tab === "market" ? renderMarket() : UI.tab === "stock" ? renderStock() : UI.tab === "rival" ? renderRival() : renderCompany();
   m.scrollTop = top;
   const mw = m.querySelector(".mapwrap.zoom"); if (mw) { mw.scrollLeft = (PROV[selProv()].cx - 15) / 1022 * mw.scrollWidth - mw.clientWidth / 2; }
   document.getElementById("endDay").disabled = S.over;

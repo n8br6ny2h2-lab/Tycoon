@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const out = join(root, "www");
-const FONTS = { "chakra-petch": [600, 700], "ibm-plex-sans": [400, 500, 600], "saira-condensed": [500, 600, 700] };
+const FONTS = { "nunito": [600, 700, 800, 900], "chakra-petch": [700], "saira-condensed": [700] };
 
 rmSync(out, { recursive: true, force: true });
 mkdirSync(join(out, "fonts"), { recursive: true });
@@ -39,7 +39,7 @@ const html = `<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="format-detection" content="telephone=no">
 <style>
-  html { background: #101418; }
+  html { background: #0d1720; }
   body { margin: 0; box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; overscroll-behavior: none; }
   input, select { -webkit-user-select: text; user-select: text; }
 </style>
