@@ -50,6 +50,7 @@ select { font: inherit; color: var(--fg); background: var(--bg); border: 1px sol
 
 /* Content */
 #main { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-block: 12px 16px; display: flex; flex-direction: column; gap: 12px; }
+#main > * { flex-shrink: 0; }
 h2 { font-family: var(--display); font-size: 15px; letter-spacing: .06em; text-transform: uppercase; margin: 0; color: var(--steel); text-wrap: balance; }
 .sec { display: flex; flex-direction: column; gap: 8px; }
 .sechead { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
@@ -140,17 +141,20 @@ svg.nw { width: 100%; height: 90px; display: block; }
   font-family: var(--num); font-size: 12px; font-weight: 700; line-height: 17px; padding: 0 4px; }
 
 /* Toast + modal */
-#toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(140px + env(safe-area-inset-bottom, 0px)); width: min(520px, calc(100% - 28px));
-  display: flex; flex-direction: column; gap: 6px; pointer-events: none; z-index: 20; }
-#toast div { background: var(--fg); color: var(--bg); padding: 10px 12px; border-radius: 8px; font-size: 13px; font-weight: 500; box-shadow: 0 6px 24px rgba(0,0,0,.4);
-  animation: tin .22s ease-out; }
+#toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(132px + env(safe-area-inset-bottom, 0px)); width: min(480px, calc(100% - 40px));
+  display: flex; flex-direction: column; align-items: center; gap: 5px; pointer-events: none; z-index: 20; }
+#toast div { pointer-events: auto; cursor: pointer; max-width: 100%; box-sizing: border-box; background: rgba(233,238,242,.96); color: #14181d; padding: 7px 12px; border-radius: 16px;
+  font-size: 12.5px; font-weight: 600; line-height: 1.35; box-shadow: 0 6px 18px rgba(0,0,0,.35); animation: tin .2s ease-out;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 #toast div.bad { background: var(--bad); color: #fff; }
 @keyframes tin { from { transform: translateY(8px); opacity: 0; } }
 #modal { position: fixed; inset: 0; background: rgba(5,8,10,.72); display: flex; align-items: flex-end; justify-content: center; z-index: 30;
   padding: 16px max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
-#modal .box { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px; width: 100%; max-width: 520px; display: flex; flex-direction: column; gap: 12px;
-  max-height: 88%; overflow-y: auto; }
-#modal h3 { font-family: var(--display); font-size: 22px; margin: 0; color: var(--hot); text-wrap: balance; }
+#modal .box { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 16px; width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 10px;
+  max-height: 80%; overflow-y: auto; box-shadow: 0 -10px 40px rgba(0,0,0,.45); animation: sheet .22s ease-out; }
+@keyframes sheet { from { transform: translateY(24px); opacity: 0; } }
+#modal h3 { font-family: var(--display); font-size: 20px; margin: 0; color: var(--hot); text-wrap: balance; }
+#modal p { font-size: 14px; }
 #modal p { margin: 0; line-height: 1.5; color: var(--fg); }
 #modal ul { margin: 0; padding-left: 18px; line-height: 1.5; color: var(--muted); }
 #modal input { width: 100%; box-sizing: border-box; padding: 11px 12px; border-radius: 7px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); font: inherit; font-size: 16px; }
@@ -181,9 +185,17 @@ svg.nw { width: 100%; height: 90px; display: block; }
 #menu { position: fixed; inset: 0; z-index: 25; background: radial-gradient(120% 70% at 50% 0%, #22303b 0%, var(--bg) 62%); overflow-y: auto; }
 #menu .inner { width: 100%; max-width: 480px; margin: 0 auto; box-sizing: border-box; min-height: 100%;
   padding-block: max(24px, env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 12px; }
-.logo { font-family: var(--display); font-size: 46px; line-height: .92; letter-spacing: .02em; margin: 14px 0 0; text-transform: uppercase; }
+.logo { font-family: var(--display); font-size: clamp(36px, 12vw, 50px); line-height: .9; letter-spacing: .02em; margin: 6px 0 0; text-transform: uppercase; }
 .logo span { color: var(--hot); display: block; }
-.tagline { color: var(--muted); font-size: 14px; margin: 0 0 4px; line-height: 1.45; }
+.tagline { color: var(--muted); font-size: 13.5px; margin: 0; line-height: 1.45; max-width: 36ch; }
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.tile { text-align: left; padding: 12px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 2px 10px; align-items: center; }
+.tile svg { grid-row: span 2; width: 26px; height: 26px; stroke: var(--hot); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.tile b { font-size: 14.5px; } .tile small { font-size: 11.5px; color: var(--muted); line-height: 1.3; }
+.mfill { flex: 1 1 0; min-height: 4px; }
+.mfoot { color: var(--muted); font-size: 11.5px; margin: 0; text-align: center; }
+@media (max-height: 700px) { .tagline { display: none; } #menu .inner { gap: 9px; } .mbtn { padding: 11px 14px; }
+  #cash { font-size: 30px; } #hud { padding-block: 7px 6px; } #ticker { margin-top: 5px; } #endDay { padding: 10px; font-size: 16px; } #bottom { gap: 6px; } }
 .tape { overflow: hidden; border-block: 1px solid var(--line); padding: 7px 0; white-space: nowrap; font-family: var(--num); font-size: 15px; color: var(--muted); }
 .tape div { display: inline-block; animation: tape 90s linear infinite; }
 .tape b { color: var(--fg); font-weight: 600; margin-left: 4px; }
@@ -246,9 +258,28 @@ svg.map .route { animation: route 1.6s linear infinite; opacity: .85; }
 /* Visuals */
 canvas.scene { width: 100%; height: 136px; display: block; border-radius: 6px; background: var(--panel2); }
 canvas.pscene { width: 100%; height: 64px; display: block; border-radius: 6px; }
-canvas.mscene { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 210px; pointer-events: none; opacity: .85; }
-#menu .inner.scenic { padding-bottom: max(200px, env(safe-area-inset-bottom, 0px)); }
-#menu .inner { position: relative; z-index: 1; }
+canvas.mscene { display: block; flex: none; height: clamp(110px, 30vh, 300px); width: calc(100% + 2 * max(14px, env(safe-area-inset-left, 0px)));
+  margin-inline: calc(-1 * max(14px, env(safe-area-inset-left, 0px))); pointer-events: none; }
+/* compact status strip, accordions, facility summaries */
+.strip { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin-inline: calc(-1 * max(14px, env(safe-area-inset-left, 0px))); padding-inline: max(14px, env(safe-area-inset-left, 0px)); }
+.strip::-webkit-scrollbar { display: none; }
+.pill { flex: none; display: inline-flex; align-items: center; gap: 6px; padding: 7px 11px; border-radius: 18px; background: var(--panel); border: 1px solid var(--line); font-size: 12.5px; font-weight: 600; white-space: nowrap; }
+.pill i { width: 7px; height: 7px; border-radius: 50%; background: var(--steel); flex: none; }
+.pill.hot i { background: var(--hot); } .pill.good i { background: var(--good); } .pill.bad i { background: var(--bad); } .pill.warn i { background: var(--warn); }
+.pill[aria-expanded="true"] { border-color: var(--steel); background: var(--panel2); }
+.pill .n { font-family: var(--num); color: var(--muted); }
+.acc { gap: 0; }
+.acc > .acch { display: flex; align-items: baseline; gap: 8px; width: 100%; text-align: left; padding: 11px 12px; border-radius: 10px; background: var(--panel); border: 1px solid var(--line); }
+.acc.open > .acch { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom-color: transparent; }
+.acc > .acch h2 { flex: none; font-size: 13.5px; }
+.acc > .acch .muted { flex: 1; min-width: 0; text-align: right; font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.acc > .acch .chev { flex: none; color: var(--muted); font-size: 12px; width: 12px; text-align: center; }
+.acc.open > .acch + * { border-top-left-radius: 0; border-top-right-radius: 0; }
+.acc.open > .card { border-top: 0; }
+.acc .accbody { display: flex; flex-direction: column; gap: 8px; }
+.locsum { display: flex; gap: 6px; flex-wrap: wrap; }
+.locsum .chip { font-size: 11.5px; }
+#news.flash { color: var(--fg); font-weight: 600; }
 #fx { position: fixed; inset: 0; pointer-events: none; z-index: 28; overflow: hidden; }
 .fxtruck { position: absolute; left: 0; bottom: calc(132px + env(safe-area-inset-bottom, 0px)); width: 120px; height: 40px; animation: drive 1.5s cubic-bezier(.45,.05,.55,.95) forwards; }
 @keyframes drive { from { transform: translateX(-130px); } to { transform: translateX(calc(100vw + 10px)); } }
@@ -593,7 +624,7 @@ const shipRate = (a, b, own) => { const d = km(a, b); return own ? 40 + d * 0.45
 // =====================================================================
 // STATE
 // =====================================================================
-let S, UI = { tab: "orders", cat: "all", open: null, qty: 1, loc: null, onlyStock: false, move: null, newCity: null, newType: "depot" };
+let S, UI = { acc: {}, locOpen: {}, tab: "orders", cat: "all", open: null, qty: 1, loc: null, onlyStock: false, move: null, newCity: null, newType: "depot" };
 function mkRival([id, name, home, style, cat, nw, cap, color]) {
   return { id, name, home, style, cat, nw: nw * rnd(0.85, 1.15), cap, color, cities: [home], tons: 0, hist: [], alive: true };
 }
@@ -1455,6 +1486,9 @@ const ACT = {
   pause: () => showMenu("main"),
   menuGo: v => { UI.confirmWipe = false; if (v === "continue") { hideMenu(); render(); if (S.cards.length) showModal("card"); return; } showMenu(v); },
   setDiff: v => { UI.newDiff = v; showMenu("new"); },
+  acc: v => { const [id, cur] = v.split(":"); UI.acc[id] = cur !== "1"; render(); },
+  pill: v => { const k = "o_" + v; UI.acc[k] = !(UI.acc[k] === undefined ? (v === "tut" && S.day <= 3) : UI.acc[k]); render(); },
+  locOpen: v => { UI.locOpen[v] = !UI.locOpen[v]; render(); },
   setScen: v => { UI.newScen = v; showMenu("new"); },
   shop: v => { UI.storeFrom = v === "menu" ? "menu" : "game"; showMenu("store"); },
   buyIAP: v => buyIAP(v),
@@ -1610,7 +1644,8 @@ function renderHud() {
     `<span>Net değer <b>${tl(netWorth())}</b></span><span>Stok <b>${nf1.format(stockTotal())}/${nf0.format(capTotal())} t</b></span><span>İtibar <b class="${S.rep < 35 ? "bad" : ""}">${Math.round(S.rep)}</b></span><span>Sıra <b>${myRank()}/${aliveCount()}</b></span>` +
     (S.loan ? `<span>Kredi <b>${tl(S.loan)}</b></span>` : "");
   const n = S.news[0], ne = document.getElementById("news");
-  ne.textContent = n ? n.text : ""; ne.className = n && n.bad ? "bad" : "";
+  if (UI.flash && Date.now() < UI.flashUntil) { ne.textContent = UI.flash; ne.className = "flash"; }
+  else { ne.textContent = n ? n.text : ""; ne.className = n && n.bad ? "bad" : ""; }
   document.getElementById("endSub").textContent = `→ Gün ${S.day + 1}`;
   const tabs = [["orders", "Siparişler", ICONS.orders, S.offers.length + S.active.length], ["market", "Piyasa", ICONS.market, 0], ["stock", "Tesisler", ICONS.stock, 0], ["rival", "Rekabet", ICONS.rival, S.tenders.filter(t => t.bid === null).length], ["company", "Şirket", ICONS.company, 0]];
   document.getElementById("tabs").innerHTML = tabs.map(([k, l, ic, b]) =>
@@ -1649,15 +1684,24 @@ function renderOrders() {
   if (owns("manager")) h += `<div class="btns"><button class="btn st" data-act="autoDeliver">Kârlı olanları teslim et<small>Operasyon Müdürü</small></button><button class="btn" data-act="skip7">7 gün ilerle<small>olay çıkarsa durur</small></button></div>`;
   const sp = scenProgress();
   if (sp && !S.scen.done) h += `<div class="banner"><span class="t">Senaryo · ${SCENARIOS[S.scen.id].name}</span><p>${SCENARIOS[S.scen.id].desc}</p><p>${sp.text}</p><div class="bar"><i style="width:${sp.pct * 100}%"></i></div></div>`;
-  if (S.tut < TUT.length) { const t = TUT[S.tut];
-    h += `<div class="card"><div class="line2"><span><b style="font-family:var(--body);color:var(--hot)">İlk adımlar ${S.tut + 1}/${TUT.length}: ${t[0]}</b></span><b>+${tl(t[3])}</b></div>
-      <div class="muted">${t[1]}</div><div class="steps">${TUT.map((x, i) => `<i class="${i < S.tut ? "on" : ""}"></i>`).join("")}</div></div>`; }
-  if (S.daily) h += `<div class="card"><div class="line2"><span><b style="font-family:var(--body)">Günlük görevler</b></span><span>her biri ${tl(2000 * (level() + 1))} · itibar +1</span></div>
-    ${S.daily.tasks.map(t => `<div class="task ${t.done ? "done" : ""}"><span>${t.done ? "✓ " : ""}${taskText(t)}</span><b>${t.k === "profit" ? tlShort(Math.min(t.n, taskProg(t))) + " / " + tlShort(t.n) : nf1.format(Math.min(t.n, taskProg(t))) + " / " + nf1.format(t.n)}</b></div>`).join("")}</div>`;
-  if (S.event) h += eventBanner();
+  // one swipeable row of status pills; details open on tap so offers stay on the first screen
+  const ex = k => !!UI.acc["o_" + k];
+  const tutOpen = UI.acc.o_tut === undefined ? S.day <= 3 && S.tut < TUT.length : ex("tut");
+  const pills = [];
+  if (S.tut < TUT.length) pills.push(`<button class="pill hot" data-act="pill" data-v="tut" aria-expanded="${tutOpen}"><i></i>Adım ${S.tut + 1}/${TUT.length}: ${TUT[S.tut][0]}</button>`);
+  if (S.daily) { const d = S.daily.tasks.filter(t => t.done).length; pills.push(`<button class="pill ${d === 3 ? "good" : ""}" data-act="pill" data-v="daily" aria-expanded="${ex("daily")}"><i></i>Görevler <span class="n">${d}/3</span></button>`); }
+  if (S.event) pills.push(`<button class="pill warn" data-act="pill" data-v="event" aria-expanded="${ex("event")}"><i></i>${esc(S.event.name.split(":")[0])} <span class="n">${Math.max(1, S.event.end - S.day + 1)} gün</span></button>`);
   const openT = S.tenders.filter(t => t.bid === null);
-  if (openT.length) h += `<div class="banner"><span class="t">Açık ihale</span><p>${openT.map(t => `<b>${esc(t.proj)}</b>: ${ton(t.qty)} ${P[t.prod].name}`).join(" · ")}</p><button class="btn st" data-act="tab" data-v="rival">Rakiplere karşı teklif ver</button></div>`;
-  if (S.priceWar) h += `<div class="hint"><b>Fiyat savaşı:</b> ${esc((rivalById(S.priceWar.rival) || {}).name || "Bir rakip")} ${CATS[S.priceWar.cat].name} fiyatlarını kırdı (${S.priceWar.days} gün). Bu kategoride marjlar düşük ve rakip daha sık araya giriyor.</div>`;
+  if (openT.length) pills.push(`<button class="pill hot" data-act="tab" data-v="rival"><i></i>${openT.length} açık ihale ›</button>`);
+  if (S.priceWar) pills.push(`<button class="pill bad" data-act="pill" data-v="war" aria-expanded="${ex("war")}"><i></i>Fiyat savaşı: ${CATS[S.priceWar.cat].name}</button>`);
+  if (pills.length) h += `<div class="strip">${pills.join("")}</div>`;
+  if (S.tut < TUT.length && tutOpen) { const t = TUT[S.tut];
+    h += `<div class="card"><div class="line2"><span><b style="font-family:var(--body);color:var(--hot)">${t[0]}</b></span><b>+${tl(t[3])}</b></div>
+      <div class="muted">${t[1]}</div><div class="steps">${TUT.map((x, i) => `<i class="${i < S.tut ? "on" : ""}"></i>`).join("")}</div></div>`; }
+  if (S.daily && ex("daily")) h += `<div class="card"><div class="line2"><span><b style="font-family:var(--body)">Günlük görevler</b></span><span>her biri ${tl(2000 * (level() + 1))} · itibar +1</span></div>
+    ${S.daily.tasks.map(t => `<div class="task ${t.done ? "done" : ""}"><span>${t.done ? "✓ " : ""}${taskText(t)}</span><b>${t.k === "profit" ? tlShort(Math.min(t.n, taskProg(t))) + " / " + tlShort(t.n) : nf1.format(Math.min(t.n, taskProg(t))) + " / " + nf1.format(t.n)}</b></div>`).join("")}</div>`;
+  if (S.event && ex("event")) h += eventBanner();
+  if (S.priceWar && ex("war")) h += `<div class="hint"><b>Fiyat savaşı:</b> ${esc((rivalById(S.priceWar.rival) || {}).name || "Bir rakip")} ${CATS[S.priceWar.cat].name} fiyatlarını kırdı (${S.priceWar.days} gün). Bu kategoride marjlar düşük ve rakip daha sık araya giriyor.</div>`;
   if (S.active.length) h += `<section class="sec"><div class="sechead"><h2>Aktif siparişler</h2><span class="muted">${S.active.length}</span></div>${S.active.map(o => orderCard(o, true)).join("")}</section>`;
   h += `<section class="sec"><div class="sechead"><h2>Yeni teklifler</h2><span class="muted">Aracılık ${brokerQuota() - S.brokerToday}/${brokerQuota()} · filo ${ton(freeCap())}</span></div>`;
   h += S.offers.length ? S.offers.map(o => orderCard(o, false)).join("") : `<div class="hint">Şu an açık teklif yok. Günü bitir, yarın yeni teklifler gelir. Satış elemanı tutarsan her gün daha çok teklif gelir.</div>`;
@@ -1723,8 +1767,12 @@ function locCard(l) {
     <canvas class="scene" data-scene="loc" data-id="${l.id}" role="img" aria-label="${esc(locName(l))}: ${t.name}, ${nf1.format(used)} t stok"></canvas>
     <div class="line2"><span>Doluluk${inc ? ` (+${ton(inc)} yolda)` : ""}</span><b>${nf1.format(used)} / ${cap} t</b></div>
     <div class="bar"><i class="${(used + inc) / cap > 0.9 ? "full" : ""}" style="width:${Math.min(100, (used + inc) / cap * 100)}%"></i></div>
-    <div class="line2"><span>Yükleme bugün</span><b>${ton(l.used)} / ${ton(locHandle(l))}</b></div>
-    <div class="line2"><span>Aylık kira</span><b>${tl(t.rent)}</b></div>`;
+    <div class="line2"><span>Yükleme bugün <b>${ton(l.used)} / ${ton(locHandle(l))}</b></span><span>kira <b>${tlShort(t.rent)}${tlShort(t.rent).endsWith("₺") ? "" : " ₺"}/ay</b></span></div>`;
+  const ents = Object.entries(l.stock).sort((a, b) => b[1].q - a[1].q);
+  const openL = !!UI.locOpen[l.id];
+  h += `<div class="item"><div class="locsum">${ents.length ? ents.slice(0, 3).map(([id, s]) => `<span class="chip">${P[id].name.replace(/ \(.*\)/, "")} · ${ton(s.q)}</span>`).join("") + (ents.length > 3 ? `<span class="chip">+${ents.length - 3} ürün</span>` : "") : `<span class="chip">Boş</span>`}</div>
+    <button class="btn ${openL ? "" : "st"} sm" data-act="locOpen" data-v="${l.id}" aria-expanded="${openL}">${openL ? "Kapat ▴" : "Yönet ▾"}</button></div>`;
+  if (!openL) return h + `</div>`;
   if (l.type === "shop") h += `<div class="item"><div><b>Tezgâhtar</b> <span class="muted">× ${l.clerks}</span><div class="muted">Kapı müşterisi +%50 her biri · aylık ${tl(CLERK.salary)} · günde ~${Math.round(t.walk * C[l.city].size * (1 + 0.5 * l.clerks) * S.rep / 60)} müşteri</div></div>
     <div class="btns">${l.clerks ? `<button class="btn ghost sm" data-act="clerk" data-v="${l.id}:-1">−</button>` : ""}<button class="btn st sm" data-act="clerk" data-v="${l.id}:1" ${l.clerks >= CLERK.max ? "disabled" : ""}>+</button></div></div>`;
   for (const [k, e] of Object.entries(EQUIP)) {
@@ -1827,7 +1875,7 @@ function renderRival() {
 // ---------- main menu ----------
 const hasGame = () => S && S.seen.intro;
 function showMenu(view) { UI.menu = view; const m = document.getElementById("menu"); m.hidden = false;
-  m.innerHTML = (view === "main" || view === "new" ? `<canvas class="mscene" data-scene="menu" aria-hidden="true"></canvas>` : "") + `<div class="inner gut ${view === "main" || view === "new" ? "scenic" : ""}">${menuHtml(view)}</div>`; m.scrollTop = 0; visMount();
+  m.innerHTML = `<div class="inner gut">${menuHtml(view)}</div>`; m.scrollTop = 0; visMount();
   const f = m.querySelector(".mbtn, input"); if (f && view !== "new") f.focus(); }
 function hideMenu() { UI.menu = null; const m = document.getElementById("menu"); m.hidden = true; m.innerHTML = ""; }
 // ---------- in-app purchases ----------
@@ -1998,16 +2046,21 @@ function menuHtml(v) {
   // main
   const items = PRODUCTS.filter(p => p.lvl <= 2).map(p => { const ch = price(p.id) / prevPrice(p.id) - 1; return `${p.name}<b>${nf0.format(price(p.id))}</b><i class="${ch >= 0 ? "good" : "bad"}">${pct(ch)}</i>`; }).join("");
   const g = hasGame() && !S.over;
+  const tile = (act, v, ic, t, sub) => `<button class="tile" data-act="${act}" data-v="${v}"><svg viewBox="0 0 24 24" aria-hidden="true">${ic}</svg><b>${t}</b><small>${sub}</small></button>`;
   return `<h1 class="logo">Demir<span>Baronu</span></h1>
-    <p class="tagline">Boru, profil, sac ve inşaat demiri ticareti. Cebinde 5.000 ₺ ve bir telefonla başla, rakip şirketleri geç, sektörün baronu ol.</p>
+    <p class="tagline">Boru, profil, sac ve inşaat demiri ticareti. 5.000 ₺ ile başla, rakipleri geç, sektörün baronu ol.</p>
     <div class="tape" aria-hidden="true"><div>${items}${items}</div></div>
-    ${g ? `<button class="mbtn hot" data-act="menuGo" data-v="continue"><span>Devam et<small>${esc(S.name)} · ${dateStr()} Yıl ${yearOf()} · ${LEVELS[level()].name} · ${tl(netWorth())} · ${myRank()}. sıra</small></span><span class="arrow">›</span></button>` : ""}
+    ${g ? `<button class="mbtn hot" data-act="menuGo" data-v="continue"><span>Devam et<small>${esc(S.name)} · ${dateStr()} Yıl ${yearOf()} · ${LEVELS[level()].name} · ${tlShort(netWorth())}${tlShort(netWorth()).endsWith("₺") ? "" : " ₺"} · ${myRank()}. sıra</small></span><span class="arrow">›</span></button>` : ""}
     <button class="mbtn ${g ? "" : "hot"}" data-act="menuGo" data-v="new"><span>Yeni oyun<small>Şirketini kur, şehrini ve zorluğu seç</small></span><span class="arrow">›</span></button>
-    <button class="mbtn" data-act="shop" data-v="menu"><span>Mağaza<small>Sermaye, güçlendiriciler, Baron Kulübü, temalar</small></span><span class="arrow">›</span></button>
-    <button class="mbtn" data-act="menuGo" data-v="help"><span>Nasıl oynanır<small>Aracılık, tesisler, rakipler, ihaleler</small></span><span class="arrow">›</span></button>
-    <button class="mbtn" data-act="menuGo" data-v="records"><span>Rekorlar<small>En iyi şirketlerin</small></span><span class="arrow">›</span></button>
-    <button class="mbtn" data-act="menuGo" data-v="settings"><span>Ayarlar<small>Bildirimler, verileri sil</small></span><span class="arrow">›</span></button>
-    <p class="muted" style="margin-top:auto;font-size:12px">Prototip · kayıt bu cihazda tutulur</p>`;
+    <div class="tiles">
+      ${tile("shop", "menu", '<path d="M4 9h16l-1.5 11h-13z"/><path d="M8 9V7a4 4 0 0 1 8 0v2"/>', "Mağaza", "Paketler, kulüp, temalar")}
+      ${tile("menuGo", "help", '<path d="M4 5a2 2 0 0 1 2-2h5v17H6a2 2 0 0 0-2 2z"/><path d="M20 5a2 2 0 0 0-2-2h-5v17h5a2 2 0 0 1 2 2z"/>', "Nasıl oynanır", "Kısa rehber")}
+      ${tile("menuGo", "records", '<path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 20h8"/>', "Rekorlar", "En iyi şirketlerin")}
+      ${tile("menuGo", "settings", '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>', "Ayarlar", "Ses, animasyon")}
+    </div>
+    <div class="mfill"></div>
+    <canvas class="mscene" data-scene="menu" aria-hidden="true"></canvas>
+    <p class="mfoot">Prototip · kayıt bu cihazda tutulur</p>`;
 }
 const STATUS_TXT = { normal: "", takip: "Takipte", icra: "İcrada", dava: "Davada", sigorta: "Sigortada" };
 function recvCard(r) {
@@ -2041,64 +2094,72 @@ function nwChart() {
     <polyline points="${pts.join(" ")}" fill="none" stroke="var(--steel)" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>
     <div class="line2"><span>${h.length} gün önce <b>${tl(h[0])}</b></span><span>bugün <b>${tl(h[h.length - 1])}</b></span></div>`;
 }
+function accSec(id, title, sum, body, def) {
+  const open = UI.acc[id] === undefined ? !!def : UI.acc[id];
+  return `<section class="sec acc ${open ? "open" : ""}"><button class="acch" data-act="acc" data-v="${id}:${open ? 1 : 0}" aria-expanded="${open}"><h2>${title}</h2><span class="muted">${sum}</span><span class="chev">${open ? "▾" : "▸"}</span></button>${open ? body : ""}</section>`;
+}
 function renderCompany() {
   const l = level(), L = LEVELS[l], N = LEVELS[l + 1];
-  let h = `<section class="sec"><h2>Unvan</h2><div class="card">
+  let h = accSec("title", "Unvan", `${L.name}${N ? " → " + N.name : ""}`, `<div class="card">
     <div class="line2"><span>Toplam satılan</span><b>${ton(S.tons)}</b></div>
     ${N ? `<div class="bar"><i style="width:${Math.min(100, (S.tons - L.tons) / (N.tons - L.tons) * 100)}%"></i></div>
     <div class="line2"><span>Net değer</span><b class="${netWorth() >= N.worth ? "good" : ""}">${tl(netWorth())} / ${tl(N.worth)}</b></div>
     <div class="muted">${N.name} için ${ton(N.tons)} satış ve ${tl(N.worth)} net değer gerekir. Açılacaklar: ${N.perk}.</div>`
     : `<div class="good">Demir Baronu oldun. Artık hedef net değeri büyütmek.</div>`}
-    <div class="ladder">${LEVELS.map((x, i) => `<div class="${i === l ? "me" : i < l ? "done" : ""}"><span>${x.name}</span><span class="num">${nf0.format(x.tons)} t · ${tl(x.worth)}</span></div>`).join("")}</div></div></section>`;
-  h += `<section class="sec"><h2>Net değer</h2><div class="card">${nwChart()}</div></section>`;
-  h += `<section class="sec"><div class="sechead"><h2>Filo</h2><span class="muted">${ton(fleetCap())}/gün · fazlası nakliyeciyle</span></div><div class="card">`;
-  for (const [k, v] of Object.entries(VEHICLES)) h += `<div class="item"><div><b>${v.name}</b> <span class="muted">× ${S.vehicles[k]}</span><div class="muted">${v.cap} t/gün · yakıt ~0,45 ₺/t·km · aylık ${tl(v.monthly)}</div></div>
+    <div class="ladder">${LEVELS.map((x, i) => `<div class="${i === l ? "me" : i < l ? "done" : ""}"><span>${x.name}</span><span class="num">${nf0.format(x.tons)} t · ${tl(x.worth)}</span></div>`).join("")}</div></div>`, true);
+  h += accSec("nw", "Net değer", tl(netWorth()), `<div class="card">${nwChart()}</div>`, true);
+  const nveh = Object.values(S.vehicles).reduce((a, b) => a + b, 0);
+  let body = `<div class="card">`;
+  for (const [k, v] of Object.entries(VEHICLES)) body += `<div class="item"><div><b>${v.name}</b> <span class="muted">× ${S.vehicles[k]}</span><div class="muted">${v.cap} t/gün · yakıt ~0,45 ₺/t·km · aylık ${tl(v.monthly)}</div></div>
     <div class="btns">${S.vehicles[k] ? `<button class="btn ghost sm" data-act="vehSell" data-v="${k}">Sat</button>` : ""}<button class="btn st sm" data-act="veh" data-v="${k}" ${S.cash < v.price ? "disabled" : ""}>${tl(v.price)}</button></div></div>`;
-  h += `<div class="muted">Kendi aracın yalnızca yakıt öder. Nakliyeci aynı şehirde 150 ₺/t, şehirler arası 250 ₺ + 1,1 ₺/km alır.</div></div></section>`;
-  h += `<section class="sec"><h2>Atölye makineleri</h2><div class="card">`;
-  for (const [k, m] of Object.entries(MACHINES)) h += `<div class="item"><div><b>${m.name}</b><div class="muted">${m.desc}.${m.proc ? ` ${PROCS[m.proc].name} siparişinde %${Math.round(PROCS[m.proc].fason * 100)} fason masrafı yerine yalnızca %1,2 fire.` : ""}${m.lvl && level() < m.lvl ? ` ${LEVELS[m.lvl].name} unvanında açılır.` : ""}</div></div>
+  body += `<div class="muted">Kendi aracın yalnızca yakıt öder. Nakliyeci aynı şehirde 150 ₺/t, şehirler arası 250 ₺ + 1,1 ₺/km alır.</div></div>`;
+  h += accSec("fleet", "Filo", nveh ? `${nveh} araç · ${ton(fleetCap())}/gün` : "Araç yok, nakliyeci", body);
+  body = `<div class="card">`;
+  for (const [k, m] of Object.entries(MACHINES)) body += `<div class="item"><div><b>${m.name}</b><div class="muted">${m.desc}.${m.proc ? ` ${PROCS[m.proc].name} siparişinde %${Math.round(PROCS[m.proc].fason * 100)} fason masrafı yerine yalnızca %1,2 fire.` : ""}${m.lvl && level() < m.lvl ? ` ${LEVELS[m.lvl].name} unvanında açılır.` : ""}</div></div>
     ${S.machines[k] ? `<span class="chip g">Kurulu</span>` : `<button class="btn st sm" data-act="mach" data-v="${k}" ${S.cash < m.price || (m.lvl && level() < m.lvl) ? "disabled" : ""}>${tl(m.price)}</button>`}</div>`;
-  h += `</div></section>`;
-  h += `<section class="sec"><h2>Personel</h2><div class="card">`;
-  for (const [k, s] of Object.entries(STAFF)) h += `<div class="item"><div><b>${s.name}</b> <span class="muted">× ${S.staff[k]}</span><div class="muted">${s.desc} · aylık ${tl(s.salary)}</div></div>
+  h += accSec("mach", "Atölye", `${Object.values(S.machines).filter(Boolean).length}/${Object.keys(MACHINES).length} makine`, body + `</div>`);
+  body = `<div class="card">`;
+  for (const [k, s] of Object.entries(STAFF)) body += `<div class="item"><div><b>${s.name}</b> <span class="muted">× ${S.staff[k]}</span><div class="muted">${s.desc} · aylık ${tl(s.salary)}</div></div>
     <div class="btns">${S.staff[k] ? `<button class="btn ghost sm" data-act="fire" data-v="${k}">Çıkar</button>` : ""}<button class="btn st sm" data-act="hire" data-v="${k}" ${S.staff[k] >= s.max ? "disabled" : ""}>İşe al</button></div></div>`;
-  h += `<div class="muted">Tezgâhtarlar dükkan kartından alınır.</div></div></section>`;
-  h += `<section class="sec"><h2>Sigorta</h2><div class="card"><div class="item"><div><b>${S.insured ? "Stoklar sigortalı" : "Sigorta yok"}</b><div class="muted">Hırsızlık ve yangında zararın %90'ı ödenir. Prim aylık stok değerinin %${nf1.format(INS_RATE * 100)}'i (şu an ${tl(Math.max(1000, stockValue() * INS_RATE))}).</div></div>
+  const nstaff = Object.values(S.staff).reduce((a, b) => a + b, 0);
+  h += accSec("staff", "Personel", nstaff ? `${nstaff} kişi` : "Kimse yok", body + `<div class="muted">Tezgâhtarlar dükkan kartından alınır.</div></div>`);
+  h += accSec("ins", "Sigorta", `${S.insured ? "Stok ✓" : "Stok ✗"} · ${S.credIns ? "Alacak ✓" : "Alacak ✗"}`, `<div class="card"><div class="item"><div><b>${S.insured ? "Stoklar sigortalı" : "Sigorta yok"}</b><div class="muted">Hırsızlık ve yangında zararın %90'ı ödenir. Prim aylık stok değerinin %${nf1.format(INS_RATE * 100)}'i (şu an ${tl(Math.max(1000, stockValue() * INS_RATE))}).</div></div>
     <button class="btn ${S.insured ? "ghost" : "st"} sm" data-act="insure">${S.insured ? "İptal et" : "Sigortala"}</button></div>
     <div class="item"><div><b>${S.credIns ? "Alacaklar kredi sigortalı" : "Kredi sigortası yok"}</b><div class="muted">Müşteri ödemezse 30 gün içinde alacağın %80'i ödenir. Prim aylık açık alacakların %0,4'ü (şu an ${tl(Math.max(2000, recvNormal() * 0.004))}).</div></div>
-    <button class="btn ${S.credIns ? "ghost" : "st"} sm" data-act="credIns">${S.credIns ? "İptal et" : "Sigortala"}</button></div></div></section>`;
+    <button class="btn ${S.credIns ? "ghost" : "st"} sm" data-act="credIns">${S.credIns ? "İptal et" : "Sigortala"}</button></div></div>`);
   const lim = loanLimit(), step = Math.max(50000, Math.round(lim / 5 / 10000) * 10000);
-  h += `<section class="sec"><h2>Banka</h2><div class="card"><div class="kv">
+  h += accSec("bank", "Banka", `borç ${tlShort(S.loan)} · limit ${tlShort(lim)}`, `<div class="card"><div class="kv">
     <span>Kredi borcu</span><span>${tl(S.loan)}</span><span>Kredi limiti</span><span>${tl(lim)}</span>
     <span>Aylık faiz</span><span>%${nf1.format(loanRate() * 100)}</span><span>Eksi bakiye sınırı</span><span>−${tl(overdraftLimit())}</span></div>
     <div class="btns"><button class="btn st" data-act="loan" data-v="${step}" ${lim - S.loan <= 0 ? "disabled" : ""}>Kredi çek<small>+${tl(Math.min(step, Math.max(0, lim - S.loan)))}</small></button>
-    <button class="btn" data-act="repay" data-v="0" ${S.loan <= 0 || S.cash <= 0 ? "disabled" : ""}>Öde<small>${tl(Math.min(S.loan, Math.max(0, S.cash)))}</small></button></div></div></section>`;
-  h += `<section class="sec"><div class="sechead"><h2>Alacaklar</h2><span class="muted">${tl(recvTotal())}</span></div>`;
-  h += S.recv.length ? S.recv.slice().sort((a, b) => (a.status === "normal") - (b.status === "normal") || a.due - b.due).map(recvCard).join("")
-    : `<div class="hint">Vadeli sattığında alacakların burada görünür. Müşteri bazen geç öder, bazen kısmen öder, bazen hiç ödemez. Ödemeyen için icra ya da dava açabilirsin.</div>`;
-  if (S.suits.length) h += `<div class="card"><b>Aleyhine davalar</b>${S.suits.map(x => `<div class="line2"><span>${esc(x.cust)} · ${x.kind === "accident" ? "iş kazası tazminatı" : "kalite tazminatı"} ${tl(x.claim)}</span><b>${x.stage === "court" ? "karar " + dateStr(x.end) : "bekliyor"}</b></div>`).join("")}</div>`;
-  h += `</section>`;
+    <button class="btn" data-act="repay" data-v="0" ${S.loan <= 0 || S.cash <= 0 ? "disabled" : ""}>Öde<small>${tl(Math.min(S.loan, Math.max(0, S.cash)))}</small></button></div></div>`);
+  const nlegal = S.recv.filter(r => r.status !== "normal").length;
+  body = `<div class="accbody">` + (S.recv.length ? S.recv.slice().sort((a, b) => (a.status === "normal") - (b.status === "normal") || a.due - b.due).map(recvCard).join("")
+    : `<div class="hint">Vadeli sattığında alacakların burada görünür. Müşteri bazen geç öder, bazen kısmen öder, bazen hiç ödemez. Ödemeyen için icra ya da dava açabilirsin.</div>`);
+  if (S.suits.length) body += `<div class="card"><b>Aleyhine davalar</b>${S.suits.map(x => `<div class="line2"><span>${esc(x.cust)} · ${x.kind === "accident" ? "iş kazası tazminatı" : "kalite tazminatı"} ${tl(x.claim)}</span><b>${x.stage === "court" ? "karar " + dateStr(x.end) : "bekliyor"}</b></div>`).join("")}</div>`;
+  h += accSec("recv", "Alacaklar", `${tlShort(recvTotal())}${nlegal ? ` · ${nlegal} takipte` : ""}${S.suits.length ? ` · ${S.suits.length} dava` : ""}`, body + `</div>`, nlegal > 0);
   const mc = monthlyCosts(), mt = mc.reduce((a, [, v]) => a + v, 0);
-  h += `<section class="sec"><h2>Ay sonu</h2><div class="card"><div class="kv">${mc.map(([k, v]) => `<span>${k}</span><span>${tl(v)}</span>`).join("")}
+  h += accSec("month", "Ay sonu", `gider ${tlShort(mt)} · ${30 - ((S.day - 1) % 30)} gün kaldı`, `<div class="card"><div class="kv">${mc.map(([k, v]) => `<span>${k}</span><span>${tl(v)}</span>`).join("")}
     <span><b>Sabit giderler</b></span><span><b>${tl(mt)}</b></span><span>Bu ayki kâr (şimdiye kadar)</span><span class="${S.mProfit >= 0 ? "good" : "bad"}">${tl(S.mProfit)}</span>
-    <span>Tahmini vergi (%${Math.round(taxRate() * 100)})</span><span>${tl(Math.max(0, S.mProfit - mt) * taxRate())}</span></div></div></section>`;
+    <span>Tahmini vergi (%${Math.round(taxRate() * 100)})</span><span>${tl(Math.max(0, S.mProfit - mt) * taxRate())}</span></div></div>`);
   const loyal = Object.entries(S.rel).filter(([, v]) => v >= 3).sort((a, b) => b[1] - a[1]);
-  h += `<section class="sec"><div class="sechead"><h2>Sadık müşteriler</h2><span class="muted">${loyal.length}</span></div><div class="card">
-    ${loyal.length ? loyal.slice(0, 8).map(([f, v]) => `<div class="line2"><span>${esc(f)}</span><b>${v} iş</b></div>`).join("") : `<div class="muted">Bir firmaya 3 kez teslimat yapınca sadık müşterin olur: daha iyi fiyat, daha düşük risk.</div>`}</div></section>`;
-  h += `<section class="sec"><div class="sechead"><h2>Başarımlar</h2><span class="muted">${Object.keys(S.ach).length}/${ACH.length}</span></div><div class="card">
-    ${ACH.map(a => `<div class="ach"><span class="${S.ach[a.id] ? "ok" : "no"}">${S.ach[a.id] ? "✓" : "○"}</span><div><b>${a.name}</b><div class="muted">${a.desc}</div></div><span class="num muted">${tl(a.reward)}</span></div>`).join("")}</div></section>`;
-  h += `<section class="sec"><h2>İstatistik</h2><div class="card"><div class="kv">
+  h += accSec("loyal", "Sadık müşteriler", `${loyal.length} firma`, `<div class="card">
+    ${loyal.length ? loyal.slice(0, 8).map(([f, v]) => `<div class="line2"><span>${mono(f)} ${esc(f)}</span><b>${v} iş</b></div>`).join("") : `<div class="muted">Bir firmaya 3 kez teslimat yapınca sadık müşterin olur: daha iyi fiyat, daha düşük risk.</div>`}</div>`);
+  h += accSec("ach", "Başarımlar", `${Object.keys(S.ach).length}/${ACH.length}`, `<div class="card">
+    ${ACH.map(a => `<div class="ach"><span class="${S.ach[a.id] ? "ok" : "no"}">${S.ach[a.id] ? "✓" : "○"}</span><div><b>${a.name}</b><div class="muted">${a.desc}</div></div><span class="num muted">${tl(a.reward)}</span></div>`).join("")}</div>`);
+  h += accSec("stats", "İstatistik", `kâr ${tlShort(S.stats.profit)}`, `<div class="card"><div class="kv">
     <span>Toplam kâr</span><span>${tl(S.stats.profit)}</span><span>Kapanan sipariş</span><span>${S.stats.deals} (aracılık ${S.stats.brokered})</span>
     <span>Perakende satış</span><span>${S.stats.retail} · ${tl(S.stats.retailRev)}</span><span>En kârlı iş</span><span>${tl(S.stats.best)}</span>
     <span>Ödenen vergi</span><span>${tl(S.stats.taxes)}</span><span>Karşılıksız çek</span><span>${S.stats.defaults}</span>
-    <span>Hırsızlık / yangın</span><span>${S.stats.incidents}</span><span>Geciken sipariş</span><span>${S.stats.late}</span></div></div></section>`;
-  h += `<section class="sec"><h2>Haberler</h2><div class="card">${S.news.slice(0, 10).map(n => `<div class="line2"><span class="${n.bad ? "bad" : ""}" style="${n.bad ? "" : "color:var(--fg)"}">${esc(n.text)}</span><b>G${n.day}</b></div>`).join("")}</div></section>`;
+    <span>Hırsızlık / yangın</span><span>${S.stats.incidents}</span><span>Geciken sipariş</span><span>${S.stats.late}</span></div></div>`);
+  h += accSec("news", "Haberler", S.news[0] ? esc(S.news[0].text) : "", `<div class="card">${S.news.slice(0, 10).map(n => `<div class="line2"><span class="${n.bad ? "bad" : ""}" style="${n.bad ? "" : "color:var(--fg)"}">${esc(n.text)}</span><b>${dateStr(n.day)}</b></div>`).join("")}</div>`);
   if (level() === LEVELS.length - 1) { const pts = legacyGain();
-    h += `<section class="sec"><h2>Şirketi sat</h2><div class="card"><div class="muted">Şirketini satıp yeni bir şehirde sıfırdan başlayabilirsin. ${pts} miras puanı kazanırsın. Her puan yeni oyunlarda +10.000 ₺ başlangıç, +2 itibar ve teklif fiyatlarında +%0,2 verir. Şu anki miras: ${LEG.points} puan.</div>
-      <button class="btn hot" data-act="sellCo">Şirketi sat · +${pts} miras puanı</button></div></section>`; }
+    h += accSec("sell", "Şirketi sat", `+${pts} miras puanı`, `<div class="card"><div class="muted">Şirketini satıp yeni bir şehirde sıfırdan başlayabilirsin. ${pts} miras puanı kazanırsın. Her puan yeni oyunlarda +10.000 ₺ başlangıç, +2 itibar ve teklif fiyatlarında +%0,2 verir. Şu anki miras: ${LEG.points} puan.</div>
+      <button class="btn hot" data-act="sellCo">Şirketi sat · +${pts} miras puanı</button></div>`, true); }
   h += `<button class="btn ghost" style="align-self:flex-start" data-act="reset">Yeni oyun başlat</button>`;
   return h;
 }
+
 // =====================================================================
 // VISUALS: canvas scenes (facilities, menu, season particles, products), screen effects, avatars, modal art.
 // Scenes draw a still frame at once; animation runs only for canvases on screen, at most 30 fps, and stops when
@@ -2508,8 +2569,9 @@ function toast(msg, bad) {
   if (bad) beep("error");
   const t = document.getElementById("toast"), d = document.createElement("div");
   d.textContent = msg; if (bad) d.className = "bad"; t.appendChild(d);
-  while (t.children.length > 3) t.firstChild.remove();
-  setTimeout(() => d.remove(), 3400);
+  while (t.children.length > 2) t.firstChild.remove();
+  d.addEventListener("click", () => d.remove());
+  setTimeout(() => d.remove(), bad ? 3600 : 2800);
 }
 const MQ = [];
 function showModal(kind, data) {
@@ -2541,7 +2603,8 @@ function closeModal() {
   const md = document.getElementById("modal"); md.hidden = true; md.innerHTML = "";
   if (MQ.length) { const [k, d] = MQ.shift(); showModal(k, d); } else if (S && S.cards && S.cards.length) showModal("card");
 }
-function info(msg) { if (SET.toasts) toast(msg); }
+// Day summaries go to the HUD news line instead of covering the screen
+function info(msg) { if (!SET.toasts) return; UI.flash = msg; UI.flashUntil = Date.now() + 4500; const ne = document.getElementById("news"); if (ne) { ne.textContent = msg; ne.className = "flash"; } }
 
 // =====================================================================
 // SAVE + BOOT
@@ -2592,6 +2655,7 @@ function start(data) {
   S = (hot && data.S) || load();
   if (S) { migrate(S); genDaily(); }
   if (data && data.UI && S) UI = Object.assign(UI, data.UI);
+  UI.acc = UI.acc || {}; UI.locOpen = UI.locOpen || {};
   if (!S) newGame();
   render();
   if (hot) { if (UI.menu) showMenu(UI.menu); else if (S.cards.length) showModal("card"); }

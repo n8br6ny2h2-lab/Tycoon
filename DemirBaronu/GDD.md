@@ -400,6 +400,16 @@ Görsel dosya kullanılmaz. Her şey kodla çizilir (canvas ve SVG); bu yüzden 
 6. **Şirket:** unvan, net değer grafiği, filo, atölye makineleri, personel, sigorta, banka, alacaklar, ay sonu tahmini (vergi dahil), sadık müşteriler, başarımlar, istatistik, haberler
 7. **Üst bar:** menü düğmesi, tarih ve mevsim, kasa, unvan, net değer, stok/kapasite, itibar, sektör sırası, haber bandı. Altta büyük **Günü Bitir** düğmesi
 
+### Ekran düzeni ilkeleri
+
+- **Ana menü:** ekran yüksekliğine göre küçülen logo, iki ana düğme ve 2×2 karo. Fabrika sahnesi akışın sonunda durur, hiçbir düğmenin üstüne binmez. Kısa ekranlarda (≤700 px) tanıtım cümlesi gizlenir ve aralıklar daralır; iPhone SE'de kaydırma gerekmez.
+- **Bildirimler:** Gün sonu özeti üst bardaki haber satırına yazılır. Baloncuklar küçük ve en fazla 2 tanedir; 2,8 saniyede kaybolur, dokununca kapanır.
+- **Siparişler:** Eğitim, görevler, etkinlik, ihale ve fiyat savaşı tek satırlık kaydırılabilir etiketlerdedir; dokununca ayrıntı açılır. Teklifler ilk ekranda görünür.
+- **Tesisler:** Kartta sahne, doluluk, yükleme, kira ve stok özeti görünür. Ekipman, büyütme ve stok satırları "Yönet" altındadır.
+- **Şirket:** 13 bölüm özet satırlı açılır başlıklardır. Unvan ve net değer açık başlar; takipte alacak varsa Alacaklar da açılır.
+- **Pencereler:** alttan açılan kart, ekranın en fazla %80'i; çizim yüksekliği 64–84 px.
+- **Kontrol:** Her sürümde 19 ekran 375×667 ve 430×932 boyutlarında otomatik çekilir; yatay taşma ve konsol hatası denetlenir.
+
 ## 13. Teknik plan
 
 - **Prototip (bitti):** tek dosyalık HTML/JS, `DemirBaronu/web/play.html`. Tüm kurallar burada çalışıyor, kayıt tarayıcıda tutuluyor.
