@@ -366,7 +366,16 @@ Görsel dosya kullanılmaz. Her şey kodla çizilir (canvas ve SVG); bu yüzden 
   - **Bina:** Depo kademeye göre büyür: depo köşesi → depo + açık saha (çit) → lojistik depo (kemerli çatı, 3 kapı) → liman deposu (deniz, gemi, rıhtım vinci). Dükkan; tentesi, vitrini ve şirket adının yazılı tabelasıyla görünür. Yapı market tabelası da vardır.
   - **Stok:** her 1/14 kapasite için bir yığın, ürün kategorisine göre çizilir: sac levha yığını, profil uçları, boru piramidi, nervürlü demir bağı, dolu mil, parlak paslanmaz.
   - **Hareket:** forkliftler mal taşır, tavan vinci yük kaldırır, gelen sevkiyat kamyonu yaklaşır, o gün yükleme yapıldıysa kamyon çıkar, dükkana müşteriler yürür. Bayramda dükkan kapalıdır.
-- **Ana menü:** fabrika silueti, tüten bacalar, rıhtım vinci, yolda iki yönde giden yüklü kamyonlar, kaynak kıvılcımları.
+- **Derinlik ve ışık:**
+  - Binalar ön yüz, koyu yan yüz ve çatıdan oluşur; cephelerde dikey oluk çizgileri ve pas izleri vardır.
+  - Cephe tabelasında şirket adı yazar. Pencereler ışıklıdır, rampa lambaları titreşir.
+  - Her nesnenin altına gölge düşer. Stok yığınlarında üst yüz ve parlama, borularda radyal ışık vardır.
+  - Gökyüzü mevsim renginde; güneş, süzülen bulutlar, uzak tepeler ve pencereleri yanan şehir silueti görünür. Zemin beton saha ve şeritli yoldur.
+- **Araçlar:** Kamyonet, kamyon ve TIR ayrı çizilir (ızgara, far, ayna; TIR'da dorse). Filodaki araçlar ana tesiste park eder. Forkliftte koruma kafesi ve baretli sürücü vardır. Tavan vinci ve rıhtım vinci kafes kirişlidir. Liman gemisinde renkli konteynerler bulunur.
+- **Mevsim havası:** Kışın çatılarda, yığınlarda ve zeminde kar olur, kar yağar. Sonbaharda yağmur, yazın sıcak hava dalgası vardır.
+- **Ana menü:** gün batımı gökyüzü, iki katmanlı fabrika silueti ve ışıklı pencereler, tüten bacalar, parlayan fırın ağzı, kafes kirişli rıhtım vinci. Yolda iki yönde TIR, kamyon ve kamyonet geçer; kaynak kıvılcımları saçılır.
+- **Harita:** dalgalı deniz, gradyanlı kara, merkezden diğer tesislere akan hareketli sevkiyat rotaları.
+- **Arayüz:** fiyat grafiklerinin altı dolgulu, sipariş kartlarında ürün kesit ikonu.
 - **Mevsim efekti (üst bar):** kışın kar, sonbaharda yaprak, ilkbaharda polen, yazın sıcak hava zerreleri. Sahnelerin gökyüzü rengi de mevsime göre değişir.
 - **Ekran efektleri:**
   - Teslimatta yüklü bir kamyon ekranı geçer ve "+kâr" yazısı yükselir.
