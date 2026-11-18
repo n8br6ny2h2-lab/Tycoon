@@ -20,7 +20,7 @@ export function createMap(canvas, getState, onTap) {
   function size() { const r = canvas.getBoundingClientRect(), d = Math.min(2, window.devicePixelRatio || 1); const w = Math.round(r.width * d), h = Math.round(r.height * d); if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; } return [r.width, r.height, d]; }
   function bounds(regId) { const R = RG[regId], W = R.cols * STEP + GAP, D = R.rows * STEP + GAP; return { W, D }; }
   M.fit = function () {
-    const [w, h] = size(); if (M.mode === "world") { M.cam = { x: 0, y: 0, z: Math.min(w / 1700, h / 900) }; clampCam(); return; }
+    const [w, h] = size(); if (!w || !h) { M.needFit = true; return; } M.needFit = false; if (M.mode === "world") { M.cam = { x: 0, y: 0, z: Math.min(w / 1700, h / 900) }; clampCam(); return; }
     const { W, D } = bounds(M.region), R = RG[M.region], st = getState(); let x0 = 0, y0 = 0, x1 = W, y1 = D;
     if (st && st.regions[M.region].owned) { const own = st.regions[M.region].plots.map((p, i) => [p, i]).filter(([p]) => p.owned || p.b);
       if (own.length && own.length < R.cols * R.rows) { const cs = own.map(([, i]) => i % R.cols), rs = own.map(([, i]) => Math.floor(i / R.cols));
@@ -55,7 +55,7 @@ export function createMap(canvas, getState, onTap) {
   const clampZ = z => Math.max(M.mode === "world" ? 0.2 : 0.25, Math.min(2.6, z));
   // Kamera sınırı: ekranın dört köşesi her zaman zeminin (bölge + çevre halkası) üstünde kalır; boşluğa kayılmaz.
   function clampCam() {
-    const [w, h] = size(); if (!w || !h) return;
+    const [w, h] = size(); if (!w || !h) return; if (M.needFit || !(M.cam.z > 0) || !isFinite(M.cam.x) || !isFinite(M.cam.y)) { M.fit(); return; }
     if (M.mode === "world") { M.cam.z = Math.max(M.cam.z, Math.max(w / 3600, h / 2200)); const hx = Math.max(0, 1800 - w / 2 / M.cam.z), hy = Math.max(0, 1100 - h / 2 / M.cam.z); M.cam.x = Math.max(-hx, Math.min(hx, M.cam.x)); M.cam.y = Math.max(-hy, Math.min(hy, M.cam.y)); return; }
     const { W, D } = bounds(M.region), ext = RG[M.region].port ? 2.4 : 0, lim = OUTER - 0.35;
     const inside = (cx, cy, z) => [[-1, -1], [1, -1], [1, 1], [-1, 1]].every(([sx, sy]) => { const X = cx + sx * w / 2 / z, Y = cy + sy * h / 2 / z, gx = (X / HW + Y / HH) / 2, gy = (Y / HH - X / HW) / 2; return gx >= -lim && gx <= W + lim + ext && gy >= -lim && gy <= D + lim; });
