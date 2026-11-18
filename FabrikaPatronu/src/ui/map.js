@@ -7,7 +7,7 @@ import { HW, HH, iso, fillPoly, box, cyl, truck, car, tree as treeArt, lamp, tra
 import { shade } from "./icons.js";
 import { monthOf } from "../core/util.js";
 
-export const STEP = 1.35, GAP = 0.35, MARGIN = 1.6;
+export const STEP = 1.35, GAP = 0.35, MARGIN = 1.6, OUTER = 5;
 export const plotOrigin = (c, r) => [GAP + c * STEP, GAP + r * STEP];
 export function season(s) { const m = monthOf(Math.floor(s.time.min / 1440)); return m === 11 || m < 2 ? "kis" : m < 5 ? "ilkbahar" : m < 8 ? "yaz" : "sonbahar"; }
 export const SEASON_NAME = { kis: "Kış", ilkbahar: "İlkbahar", yaz: "Yaz", sonbahar: "Sonbahar" };
@@ -20,14 +20,14 @@ export function createMap(canvas, getState, onTap) {
   function size() { const r = canvas.getBoundingClientRect(), d = Math.min(2, window.devicePixelRatio || 1); const w = Math.round(r.width * d), h = Math.round(r.height * d); if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; } return [r.width, r.height, d]; }
   function bounds(regId) { const R = RG[regId], W = R.cols * STEP + GAP, D = R.rows * STEP + GAP; return { W, D }; }
   M.fit = function () {
-    const [w, h] = size(); if (M.mode === "world") { M.cam = { x: 0, y: 0, z: Math.min(w / 1700, h / 900) }; return; }
+    const [w, h] = size(); if (M.mode === "world") { M.cam = { x: 0, y: 0, z: Math.min(w / 1700, h / 900) }; clampCam(); return; }
     const { W, D } = bounds(M.region), R = RG[M.region], st = getState(); let x0 = 0, y0 = 0, x1 = W, y1 = D;
     if (st && st.regions[M.region].owned) { const own = st.regions[M.region].plots.map((p, i) => [p, i]).filter(([p]) => p.owned || p.b);
       if (own.length && own.length < R.cols * R.rows) { const cs = own.map(([, i]) => i % R.cols), rs = own.map(([, i]) => Math.floor(i / R.cols));
         x0 = Math.max(0, Math.min(...cs) * STEP - 0.6); y0 = Math.max(0, Math.min(...rs) * STEP - 0.6); x1 = Math.min(W, (Math.max(...cs) + 1) * STEP + GAP + 0.8); y1 = Math.min(D, (Math.max(...rs) + 1) * STEP + GAP + 0.8); } }
     const pts = [iso(x0 - 0.2, y0 - 0.2), iso(x1 + 0.2, y0 - 0.2), iso(x1 + 0.2, y1 + 0.2), iso(x0 - 0.2, y1 + 0.2)];
     const minX = Math.min(...pts.map(p => p[0])), maxX = Math.max(...pts.map(p => p[0])), minY = Math.min(...pts.map(p => p[1])) - 70, maxY = Math.max(...pts.map(p => p[1]));
-    const z = Math.min(w * 0.72 / (maxX - minX), h / (maxY - minY)) * 0.96; M.cam = { x: -(minX + maxX) / 2 + (w * 0.12) / z, y: -(minY + maxY) / 2, z }; M.fitted = { z, x: M.cam.x, y: M.cam.y };
+    const z = Math.min(w * 0.72 / (maxX - minX), h / (maxY - minY)) * 0.96; M.cam = { x: -(minX + maxX) / 2 + (w * 0.12) / z, y: -(minY + maxY) / 2, z }; M.fitted = { z, x: M.cam.x, y: M.cam.y }; clampCam();
   };
   const toWorld = (sx, sy) => { const [w, h] = size(); return [(sx - w / 2) / M.cam.z - M.cam.x, (sy - h / 2) / M.cam.z - M.cam.y]; };
   const toGrid = (X, Y) => [(X / HW + Y / HH) / 2, (Y / HH - X / HW) / 2];
@@ -46,14 +46,27 @@ export function createMap(canvas, getState, onTap) {
   canvas.addEventListener("pointerdown", e => { canvas.setPointerCapture(e.pointerId); pts.set(e.pointerId, [e.offsetX, e.offsetY]); if (pts.size === 1) M.drag = { x: e.offsetX, y: e.offsetY, cx: M.cam.x, cy: M.cam.y, moved: 0 }; else if (pts.size === 2) { const [a, b] = [...pts.values()]; M.pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), z: M.cam.z }; } });
   canvas.addEventListener("pointermove", e => {
     if (!pts.has(e.pointerId)) return; pts.set(e.pointerId, [e.offsetX, e.offsetY]);
-    if (pts.size === 2 && M.pinch) { const [a, b] = [...pts.values()]; M.cam.z = clampZ(M.pinch.z * Math.hypot(a[0] - b[0], a[1] - b[1]) / M.pinch.d); if (M.drag) M.drag.moved = 99; return; }
-    if (M.drag) { const dx = e.offsetX - M.drag.x, dy = e.offsetY - M.drag.y; M.drag.moved = Math.max(M.drag.moved, Math.hypot(dx, dy)); M.cam.x = M.drag.cx + dx / M.cam.z; M.cam.y = M.drag.cy + dy / M.cam.z; }
+    if (pts.size === 2 && M.pinch) { const [a, b] = [...pts.values()]; M.cam.z = clampZ(M.pinch.z * Math.hypot(a[0] - b[0], a[1] - b[1]) / M.pinch.d); clampCam(); if (M.drag) M.drag.moved = 99; return; }
+    if (M.drag) { const dx = e.offsetX - M.drag.x, dy = e.offsetY - M.drag.y; M.drag.moved = Math.max(M.drag.moved, Math.hypot(dx, dy)); M.cam.x = M.drag.cx + dx / M.cam.z; M.cam.y = M.drag.cy + dy / M.cam.z; clampCam(); }
   });
   const up = e => { const d = M.drag; pts.delete(e.pointerId); if (pts.size < 2) M.pinch = null; if (!pts.size) { M.drag = null; if (d && d.moved < 8) { const hit = M.pick(e.offsetX, e.offsetY); onTap(hit); } } };
   canvas.addEventListener("pointerup", up); canvas.addEventListener("pointercancel", e => { pts.delete(e.pointerId); M.drag = null; M.pinch = null; });
-  canvas.addEventListener("wheel", e => { e.preventDefault(); M.cam.z = clampZ(M.cam.z * (e.deltaY < 0 ? 1.1 : 0.9)); }, { passive: false });
+  canvas.addEventListener("wheel", e => { e.preventDefault(); M.cam.z = clampZ(M.cam.z * (e.deltaY < 0 ? 1.1 : 0.9)); clampCam(); }, { passive: false });
   const clampZ = z => Math.max(M.mode === "world" ? 0.2 : 0.25, Math.min(2.6, z));
-  M.zoom = f => { M.cam.z = clampZ(M.cam.z * f); };
+  // Kamera sınırı: ekranın dört köşesi her zaman zeminin (bölge + çevre halkası) üstünde kalır; boşluğa kayılmaz.
+  function clampCam() {
+    const [w, h] = size(); if (!w || !h) return;
+    if (M.mode === "world") { M.cam.z = Math.max(M.cam.z, Math.max(w / 3600, h / 2200)); const hx = Math.max(0, 1800 - w / 2 / M.cam.z), hy = Math.max(0, 1100 - h / 2 / M.cam.z); M.cam.x = Math.max(-hx, Math.min(hx, M.cam.x)); M.cam.y = Math.max(-hy, Math.min(hy, M.cam.y)); return; }
+    const { W, D } = bounds(M.region), ext = RG[M.region].port ? 2.4 : 0, lim = OUTER - 0.35;
+    const inside = (cx, cy, z) => [[-1, -1], [1, -1], [1, 1], [-1, 1]].every(([sx, sy]) => { const X = cx + sx * w / 2 / z, Y = cy + sy * h / 2 / z, gx = (X / HW + Y / HH) / 2, gy = (Y / HH - X / HW) / 2; return gx >= -lim && gx <= W + lim + ext && gy >= -lim && gy <= D + lim; });
+    const core = iso(W / 2, D / 2); core[1] -= 30;
+    let cx = -M.cam.x, cy = -M.cam.y, z = M.cam.z;
+    let guard = 0; while (!inside(core[0], core[1], z) && guard++ < 60) z *= 1.04;
+    if (!inside(cx, cy, z)) { let lo = 0, hi = 1; for (let k = 0; k < 18; k++) { const t = (lo + hi) / 2; if (inside(core[0] + (cx - core[0]) * t, core[1] + (cy - core[1]) * t, z)) lo = t; else hi = t; } cx = core[0] + (cx - core[0]) * lo; cy = core[1] + (cy - core[1]) * lo; }
+    M.cam.z = z; M.cam.x = -cx; M.cam.y = -cy;
+  }
+  M.clamp = clampCam;
+  M.zoom = f => { M.cam.z = clampZ(M.cam.z * f); clampCam(); };
 
   // --- çizim ---
   M.draw = function (t) {
@@ -76,17 +89,67 @@ export function createMap(canvas, getState, onTap) {
   let STATIC = null;
   const hashR = n => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
   function staticKey(s) { const reg = s.regions[M.region]; return [M.region, season(s), reg.owned, reg.plots.map(p => (p.owned ? 1 : 0) + (p.b ? 2 : 0)).join("")].join("|"); }
+  // Dış çevre: bölgeye göre tarlalar, ormanlar, köy evleri, tepeler, göl, dağlar, kumullar, şehir blokları, ana yol bağlantıları.
+  function surroundings(c, P, quad, R, W, D, se, mo, grass) {
+    const id = M.region, H = (k) => hashR(k * 1.37 + id.length * 11.3), snow = se === "kis";
+    const inCore = (gx, gy) => gx > -1.7 && gx < W + 1.7 && gy > -1.7 && gy < D + 1.7;
+    const cropCols = snow ? ["#e8eef2", "#dfe7ec", "#f1f5f8"] : se === "sonbahar" ? ["#b8873f", "#9a6e34", "#c9a24a", "#8d7a3e"] : se === "yaz" ? ["#c9a64a", "#a8b04a", "#d7b75a", "#7f9a4a"] : ["#6f9e4f", "#8fae4f", "#5f8a44", "#a7b85a"];
+    const box2 = (gx, gy, w, d, h, col, roof) => { const pts = (z, a, b, cc, dd) => [iso(a, b, z), iso(cc, b, z), iso(cc, dd, z), iso(a, dd, z)];
+      P([iso(gx + w, gy), iso(gx + w, gy + d), iso(gx + w, gy + d, h), iso(gx + w, gy, h)], shade(col, -0.25)); P([iso(gx, gy + d), iso(gx + w, gy + d), iso(gx + w, gy + d, h), iso(gx, gy + d, h)], col);
+      if (roof) { P([iso(gx, gy + d, h), iso(gx + w, gy + d, h), iso(gx + w, gy + d / 2, h + 7), iso(gx, gy + d / 2, h + 7)], roof); P([iso(gx + w, gy, h), iso(gx + w, gy + d, h), iso(gx + w, gy + d / 2, h + 7)], shade(roof, -0.25)); }
+      else P(pts(h, gx, gy, gx + w, gy + d), shade(col, 0.2)); };
+    const treeS = (gx, gy, k) => { const [x, y] = iso(gx, gy), base = snow ? "#dde6ec" : se === "sonbahar" ? ["#c9782f", "#d99a3a", "#b5562c", "#7a8a3a"][k % 4] : se === "yaz" ? "#4f7a3a" : "#5c9446";
+      c.fillStyle = "rgba(4,10,18,.22)"; c.beginPath(); c.ellipse(x + 9, y + 3, 11, 4, 0.3, 0, 7); c.fill(); c.fillStyle = "#5a4030"; c.fillRect(x - 1.2, y - 8, 2.4, 8);
+      if (k % 3) { c.fillStyle = shade(base, 0.08); c.beginPath(); c.arc(x, y - 15, 8, 0, 7); c.fill(); c.fillStyle = shade(base, -0.18); c.beginPath(); c.arc(x + 3, y - 12, 6, 0, 7); c.fill(); }
+      else { c.fillStyle = shade(base, -0.12); c.beginPath(); c.moveTo(x - 8, y - 5); c.lineTo(x, y - 30); c.lineTo(x + 8, y - 5); c.fill(); c.fillStyle = shade(base, -0.32); c.beginPath(); c.moveTo(x, y - 30); c.lineTo(x + 8, y - 5); c.lineTo(x + 2, y - 5); c.fill(); } };
+    // ana yolların dışarı uzantısı (çevreyle bağlantı) + toprak yollar
+    const road = "#353c43";
+    for (const r of [0, R.rows]) { const y = r * STEP; quad(-mo, y + 0.05, 0, y + GAP - 0.05, road); if (!R.port) quad(W, y + 0.05, W + mo, y + GAP - 0.05, road); }
+    for (const cc of [0, R.cols]) { const x = cc * STEP; quad(x + 0.05, -mo, x + GAP - 0.05, 0, road); quad(x + 0.05, D, x + GAP - 0.05, D + mo, road); }
+    c.strokeStyle = "rgba(245,240,225,.6)"; c.lineWidth = 1.1; c.setLineDash([7, 9]);
+    for (const r of [0, R.rows]) { const y = r * STEP + GAP / 2; c.beginPath(); c.moveTo(...iso(-mo, y)); c.lineTo(...iso(0, y)); c.stroke(); if (!R.port) { c.beginPath(); c.moveTo(...iso(W, y)); c.lineTo(...iso(W + mo, y)); c.stroke(); } }
+    for (const cc of [0, R.cols]) { const x = cc * STEP + GAP / 2; c.beginPath(); c.moveTo(...iso(x, -mo)); c.lineTo(...iso(x, 0)); c.stroke(); c.beginPath(); c.moveTo(...iso(x, D)); c.lineTo(...iso(x, D + mo)); c.stroke(); }
+    c.setLineDash([]);
+    // arazi: bölgeye göre
+    const cells = []; for (let gx = -mo; gx < W + mo; gx += 0.9) for (let gy = -mo; gy < D + mo; gy += 0.9) { if (inCore(gx + 0.45, gy + 0.45)) continue; if (R.port && gx > W + 0.1) continue; cells.push([gx, gy]); }
+    cells.forEach(([gx, gy], k) => {
+      const r = H(k + 17);
+      if (id === "anadolu" || id === "liman") {
+        if (r < 0.55) { const col = cropCols[Math.floor(H(k + 3) * cropCols.length)]; quad(gx + 0.04, gy + 0.04, gx + 0.86, gy + 0.86, col, "rgba(60,50,30,.25)"); if (!snow) { c.strokeStyle = "rgba(0,0,0,.08)"; c.lineWidth = 1; for (let q = 1; q < 6; q++) { c.beginPath(); c.moveTo(...iso(gx + 0.04, gy + 0.04 + q * 0.14)); c.lineTo(...iso(gx + 0.86, gy + 0.04 + q * 0.14)); c.stroke(); } } }
+        else if (r < 0.8) { for (let q = 0; q < 6; q++) treeS(gx + 0.15 + H(k * 7 + q) * 0.6, gy + 0.15 + H(k * 9 + q) * 0.6, k + q); }
+        else if (r < 0.9) { box2(gx + 0.3, gy + 0.3, 0.22, 0.18, 12, ["#e9e2d0", "#d9c9a8", "#f0ece4"][k % 3], ["#b5452f", "#8a3a2c", "#5d6b78"][k % 3]); treeS(gx + 0.7, gy + 0.65, k); }
+        else { const [x, y] = iso(gx + 0.45, gy + 0.45), gr = c.createRadialGradient(x - 10, y - 4, 4, x, y, 48); gr.addColorStop(0, snow ? "#e9f1f6" : "#4f97c4"); gr.addColorStop(1, snow ? "#c9d6df" : "#2f6f99"); c.fillStyle = gr; c.beginPath(); c.ellipse(x, y, 46, 21, 0, 0, 7); c.fill(); c.strokeStyle = shade(grass, -0.25); c.lineWidth = 2; c.stroke(); }
+      } else if (id === "maden") {
+        if (r < 0.35) { for (let q = 0; q < 5; q++) treeS(gx + 0.15 + H(k * 7 + q) * 0.6, gy + 0.15 + H(k * 9 + q) * 0.6, 3 * q); }
+        else if (r < 0.55) { const [x, y] = iso(gx + 0.45, gy + 0.45); for (let q = 3; q > 0; q--) { c.fillStyle = shade("#7a6450", -0.08 * q); c.beginPath(); c.ellipse(x, y + (3 - q) * 3, 14 * q, 6.5 * q, 0, 0, 7); c.fill(); } }
+        else { const [x, y] = iso(gx + 0.45, gy + 0.45); for (let q = 0; q < 4; q++) { c.fillStyle = shade("#8a7d62", (H(k * 3 + q) - 0.5) * 0.3); c.beginPath(); c.ellipse(x + (H(k + q) - 0.5) * 40, y + (H(k + q + 9) - 0.5) * 18, 6 + H(k + q) * 8, 3 + H(k + q) * 3, 0, 0, 7); c.fill(); } }
+      } else if (id === "petrol") {
+        const [x, y] = iso(gx + 0.45, gy + 0.45);
+        if (r < 0.5) { const gr = c.createLinearGradient(x - 40, y - 12, x + 40, y + 10); gr.addColorStop(0, shade(grass, 0.12)); gr.addColorStop(1, shade(grass, -0.15)); c.fillStyle = gr; c.beginPath(); c.moveTo(x - 50, y + 10); c.quadraticCurveTo(x - 6, y - 26, x + 50, y + 10); c.fill(); }
+        else if (r < 0.62) { c.strokeStyle = "#39434c"; c.lineWidth = 2.2; c.beginPath(); c.moveTo(x - 7, y); c.lineTo(x, y - 18); c.lineTo(x + 7, y); c.moveTo(x - 16, y - 18); c.lineTo(x + 12, y - 20); c.stroke(); }
+        else if (r < 0.8) for (let q = 0; q < 3; q++) { c.fillStyle = snow ? "#e9eef2" : "#7d8a4a"; c.beginPath(); c.arc(x + (H(k + q) - 0.5) * 40, y + (H(k + q + 3) - 0.5) * 16, 3 + H(k + q) * 3, 0, 7); c.fill(); }
+      } else { // teknoloji, uluslararası: şehir blokları
+        if (r < 0.7) { const n = 1 + Math.floor(H(k + 5) * 3); for (let q = 0; q < n; q++) { const hh = 14 + H(k * 5 + q) * (id === "uluslararasi" ? 70 : 45); box2(gx + 0.1 + q * 0.26, gy + 0.2 + (q % 2) * 0.25, 0.22, 0.22, hh, ["#8fa3b5", "#6d7b88", "#b7c2cb", "#5a6777"][(k + q) % 4]); } }
+        else for (let q = 0; q < 4; q++) treeS(gx + 0.2 + H(k * 7 + q) * 0.5, gy + 0.2 + H(k * 9 + q) * 0.5, k + q);
+      }
+    });
+    // arka ufukta dağ silsilesi (maden ve petrol) ya da tepe hattı
+    if (id === "maden" || id === "petrol" || id === "anadolu") for (let k = 0; k < 12; k++) { const [x, y] = iso(-mo + 0.2, -mo + 0.3 + k * (D + 2 * mo) / 12), hh = (id === "maden" ? 120 : 60) + H(k + 70) * (id === "maden" ? 60 : 30), base = id === "petrol" ? "#b08a55" : id === "maden" ? "#6d5a48" : "#5f7a4a";
+      const gr = c.createLinearGradient(x - 90, 0, x + 90, 0); gr.addColorStop(0, shade(base, 0.12)); gr.addColorStop(0.5, base); gr.addColorStop(1, shade(base, -0.35)); c.fillStyle = gr; c.beginPath(); c.moveTo(x - 110, y + 30); c.quadraticCurveTo(x - 30, y - hh * 1.1, x, y - hh); c.quadraticCurveTo(x + 30, y - hh * 1.05, x + 110, y + 30); c.fill();
+      if (id === "maden" || snow) { c.fillStyle = "#eef3f6"; c.beginPath(); c.moveTo(x - 22, y - hh + 22); c.quadraticCurveTo(x, y - hh - 4, x + 22, y - hh + 20); c.lineTo(x + 6, y - hh + 16); c.lineTo(x - 6, y - hh + 24); c.fill(); } }
+  }
   function buildStatic(s) {
-    const R = RG[M.region], reg = s.regions[M.region], { W, D } = bounds(M.region), se = season(s), m = MARGIN, ext = R.port ? 2.4 : 0;
-    const corners = [iso(-m, -m), iso(W + m + ext, -m), iso(W + m + ext, D + m), iso(-m, D + m)];
+    const R = RG[M.region], reg = s.regions[M.region], { W, D } = bounds(M.region), se = season(s), m = MARGIN, mo = OUTER, ext = R.port ? 2.4 : 0;
+    const corners = [iso(-mo, -mo), iso(W + mo + ext, -mo), iso(W + mo + ext, D + mo), iso(-mo, D + mo)];
     const minX = Math.min(...corners.map(p => p[0])) - 40, maxX = Math.max(...corners.map(p => p[0])) + 40, minY = Math.min(...corners.map(p => p[1])) - 220, maxY = Math.max(...corners.map(p => p[1])) + 40;
-    const SC = 1.6, cv = document.createElement("canvas"); cv.width = Math.ceil((maxX - minX) * SC); cv.height = Math.ceil((maxY - minY) * SC);
+    const SC = 1.25, cv = document.createElement("canvas"); cv.width = Math.ceil((maxX - minX) * SC); cv.height = Math.ceil((maxY - minY) * SC);
     const c = cv.getContext("2d"); c.setTransform(SC, 0, 0, SC, -minX * SC, -minY * SC);
     const grass = M.region === "petrol" ? (se === "kis" ? "#d9d3c4" : "#c9a86a") : M.region === "maden" ? (se === "kis" ? "#d6dde3" : "#8a7d62") : GRASS[se];
     const P = (pts, col, st) => { c.beginPath(); pts.forEach((p, k) => (k ? c.lineTo(...p) : c.moveTo(...p))); c.closePath(); c.fillStyle = col; c.fill(); if (st) { c.strokeStyle = st; c.lineWidth = 0.8; c.stroke(); } };
     const quad = (x0, y0, x1, y1, col, st) => P([iso(x0, y0), iso(x1, y0), iso(x1, y1), iso(x0, y1)], col, st);
-    // zemin + doku lekeleri
-    quad(-m, -m, W + m, D + m, grass);
+    // zemin + doku lekeleri (bölge ve dış çevre halkası)
+    quad(-mo, -mo, W + mo + (R.port ? 0 : ext), D + mo, grass);
+    surroundings(c, P, quad, R, W, D, se, mo, grass);
     for (let k = 0; k < 260; k++) { const gx = -m + hashR(k) * (W + 2 * m), gy = -m + hashR(k + 999) * (D + 2 * m), [x, y] = iso(gx, gy), r = 6 + hashR(k + 55) * 22;
       c.fillStyle = hashR(k + 7) > 0.5 ? shade(grass, 0.07) : shade(grass, -0.08); c.globalAlpha = 0.5; c.beginPath(); c.ellipse(x, y, r, r * 0.5, 0, 0, 7); c.fill(); }
     c.globalAlpha = 1;
@@ -95,11 +158,12 @@ export function createMap(canvas, getState, onTap) {
     if (M.region === "anadolu") for (let k = 0; k < 3; k++) { const x0 = -m + 0.15, y0 = -m + 0.2 + k * (D + 2 * m - 0.4) / 3; for (let r2 = 0; r2 < 6; r2++) quad(x0, y0 + r2 * 0.12, x0 + 1.1, y0 + r2 * 0.12 + 0.1, se === "kis" ? "#e6edf2" : r2 % 2 ? shade(grass, 0.15) : ["#c9a64a", "#7fa04a", "#a8873f"][k]); }
     // su ve rıhtım
     if (R.port) { const wx = W + 0.25; const wg = c.createLinearGradient(...iso(wx, 0), ...iso(W + m + ext, 0)); wg.addColorStop(0, "#2f7aa3"); wg.addColorStop(1, "#1b4f73");
-      P([iso(wx, -m), iso(W + m + ext, -m), iso(W + m + ext, D + m), iso(wx, D + m)], wg); quad(W + 0.02, -m, wx, D + m, "#8a7d6b", "rgba(0,0,0,.3)");
+      P([iso(wx, -mo), iso(W + mo + ext, -mo), iso(W + mo + ext, D + mo), iso(wx, D + mo)], wg); quad(W + 0.02, -mo, wx, D + mo, "#8a7d6b", "rgba(0,0,0,.3)");
+      for (let k = 0; k < 90; k++) { const [x, y] = iso(wx + 0.3 + hashR(k + 1200) * (mo + ext - 0.5), -mo + hashR(k + 1300) * (D + 2 * mo)); c.strokeStyle = "rgba(210,235,255,.16)"; c.lineWidth = 1; c.beginPath(); c.moveTo(x - 9, y); c.quadraticCurveTo(x, y - 2.5, x + 9, y); c.stroke(); }
       for (let k = 0; k < 14; k++) { const [x, y] = iso(W + 0.06, -m + 0.4 + k * (D + 2 * m) / 14); c.fillStyle = "#3d3a36"; c.beginPath(); c.ellipse(x, y, 3, 1.5, 0, 0, 7); c.fill(); } }
     // demiryolu
-    if (R.rail) { const y0 = -0.78; quad(-m, y0 - 0.04, W + m, y0 + 0.2, "#7a6b5a"); for (let k = 0; k < 70; k++) { const gx = -m + k * (W + 2 * m) / 70; quad(gx, y0 + 0.01, gx + 0.03, y0 + 0.15, "#5a4637"); }
-      c.strokeStyle = "#b6c0c8"; c.lineWidth = 1.3; for (const yy of [y0 + 0.04, y0 + 0.12]) { c.beginPath(); c.moveTo(...iso(-m, yy)); c.lineTo(...iso(W + m, yy)); c.stroke(); } }
+    if (R.rail) { const y0 = -0.78, x1 = W + (R.port ? 0.2 : mo); quad(-mo, y0 - 0.04, x1, y0 + 0.2, "#7a6b5a"); for (let k = 0; k < 160; k++) { const gx = -mo + k * (x1 + mo) / 160; quad(gx, y0 + 0.01, gx + 0.03, y0 + 0.15, "#5a4637"); }
+      c.strokeStyle = "#b6c0c8"; c.lineWidth = 1.3; for (const yy of [y0 + 0.04, y0 + 0.12]) { c.beginPath(); c.moveTo(...iso(-mo, yy)); c.lineTo(...iso(x1, yy)); c.stroke(); } }
     // havalimanı pisti
     if (R.airport) { quad(-m + 0.1, D + 0.45, W + 0.1, D + 0.95, "#3b444c"); c.strokeStyle = "#e9eef2"; c.lineWidth = 2; c.setLineDash([14, 12]); c.beginPath(); c.moveTo(...iso(-m + 0.2, D + 0.7)); c.lineTo(...iso(W, D + 0.7)); c.stroke(); c.setLineDash([]); }
     // dağlar ve silüet (arka kenar)

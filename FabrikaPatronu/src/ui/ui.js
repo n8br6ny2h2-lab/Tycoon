@@ -232,7 +232,7 @@ function loop(now) {
   }
   if (S && (now - (loop.topT || 0) > 400)) { loop.topT = now; renderTop(); }
   if (dirty && S) { dirty = false; renderBottom(); renderView(); }
-  if (S && V.tab === "map" && !menuOpen) map.draw(now / 1000);
+  if (S && V.tab === "map" && !menuOpen) { map.clamp(); map.draw(now / 1000); }
   if (S && V.tab !== "map" && now - (loop.artT || 0) > 100) { loop.artT = now; for (const cv of document.querySelectorAll("canvas[data-art][data-run='1']")) paintArts(cv.parentElement); }
   requestAnimationFrame(loop);
 }
