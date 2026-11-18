@@ -1,6 +1,8 @@
 import { BAL } from "../data/balance.js";
 export const MIN_DAY = 1440;
 export const day = s => Math.floor(s.time.min / MIN_DAY);
+// Takvim 1 Mart'ta başlar (oyun ilkbaharda açılır). 12 ay × 30 gün.
+export const monthOf = dayNum => (Math.floor(dayNum / 30) + 2) % 12;
 export const hourOfDay = s => Math.floor((s.time.min % MIN_DAY) / 60);
 export const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
 export const round2 = x => Math.round(x * 100) / 100;

@@ -6,6 +6,8 @@ import { COMPETITORS } from "../data/competitors.js";
 import { initMarket } from "./market.js";
 import { initRivals } from "./competitors.js";
 import { initQuests } from "./quests.js";
+import { marketHour, marketDay } from "./market.js";
+import { customersDay } from "./customers.js";
 
 // Yeni oyun durumu. Başlangıç: Anadolu'da 3 arsa, birinde genel depo, 6 Mn ₺ nakit.
 export function newGame(name = "Patron Sanayi A.Ş.", seed = Date.now() % 2147483647) {
@@ -27,6 +29,8 @@ export function newGame(name = "Patron Sanayi A.Ş.", seed = Date.now() % 214748
   for (const r of REGIONS) s.inventory[r.id] = {};
   s.staff.isci.n = 0;
   initMarket(s);
+  // Piyasa geçmişi: oyun başlamadan önceki 90 günü simüle et (grafikler ilk gün dolu olsun).
+  const t0 = s.time.min; for (let d = 0; d < 90; d++) { for (let h = 0; h < 24; h++) { s.time.min = h * 60; marketHour(s); } marketDay(s); } s.time.min = t0;
   initRivals(s, COMPETITORS);
   // Başlangıç arazisi: 3 arsa; ilkinde 600 hacimlik genel depo
   const a = s.regions.anadolu.plots; a[0].owned = a[1].owned = a[4].owned = true;
@@ -34,6 +38,7 @@ export function newGame(name = "Patron Sanayi A.Ş.", seed = Date.now() % 214748
   s.buildings[id] = { id, kind: "warehouse", type: "genel", region: "anadolu", plot: 0, level: 1, security: 0, racks: false, built: s.time.min };
   a[0].b = id;
   initQuests(s);
+  customersDay(s);
   s.stats.valueWeekStart = BAL.startCash;
   return s;
 }

@@ -1,0 +1,18 @@
+{
+  "appId": "com.fabrikapatronu.app",
+  "appName": "Fabrika Patronu",
+  "webDir": "www",
+  "backgroundColor": "#0c1620",
+  "ios": {
+    "contentInset": "never",
+    "backgroundColor": "#0c1620",
+    "scrollEnabled": false,
+    "limitsNavigationsToAppBoundDomains": true
+  },
+  "plugins": {
+    "StatusBar": {
+      "style": "DARK",
+      "overlaysWebView": true
+    }
+  }
+}

@@ -19,12 +19,12 @@ test("hemen al-sat her zaman zarar (makas + komisyon + vergi + nakliye)", () => 
   }
 });
 test("büyük emir kayma yaratır: birim fiyat miktarla artar", () => {
-  const s = rich(), a = M.quote(s, "bugday", 10, "buy", "anadolu"), b = M.quote(s, "bugday", 5000, "buy", "anadolu");
+  const s = rich(), a = M.quote(s, "bugday", 10, "buy", "anadolu"), b = M.quote(s, "bugday", 40000, "buy", "anadolu");
   assert.ok(b.unit > a.unit * 1.005);
 });
 test("nakit ve depo kontrolü", () => {
-  const s = fresh(); s.company.cash = 1000;
-  assert.equal(M.buy(s, "kereste", 10, "anadolu").msg, "Nakit yetersiz");
+  const s = fresh(); s.company.cash = -1.5e6;
+  assert.equal(M.buy(s, "kereste", 10, "anadolu").msg, "Nakit ve kredi limiti yetersiz");
   s.company.cash = 1e9; assert.equal(M.buy(s, "kereste", 5000, "anadolu").msg, "Depoda yer yok");
   assert.equal(M.buy(s, "petrol", 1, "anadolu").msg, "Depoda yer yok");
   assert.equal(M.buy(s, "elektrik", 1, "anadolu").ok, false);

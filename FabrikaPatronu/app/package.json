@@ -1,0 +1,22 @@
+{
+  "name": "fabrika-patronu-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "iOS app shell for Fabrika Patronu (Capacitor). The game lives in ../src and is built by ../scripts/build.mjs.",
+  "scripts": {
+    "build:web": "node ../scripts/build.mjs && node scripts/build-web.mjs",
+    "sync": "npm run build:web && npx cap sync ios",
+    "assets": "npx capacitor-assets generate --ios --iconBackgroundColor '#0c1620' --splashBackgroundColor '#0c1620' --splashBackgroundColorDark '#0c1620'"
+  },
+  "dependencies": {
+    "@capacitor/core": "8.6.0",
+    "@capacitor/haptics": "8.0.2",
+    "@capacitor/ios": "8.6.0",
+    "@capacitor/preferences": "8.0.1",
+    "@capacitor/status-bar": "8.0.4"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "4.0.0",
+    "@capacitor/cli": "8.6.0"
+  }
+}

@@ -31,7 +31,7 @@ for (let d = 0; d < DAYS; d++) {
   for (const o of [...s.offers]) if (o.kind !== "ihale" && qty(s, reg, o.res) >= o.q * 1.2 && item(s, reg, o.res).ql >= o.minQ) { const a = K.accept(s, o.id); if (a.ok) { a.contract.auto = true; } }
   if (firstSaleDay === null && s.stats.sold > 0) firstSaleDay = d;
   // 4) Büyüme: yeni fabrika, makine, depo, araştırma, bakım
-  const reserve = E.monthlyPayroll(s) + 3e6, cash = s.company.cash - reserve;
+  const hasFac = Object.values(s.buildings).some(b => b.kind !== "warehouse"), reserve = hasFac ? E.monthlyPayroll(s) + 3e6 : 5e5, cash = s.company.cash - reserve;
   if (step < PLAN.length && cash > F.buildCost(s, PLAN[step][0], reg) * (step ? 1.6 : 1.05) && !F.canBuild(s, PLAN[step][0], reg) && buyPlotIfNeeded(reg)) {
     const r = F.buildFactory(s, PLAN[step][0], reg, freePlot(reg)); if (r.ok) { F.setRecipe(s, r.id, PLAN[step][1]); step++; if (firstFactoryDay === null) firstFactoryDay = d; }
   }

@@ -10,6 +10,7 @@
     "sim": "node scripts/sim.mjs"
   },
   "devDependencies": {
+    "@fontsource/nunito": "5.3.0",
     "esbuild": "0.27.4"
   }
 }

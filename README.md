@@ -7,6 +7,22 @@ iOS (iPhone ve iPad) için 3D idle fabrika tycoon oyunu. Unity 6 LTS, URP ve C# 
 > Yayından önce gerekenler: Unity'de ilk açılış ve düzeltmeler, cihaz testleri, Apple hesabı, reklam SDK'sı ve ekran görüntüleri.
 > Ayrıntılar: [Docs/PHASES.md](Docs/PHASES.md) · Sizden gerekenler: [Docs/USER_ACTIONS.md](Docs/USER_ACTIONS.md)
 
+## Yeni oyun: FABRİKA PATRONU — Hammadde İmparatorluğu
+
+Bu oyun, Demir Baronu'nun yerine geliştirilen 2D sanayi, hammadde ticareti ve şirket yönetimi simülasyonudur. Yatay oynanır ve iPhone içindir.
+
+- 47 ürün, 15 fabrika ve 4 çıkarma/enerji tesisi, 6 depo tipi, 6 bölge, 10 yapay zekâ rakip.
+- Gerçek arz-talep piyasası, sözleşmeler ve ihaleler, lojistik ve filo, araştırma ağacı, personel, kredi ve vergi.
+- Çevrimdışı ilerleme ve sürümlü kayıt.
+
+Belgeler ve dosyalar:
+
+- Mimari: [FabrikaPatronu/ARCHITECTURE.md](FabrikaPatronu/ARCHITECTURE.md)
+- Tasarım: [FabrikaPatronu/GDD.md](FabrikaPatronu/GDD.md)
+- App Store: [FabrikaPatronu/APPSTORE.md](FabrikaPatronu/APPSTORE.md)
+- Tek dosya sürüm: [FabrikaPatronu/web/play.html](FabrikaPatronu/web/play.html)
+- Testler: `cd FabrikaPatronu && npm test && npm run sim`
+
 ## Yeni oyun: DEMİR BARONU — Çelik Ticareti
 
 Boru, profil, sac ve inşaat demiri ticareti üzerine gün tabanlı bir ticaret oyunu: 48 ürün, 15 şehir, depo ve dükkanlar, 7 rakip şirket, ihaleler ve etkinlikler. Oyuncu 5.000 ₺ ve bir telefonla, depo ve kamyon olmadan başlar. Aracılıkla sermaye biriktirir, depo kiralar, stok alır, vadeli satışın ve kredinin riskini yönetir. Hedef 12.000 ton satış ve 40 milyon ₺ net değerle **Demir Baronu** olmaktır.
